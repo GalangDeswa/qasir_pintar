@@ -226,6 +226,10 @@ final List<GetPage<dynamic>> route = [
       page: () => TambahProdukv3next(),
       binding: TambahProdukBinding()),
   GetPage(
+      name: "/tambahprodukv3final",
+      page: () => TambahProdukv3Final(),
+      binding: TambahProdukBinding()),
+  GetPage(
       name: "/isiproduk",
       page: () => ViewIsiproduk(),
       binding: IsiProdukBinding()),

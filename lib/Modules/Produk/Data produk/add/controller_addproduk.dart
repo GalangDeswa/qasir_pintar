@@ -35,8 +35,6 @@ class TambahProdukController extends GetxController {
     await fetchKategoriProdukLocal(id_toko: id_toko);
     await fetchSubKategoriProdukLocal(
         id_toko: id_toko, kategori: kategorivalue);
-    print('kat id ===> ' + kategorivalue);
-    print('sub kat id ===> ' + subKategorivalue);
 
     opsidiskon[0];
 
@@ -57,6 +55,7 @@ class TambahProdukController extends GetxController {
   var tampilkanDiProduk = true.obs;
   var registerKey = GlobalKey<FormState>().obs;
   var registerKey2 = GlobalKey<FormState>().obs;
+  var registerKey3 = GlobalKey<FormState>().obs;
   var pajakkey = GlobalKey<FormState>().obs;
   var ukurankey = GlobalKey<FormState>().obs;
 
