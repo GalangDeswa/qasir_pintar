@@ -90,7 +90,7 @@ class ViewIsiproduk extends GetView<IsiProdukController> {
                         onPageChanged: (index, reason) {
                           controller.current(index);
                         },
-                        viewportFraction: 0.45,
+                        viewportFraction: 0.70,
                         enlargeCenterPage: true,
                         enableInfiniteScroll: true,
                         autoPlay: true,
@@ -104,15 +104,15 @@ class ViewIsiproduk extends GetView<IsiProdukController> {
                               ? controller.isBase64Svg(x.gambar!)
                                   ? SvgPicture.memory(
                                       base64Decode(x.gambar!),
-                                      fit: BoxFit.cover,
+                                      fit: BoxFit.contain,
                                     )
                                   : Image.memory(
                                       base64Decode(x.gambar!),
-                                      fit: BoxFit.cover,
+                                      fit: BoxFit.contain,
                                     )
                               : Image.asset(
                                   AppString.defaultImg,
-                                  fit: BoxFit.cover,
+                                  fit: BoxFit.contain,
                                 ),
                         );
                       }).toList())

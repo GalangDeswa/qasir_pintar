@@ -35,11 +35,10 @@ class TambahProdukController extends GetxController {
     await fetchKategoriProdukLocal(id_toko: id_toko);
     await fetchSubKategoriProdukLocal(
         id_toko: id_toko, kategori: kategorivalue);
-
+    await fetchpajak(id_toko: id_toko);
+    await fetchukuran(id_toko: id_toko);
     opsidiskon[0];
-
     selecteddiskon.value = 'Rp.';
-    // await fetchSubKategoriProdukLocal(id_toko: id_toko);
   }
 
   //var uuid_produk = Uuid().v4();
@@ -914,24 +913,145 @@ class TambahProdukController extends GetxController {
     }
   }
 
-  // Future<void> tambahHargaJualProduk() async {
-  //   print('-------------------tambah supplier local---------------------');
-  //   var uuid_produk = Uuid().v4();
-  //   var uuid = Uuid().v4();
-  //   Get.dialog(showloading(), barrierDismissible: false);
-  //   var hargaJualInsertResult = await DBHelper().INSERT(
-  //     'harga_jual_produk',
-  //     DataHargaJualProduk(
-  //       uuid: uuid,
-  //       id_produk: uuid_produk,
-  //       id_toko: id_toko,
-  //       aktif: 1,
-  //       harga_jual: double.parse(hargaJualUtama.value.text),
-  //       jenis_transaksi: 'qweqwe',
-  //       // Add other fields as necessary
-  //     ).DB(),
-  //   );
-  // }
+  tambahProdukLocalv3() async {
+    print('-------------------tambah produk local v3---------------------');
+
+    Get.dialog(showloading(), barrierDismissible: false);
+    var uuid_produk = Uuid().v4();
+
+    var uuid_hargajual = Uuid().v4();
+    var uuid_satuanproduk = Uuid().v4();
+    var uuid_pajak = Uuid().v4();
+    var uuid_ukuran = Uuid().v4();
+
+    if (image64List.isNotEmpty) {
+      for (String image64 in image64List.value) {
+        // Generate a new UUID for each image
+        var uuid_gambar = Uuid().v4();
+        gambartemp.add(DataGambarProduk(
+          uuid: uuid_gambar, // Unique UUID per image
+          id_toko: id_toko,
+          aktif: 1,
+          gambar: image64,
+        ));
+        // Store each insert result
+      }
+    }
+
+    var produkResult = await DBHelper().INSERT(
+      'produk',
+      DataProduk(
+        uuid: uuid_produk,
+        id_toko: id_toko,
+        id_kelompok_produk: kategorivalue,
+        id_sub_kelompok_produk: subKategorivalue,
+        kode_produk: kodeProduk.value.text,
+        nama_produk: namaProduk.value.text,
+        serial_key: serialKey.value.text,
+        imei: imei.value.text,
+        harga_beli: double.parse(hargaBeli.value.text.replaceAll(',', '')),
+        hpp: double.parse(hpp.value.text.replaceAll(',', '')),
+        gambar_produk_utama: image64List.isNotEmpty ? image64List.first : null,
+        hitung_stok: hitungStok.value == true ? 1 : 0,
+        tampilkan_di_produk: tampilkanDiProduk.value == true ? 1 : 0,
+        harga_jual_grosir: hargaJualGrosir.value.text.isNotEmpty
+            ? double.parse(hargaJualGrosir.value.text.replaceAll(',', ''))
+            : 0,
+        harga_jual_eceran: hargaJualEceran.value.text.isNotEmpty
+            ? double.parse(hargaJualEceran.value.text.replaceAll(',', ''))
+            : 0,
+        harga_jual_pelanggan: hargaJualPelanggan.value.text.isNotEmpty
+            ? double.parse(hargaJualPelanggan.value.text.replaceAll(',', ''))
+            : 0,
+        pajak: pajakValue,
+        info_stok_habis: infostock.value.text.isNotEmpty
+            ? int.parse(infostock.value.text)
+            : 0,
+        ukuran: ukuranValue,
+        berat: berat.value.text.isNotEmpty
+            ? double.parse(berat.value.text.replaceAll(',', ''))
+            : 0,
+        volume_panjang: volumePanjang.value.text.isNotEmpty
+            ? double.parse(volumePanjang.value.text.replaceAll(',', ''))
+            : 0,
+        volume_lebar: volumeLebar.value.text.isNotEmpty
+            ? double.parse(volumeLebar.value.text.replaceAll(',', ''))
+            : 0,
+        volume_tinggi: volumeTinggi.value.text.isNotEmpty
+            ? double.parse(volumeTinggi.value.text.replaceAll(',', ''))
+            : 0,
+        id_gambar: image64List.isNotEmpty ? gambartemp.first.uuid : null,
+        stockawal: stockawal.value.text.isNotEmpty
+            ? int.parse(stockawal.value.text)
+            : 0,
+        diskon: selecteddiskon.value == 'Rp.'
+            ? diskonvalue.value
+            : (double.parse(hargaJualEceran.value.text.replaceAll(',', '')) *
+                diskonvalue.value /
+                100),
+      ).DB(),
+    );
+
+    if (produkResult != null) {
+      if (image64List.isNotEmpty) {
+        for (String image64 in image64List.value) {
+          // Generate a new UUID for each image
+          String newUuid = const Uuid().v4(); // Requires the 'uuid' package
+          // Insert each image entry into the database
+          var result = await DBHelper().INSERT(
+            'gambar_produk',
+            DataGambarProduk(
+              uuid: newUuid, // Unique UUID per image
+              id_toko: id_toko,
+              aktif: 1,
+              gambar: image64,
+              id_produk: uuid_produk,
+            ).DB(),
+          );
+          insertResults.add(result); // Store each insert result
+        }
+      }
+
+// check kalok ga input image;
+      if (produkResult != null) {
+        String stockuuid = const Uuid().v4();
+        print('insert stock--------------->');
+        await DBHelper().INSERT(
+          'stock_produk',
+          DataStockProduk(
+            id_toko: id_toko,
+            uuid: stockuuid,
+            id_produk: uuid_produk,
+            hpp: double.parse(hpp.value.text.replaceAll(',', '')),
+            stok: stockawal.value.text.isNotEmpty
+                ? int.parse(stockawal.value.text)
+                : 0,
+          ).DB(),
+        );
+
+        // await Get.find<BaseMenuProdukController>()
+        //     .fetchProdukLocal(id_toko: id_toko);
+        Get.find<BaseMenuProdukController>().fetchPajakLocal(id_toko: id_toko);
+        Get.find<BaseMenuProdukController>().fetchUkuranLocal(id_toko: id_toko);
+        // Get.find<KasirController>().fetchProdukLocal(id_toko: id_toko);
+        await Get.find<CentralProdukController>()
+            .fetchProdukLocal(id_toko: id_toko);
+        Get.back(closeOverlays: true);
+        Get.back();
+        Get.back();
+
+        Get.showSnackbar(toast().bottom_snackbar_success('Sukses', 'Berhasil'));
+      } else {
+        Get.back(closeOverlays: true);
+        //Get.back();
+        Get.showSnackbar(toast().bottom_snackbar_error('error', 'gagal'));
+      }
+    } else {
+      Get.back(closeOverlays: true);
+      //Get.back();
+      Get.showSnackbar(toast().bottom_snackbar_error('error', 'gagal'));
+    }
+  }
 
   void tambahSatuanProduk() {}
 

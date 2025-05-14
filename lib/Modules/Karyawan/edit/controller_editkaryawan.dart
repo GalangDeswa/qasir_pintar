@@ -132,7 +132,7 @@ class EditKaryawanController extends GetxController {
     try {
       final image = await ImagePicker().pickImage(
           source: ImageSource.gallery,
-          imageQuality: 85,
+          imageQuality: 100,
           maxHeight: 300,
           maxWidth: 300);
       if (image == null) return;
@@ -153,7 +153,7 @@ class EditKaryawanController extends GetxController {
     try {
       final image = await ImagePicker().pickImage(
           source: ImageSource.camera,
-          imageQuality: 85,
+          imageQuality: 100,
           maxHeight: 300,
           maxWidth: 300);
       if (image == null) return;
@@ -278,7 +278,7 @@ class EditKaryawanController extends GetxController {
     var query = await DBHelper().UPDATE(
         table: 'Karyawan',
         data: dataedit(
-            pin: pin.value.text,
+            pin: ubahpin.value == true ? pin.value.text : data.pin,
             email: email.value.text,
             hp: telepon.value.text,
             aktif: isAktif.value == true ? 1 : 0,

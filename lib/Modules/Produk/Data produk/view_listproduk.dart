@@ -82,8 +82,8 @@ class ListProduk extends GetView<BaseMenuProdukController> {
                     itemBuilder: (context, index) {
                       final produk = con.produk;
 
-                      return custom_list(
-                        controller: controller,
+                      return custom_list_produk(
+                        controller: con,
                         gestureroute: '/isiproduk',
                         gestureArgument: produk[index],
                         isDeleted: produk[index].tampilkan_di_produk == 1
@@ -96,14 +96,15 @@ class ListProduk extends GetView<BaseMenuProdukController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(produk[index].namaKategori!),
-                            Text('Qty x ' + produk[index].qty.toString())
+                            Text('Rp. ' +
+                                produk[index].harga_jual_eceran.toString())
                           ],
                         ),
                         trailing: customDropdown(
                             onSelected: (value) {
                               switch (value) {
                                 case 'Ubah':
-                                  Get.toNamed('/editproduk',
+                                  Get.toNamed('/editisiproduk',
                                       arguments: produk[index]);
                                   break;
                                 case 'Hapus':

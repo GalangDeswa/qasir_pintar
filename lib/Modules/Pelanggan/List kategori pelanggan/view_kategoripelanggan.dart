@@ -87,6 +87,7 @@ class KategoriPelanggan extends GetView<KategoriPelangganController> {
                       final customer = controller.kategoripelangganList;
 
                       return custom_list(
+                        controller: controller,
                         title: customer[index].kategori,
                         isDeleted: customer[index].status == 1 ? false : true,
                         usingGambar: true,

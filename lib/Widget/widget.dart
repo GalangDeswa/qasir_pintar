@@ -444,17 +444,18 @@ class AppIcon extends StatelessWidget {
 }
 
 class custom_list extends StatelessWidget {
-  custom_list(
-      {super.key,
-      this.gestureArgument,
-      this.gestureroute,
-      this.trailing,
-      this.gambar,
-      this.title,
-      this.subtitle,
-      this.controller,
-      this.usingGambar,
-      this.isDeleted});
+  custom_list({
+    super.key,
+    this.gestureArgument,
+    this.gestureroute,
+    this.trailing,
+    this.gambar,
+    this.title,
+    this.subtitle,
+    this.controller,
+    this.usingGambar = true,
+    this.isDeleted = false,
+  });
 
   final gestureArgument;
   final gestureroute;
@@ -468,176 +469,417 @@ class custom_list extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return isDeleted == true
-        ? Container(
-            color: Colors.grey[300],
-            child: Column(
-              children: [
-                usingGambar == false
-                    ? ListTile(
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              style: AppFont.regular(),
-                            ),
-                            Text(
-                              'Nonaktif',
-                              style: AppFont.regular_warning(),
-                            ),
-                          ],
-                        ),
-                        subtitle: subtitle,
-                        trailing: trailing,
-                      )
-                    : ListTile(
-                        leading: ClipOval(
-                          child: gambar != '-' && gambar != null && gambar != ''
-                              ? controller.isBase64Svg(gambar!)
-                                  ? GestureDetector(
-                                      onTap: () {
-                                        String val = 'icon';
-                                        heroPop(
-                                            tag: gambar,
-                                            image: gambar,
-                                            type: val);
-                                      },
-                                      child: SvgPicture.memory(
-                                        base64Decode(gambar!),
-                                        width: 45,
-                                        height: 45,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : GestureDetector(
-                                      onTap: () {
-                                        String val = 'memory';
-                                        heroPop(
-                                            tag: gambar,
-                                            image: gambar,
-                                            type: val);
-                                      },
-                                      child: Image.memory(
-                                        base64Decode(gambar!),
-                                        width: 45,
-                                        height: 45,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                              : GestureDetector(
-                                  onTap: () {
-                                    String val = 'asset';
-                                    heroPop(
-                                        tag: gambar, image: gambar, type: val);
-                                  },
-                                  child: Image.asset(
-                                    AppString.defaultImg,
-                                    width: 45,
-                                    height: 45,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                        ),
-                        title: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              title,
-                              style: AppFont.regular(),
-                            ),
-                            Text(
-                              'Nonaktif',
-                              style: AppFont.regular_warning(),
-                            ),
-                          ],
-                        ),
-                        subtitle: subtitle,
-                        trailing: trailing,
-                      ),
-                Container(
-                  height: 0.5,
-                  color: Colors.black,
-                )
-              ],
+    return isDeleted == true ? _buildDeletedContainer() : _buildActiveList();
+  }
+
+  Widget _buildDeletedContainer() {
+    return Container(
+      color: Colors.grey[300],
+      child: Column(
+        children: [
+          usingGambar == false ? _buildSimpleListTile() : _buildImageListTile(),
+          const Divider(height: 0.5, color: Colors.black),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActiveList() {
+    return Column(
+      children: [
+        usingGambar == false
+            ? _buildSimpleListTile()
+            : GestureDetector(
+                onTap: () =>
+                    Get.toNamed(gestureroute, arguments: gestureArgument),
+                child: _buildImageListTile(),
+              ),
+        const Divider(height: 0.5, color: Colors.black),
+      ],
+    );
+  }
+
+  Widget _buildSimpleListTile() {
+    return ListTile(
+      title: Text(title, style: AppFont.regular()),
+      subtitle: subtitle,
+      trailing: trailing,
+    );
+  }
+
+  Widget _buildImageListTile() {
+    final hasValidImage = gambar != null && gambar != '-' && gambar!.isNotEmpty;
+
+    return ListTile(
+      leading: ClipOval(
+        child: hasValidImage ? _buildValidImage() : _buildDefaultImage(),
+      ),
+      title: Text(title, style: AppFont.regular()),
+      subtitle: subtitle,
+      trailing: trailing,
+    );
+  }
+
+  Widget _buildValidImage() {
+    final isSvg = controller.isBase64Svg(gambar!);
+    final imageType = isSvg ? 'icon' : 'memory';
+
+    return GestureDetector(
+      onTap: () => heroPop(
+        tag: gambar!,
+        image: gambar!,
+        type: imageType,
+      ),
+      child: isSvg
+          ? SvgPicture.memory(
+              base64Decode(gambar!),
+              width: 45,
+              height: 45,
+              fit: BoxFit.cover,
+            )
+          : Image.memory(
+              base64Decode(gambar!),
+              width: 45,
+              height: 45,
+              fit: BoxFit.cover,
             ),
-          )
-        : Column(
-            children: [
-              usingGambar == false
-                  ? ListTile(
-                      title: Text(
-                        title,
-                        style: AppFont.regular(),
-                      ),
-                      subtitle: subtitle,
-                      trailing: trailing,
-                    )
-                  : GestureDetector(
-                      onTap: () {
-                        Get.toNamed(gestureroute, arguments: gestureArgument);
-                      },
-                      child: ListTile(
-                        leading: ClipOval(
-                          child: gambar != '-' && gambar != null
-                              ? controller.isBase64Svg(gambar!)
-                                  ? GestureDetector(
-                                      onTap: () {
-                                        String val = 'icon';
-                                        heroPop(
-                                            tag: gambar,
-                                            image: gambar,
-                                            type: val);
-                                      },
-                                      child: SvgPicture.memory(
-                                        base64Decode(gambar!),
-                                        width: 45,
-                                        height: 45,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                                  : GestureDetector(
-                                      onTap: () {
-                                        String val = 'memory';
-                                        heroPop(
-                                            tag: gambar,
-                                            image: gambar,
-                                            type: val);
-                                      },
-                                      child: Image.memory(
-                                        base64Decode(gambar!),
-                                        width: 45,
-                                        height: 45,
-                                        fit: BoxFit.cover,
-                                      ),
-                                    )
-                              : GestureDetector(
-                                  onTap: () {
-                                    String val = 'asset';
-                                    heroPop(
-                                        tag: gambar, image: gambar, type: val);
-                                  },
-                                  child: Image.asset(
-                                    AppString.defaultImg,
-                                    width: 45,
-                                    height: 45,
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                        ),
-                        title: Text(
-                          title,
-                          style: AppFont.regular(),
-                        ),
-                        subtitle: subtitle,
-                        trailing: trailing,
-                      ),
-                    ),
-              Container(
-                height: 0.5,
-                color: Colors.black,
-              )
-            ],
-          );
+    );
+  }
+
+  Widget _buildDefaultImage() {
+    return GestureDetector(
+      onTap: () => heroPop(
+        tag: AppString.defaultImg,
+        image: AppString.defaultImg,
+        type: 'asset',
+      ),
+      child: Image.asset(
+        AppString.defaultImg,
+        width: 45,
+        height: 45,
+        fit: BoxFit.cover,
+      ),
+    );
+  }
+}
+
+// class custom_list extends StatelessWidget {
+//   custom_list(
+//       {super.key,
+//       this.gestureArgument,
+//       this.gestureroute,
+//       this.trailing,
+//       this.gambar,
+//       this.title,
+//       this.subtitle,
+//       this.controller,
+//       this.usingGambar,
+//       this.isDeleted});
+//
+//   final gestureArgument;
+//   final gestureroute;
+//   final trailing;
+//   final gambar;
+//   final title;
+//   final subtitle;
+//   final controller;
+//   bool? usingGambar = true;
+//   bool? isDeleted = false;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return isDeleted == true
+//         ? Container(
+//             color: Colors.grey[300],
+//             child: Column(
+//               children: [
+//                 usingGambar == false
+//                     ? ListTile(
+//                         title: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Text(
+//                               title,
+//                               style: AppFont.regular(),
+//                             ),
+//                             Text(
+//                               'Nonaktif',
+//                               style: AppFont.regular_warning(),
+//                             ),
+//                           ],
+//                         ),
+//                         subtitle: subtitle,
+//                         trailing: trailing,
+//                       )
+//                     : ListTile(
+//                         leading: ClipOval(
+//                           child: gambar != '-' && gambar != null && gambar != ''
+//                               ? controller.isBase64Svg(gambar!)
+//                                   ? GestureDetector(
+//                                       onTap: () {
+//                                         String val = 'icon';
+//                                         heroPop(
+//                                             tag: gambar,
+//                                             image: gambar,
+//                                             type: val);
+//                                       },
+//                                       child: SvgPicture.memory(
+//                                         base64Decode(gambar!),
+//                                         width: 45,
+//                                         height: 45,
+//                                         fit: BoxFit.cover,
+//                                       ),
+//                                     )
+//                                   : GestureDetector(
+//                                       onTap: () {
+//                                         String val = 'memory';
+//                                         heroPop(
+//                                             tag: gambar,
+//                                             image: gambar,
+//                                             type: val);
+//                                       },
+//                                       child: Image.memory(
+//                                         base64Decode(gambar!),
+//                                         width: 45,
+//                                         height: 45,
+//                                         fit: BoxFit.cover,
+//                                       ),
+//                                     )
+//                               : GestureDetector(
+//                                   onTap: () {
+//                                     String val = 'asset';
+//                                     heroPop(
+//                                         tag: gambar, image: gambar, type: val);
+//                                   },
+//                                   child: Image.asset(
+//                                     AppString.defaultImg,
+//                                     width: 45,
+//                                     height: 45,
+//                                     fit: BoxFit.cover,
+//                                   ),
+//                                 ),
+//                         ),
+//                         title: Column(
+//                           crossAxisAlignment: CrossAxisAlignment.start,
+//                           children: [
+//                             Text(
+//                               title,
+//                               style: AppFont.regular(),
+//                             ),
+//                             Text(
+//                               'Nonaktif',
+//                               style: AppFont.regular_warning(),
+//                             ),
+//                           ],
+//                         ),
+//                         subtitle: subtitle,
+//                         trailing: trailing,
+//                       ),
+//                 Container(
+//                   height: 0.5,
+//                   color: Colors.black,
+//                 )
+//               ],
+//             ),
+//           )
+//         : Column(
+//             children: [
+//               usingGambar == false
+//                   ? ListTile(
+//                       title: Text(
+//                         title,
+//                         style: AppFont.regular(),
+//                       ),
+//                       subtitle: subtitle,
+//                       trailing: trailing,
+//                     )
+//                   : GestureDetector(
+//                       onTap: () {
+//                         Get.toNamed(gestureroute, arguments: gestureArgument);
+//                       },
+//                       child: ListTile(
+//                         leading: ClipOval(
+//                           child: gambar != '-' && gambar != null
+//                               ? controller.isBase64Svg(gambar!)
+//                                   ? GestureDetector(
+//                                       onTap: () {
+//                                         String val = 'icon';
+//                                         heroPop(
+//                                             tag: gambar,
+//                                             image: gambar,
+//                                             type: val);
+//                                       },
+//                                       child: SvgPicture.memory(
+//                                         base64Decode(gambar!),
+//                                         width: 45,
+//                                         height: 45,
+//                                         fit: BoxFit.cover,
+//                                       ),
+//                                     )
+//                                   : GestureDetector(
+//                                       onTap: () {
+//                                         String val = 'memory';
+//                                         heroPop(
+//                                             tag: gambar,
+//                                             image: gambar,
+//                                             type: val);
+//                                       },
+//                                       child: Image.memory(
+//                                         base64Decode(gambar!),
+//                                         width: 45,
+//                                         height: 45,
+//                                         fit: BoxFit.cover,
+//                                       ),
+//                                     )
+//                               : GestureDetector(
+//                                   onTap: () {
+//                                     String val = 'asset';
+//                                     heroPop(
+//                                         tag: gambar, image: gambar, type: val);
+//                                   },
+//                                   child: Image.asset(
+//                                     AppString.defaultImg,
+//                                     width: 45,
+//                                     height: 45,
+//                                     fit: BoxFit.cover,
+//                                   ),
+//                                 ),
+//                         ),
+//                         title: Text(
+//                           title,
+//                           style: AppFont.regular(),
+//                         ),
+//                         subtitle: subtitle,
+//                         trailing: trailing,
+//                       ),
+//                     ),
+//               Container(
+//                 height: 0.5,
+//                 color: Colors.black,
+//               )
+//             ],
+//           );
+//   }
+// }
+
+class custom_list_produk extends StatelessWidget {
+  custom_list_produk({
+    super.key,
+    this.gestureArgument,
+    this.gestureroute,
+    this.trailing,
+    this.gambar,
+    this.title,
+    this.subtitle,
+    this.controller,
+    this.usingGambar = true,
+    this.isDeleted = false,
+  });
+
+  final gestureArgument;
+  final gestureroute;
+  final trailing;
+  final gambar;
+  final title;
+  final subtitle;
+  final controller;
+  bool? usingGambar = true;
+  bool? isDeleted = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return isDeleted == true ? _buildDeletedContainer() : _buildActiveList();
+  }
+
+  Widget _buildDeletedContainer() {
+    return Container(
+      color: Colors.grey[300],
+      child: Column(
+        children: [
+          usingGambar == false ? _buildSimpleListTile() : _buildImageListTile(),
+          const Divider(height: 0.5, color: Colors.black),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActiveList() {
+    return Column(
+      children: [
+        usingGambar == false
+            ? _buildSimpleListTile()
+            : GestureDetector(
+                onTap: () =>
+                    Get.toNamed(gestureroute, arguments: gestureArgument),
+                child: _buildImageListTile(),
+              ),
+        const Divider(height: 0.5, color: Colors.black),
+      ],
+    );
+  }
+
+  Widget _buildSimpleListTile() {
+    return ListTile(
+      title: Text(title, style: AppFont.regular()),
+      subtitle: subtitle,
+      trailing: trailing,
+    );
+  }
+
+  Widget _buildImageListTile() {
+    final hasValidImage = gambar != null && gambar != '-' && gambar!.isNotEmpty;
+
+    return ListTile(
+      leading: Container(
+        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+        width: Get.width * 0.25,
+        child: hasValidImage ? _buildValidImage() : _buildDefaultImage(),
+      ),
+      title: Text(title, style: AppFont.regular()),
+      subtitle: subtitle,
+      trailing: trailing,
+    );
+  }
+
+  Widget _buildValidImage() {
+    final isSvg = controller.isBase64Svg(gambar!);
+    final imageType = isSvg ? 'icon' : 'memory';
+
+    return GestureDetector(
+      onTap: () => heroPop(
+        tag: gambar!,
+        image: gambar!,
+        type: imageType,
+      ),
+      child: isSvg
+          ? SvgPicture.memory(
+              base64Decode(gambar!),
+              width: 45,
+              height: 45,
+              fit: BoxFit.cover,
+            )
+          : Image.memory(
+              base64Decode(gambar!),
+              width: 45,
+              height: 45,
+              fit: BoxFit.cover,
+            ),
+    );
+  }
+
+  Widget _buildDefaultImage() {
+    return GestureDetector(
+      onTap: () => heroPop(
+        tag: AppString.defaultImg,
+        image: AppString.defaultImg,
+        type: 'asset',
+      ),
+      child: Image.asset(
+        AppString.defaultImg,
+        width: 45,
+        height: 45,
+        fit: BoxFit.cover,
+      ),
+    );
   }
 }
