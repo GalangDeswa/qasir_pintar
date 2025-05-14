@@ -1,0 +1,2 @@
+D:/AndroidStudioProjects/qasir_pintar/android/app/.cxx/RelWithDebInfo/1a2w2460/arm64-v8a/CMakeFiles/edit_cache.dir
+D:/AndroidStudioProjects/qasir_pintar/android/app/.cxx/RelWithDebInfo/1a2w2460/arm64-v8a/CMakeFiles/rebuild_cache.dir

@@ -1,0 +1,2 @@
+D:/AndroidStudioProjects/qasir_pintar/android/app/.cxx/Debug/6u3j1w4r/x86/CMakeFiles/edit_cache.dir
+D:/AndroidStudioProjects/qasir_pintar/android/app/.cxx/Debug/6u3j1w4r/x86/CMakeFiles/rebuild_cache.dir
