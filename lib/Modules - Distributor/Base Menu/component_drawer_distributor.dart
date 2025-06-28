@@ -101,7 +101,7 @@ class DrawerBaseDistributor extends GetView<BaseMenuDistributorController> {
                     ),
                     _buildDrawerItem(
                       icon: FontAwesomeIcons.cashRegister,
-                      title: 'P.O.S',
+                      title: 'P.O.v2',
                       onTap: () {
                         Get.offAllNamed('/basemenu');
                       },
