@@ -1,0 +1,340 @@
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:meta/meta.dart';
+import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Modules - P.O.S/Produk/Kategori/model_subkategoriproduk.dart';
+import 'package:qasir_pintar/Modules - P.O.S/Produk/controller_basemenuproduk.dart';
+
+import '../../../../Database/DB_helper.dart';
+import '../../../../Widget/widget.dart';
+import '../../../Region/model_district.dart';
+import '../../Produk/model_kategoriproduk.dart';
+
+class EditSubKategoriProdukController extends GetxController {
+  final _obj = ''.obs;
+
+  set obj(value) => _obj.value = value;
+
+  get obj => _obj.value;
+
+  @override
+  Future<void> onInit() async {
+    // TODO: implement onInit
+    super.onInit();
+    await fetchKategoriProdukLocal(id_toko: id_toko);
+    kategorivalue = data.id_kelompok_produk;
+    nama.value.text = data.namaSubkelompok!;
+    isAktif.value = data.aktif == 1 ? true : false;
+  }
+
+  var isAktif = true.obs;
+  DataSubKategoriProduk data = Get.arguments;
+  var nama = TextEditingController().obs;
+  var email = TextEditingController().obs;
+  var id_toko = GetStorage().read('uuid');
+  var telepon = TextEditingController().obs;
+  var kodeRef = TextEditingController().obs;
+  var konpass = TextEditingController().obs;
+  var alamat = TextEditingController().obs;
+  final registerKey = GlobalKey<FormState>().obs;
+  final registerLokasiKey = GlobalKey<FormState>().obs;
+  var id;
+  var showpass = true.obs;
+  var showkon = true.obs;
+  List<DateTime?> datedata = [
+    //DateTime.now(),
+  ];
+  String? jenisvalue;
+  var jenislistlocal = ['Toko', 'CAFE', "JASA"].obs;
+
+  var kategoriprodukList = <DataKategoriProduk>[].obs;
+  var kategorivalue;
+
+  fetchKategoriProdukLocal({id_toko}) async {
+    print('-------------------fetch pelanggan local---------------------');
+
+    List<Map<String, Object?>> query = await DBHelper()
+        .FETCH('SELECT * FROM Kelompok_produk WHERE id_toko = "$id_toko"');
+    if (query.isNotEmpty) {
+      List<DataKategoriProduk> data =
+          query.map((e) => DataKategoriProduk.fromJsondb(e)).toList();
+      kategoriprodukList.value = data;
+      //logo.value = userList.value.first.logo!;
+      return data;
+    } else {
+      print('empty');
+      return null;
+    }
+  }
+
+  Map<String, dynamic> dataedit({id_kelopokproduk, subkelompok, aktif}) {
+    var map = <String, dynamic>{};
+
+    map['ID_Kelompok_Produk'] = id_kelopokproduk;
+    map['Nama_Sub_Kelompok'] = subkelompok;
+    map['aktif'] = aktif;
+    return map;
+  }
+
+  editSubKategoriProduklocal() async {
+    print('-------------------edit user local---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var query = await DBHelper().UPDATE(
+        table: 'Sub_Kelompok_produk',
+        data: dataedit(
+            id_kelopokproduk: kategorivalue,
+            subkelompok: nama.value.text,
+            aktif: isAktif.value == true ? 1 : 0),
+        id: data.uuid);
+
+    print(query);
+    if (query == 1) {
+      //print('edit user local berhasil------------------------------------->');
+      await Get.find<BaseMenuProdukController>()
+          .fetchSubKategoriProdukLocal(id_toko: id_toko);
+      Get.back(closeOverlays: true);
+      Get.showSnackbar(toast()
+          .bottom_snackbar_success('sukses', 'Pelanggan berhasil diedit'));
+    } else {
+      Get.back(closeOverlays: true);
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal edit data local'));
+    }
+  }
+
+  pilihsourcefoto() {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Colors.white,
+        contentPadding: const EdgeInsets.all(20),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16.0)),
+        ),
+        content: Builder(
+          builder: (context) {
+            return Container(
+              width: context.res_height / 2.6,
+              height: context.res_height / 2.6,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Pilih Sumber Foto",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueAccent,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: button_solid_custom(
+                        onPressed: () {
+                          pickImageGallery();
+                        },
+                        child: Text(
+                          'Galeri',
+                          style: AppFont.regular_white_bold(),
+                        ),
+                        width: context.res_width),
+                  ),
+                  Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: button_solid_custom(
+                        onPressed: () {
+                          pickImageCamera();
+                        },
+                        child:
+                            Text('Kamera', style: AppFont.regular_white_bold()),
+                        width: context.res_width),
+                  ),
+                  Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: button_border_custom(
+                        onPressed: () {
+                          pilihIcon(context);
+                        },
+                        child: Text('Ikon', style: AppFont.regular_bold()),
+                        width: context.res_width),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  // Method to open a list of FaIcons
+  void pilihIcon(BuildContext context) {
+    final List<String> icons = [
+      'assets/icons/adduser.svg',
+      'assets/icons/camera.svg',
+      'assets/icons/cart.svg',
+      'assets/icons/cashier.svg',
+      'assets/icons/coffe1.svg',
+      'assets/icons/coffe2.svg',
+      'assets/icons/disk.svg',
+      'assets/icons/dress.svg',
+      'assets/icons/dumbell.svg',
+      'assets/icons/guitar.svg',
+      'assets/icons/history.svg',
+      'assets/icons/laporan.svg',
+      'assets/icons/money.svg',
+      'assets/icons/moneybag.svg',
+      'assets/icons/monitor.svg',
+      'assets/icons/phone.svg',
+      'assets/icons/produk.svg',
+      'assets/icons/shoes.svg',
+      'assets/icons/sportshirt.svg',
+      'assets/icons/star.svg',
+      'assets/icons/think.svg',
+      'assets/icons/tshirt.svg',
+      'assets/icons/wallet.svg',
+      'assets/icons/watch.svg',
+    ];
+
+    Get.dialog(
+      AlertDialog(
+        contentPadding: const EdgeInsets.all(10),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12.0),
+          ),
+        ),
+        content: Container(
+          width: context.res_height / 2,
+          height: context.res_height / 2,
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3, // 3 icons per row
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 20,
+            ),
+            itemCount: icons.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  // Handle icon selection
+                  _onIconSelected(icons[index]);
+                  Get.back(); // Close the dialog
+                },
+                child: Card(
+                  color: Colors.white,
+                  elevation: 5,
+                  margin: EdgeInsets.all(1),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SvgPicture.asset(
+                      icons[index],
+                      width: 30, // Adjust size as needed
+                      height: 30,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onIconSelected(String iconPath) async {
+    // Handle the selected icon
+    pikedImagePath.value = '';
+    pickedIconPath.value = iconPath;
+    final String base64Svg = await svgToBase64(iconPath);
+    image64 = base64Svg;
+    print('Base64 SVG: $base64Svg');
+    Get.back();
+
+    // You can store the icon path in a variable or database
+  }
+
+  var pickedIconPath = ''.obs;
+
+  Future<String> svgToBase64(String assetPath) async {
+    // final String svgString = await rootBundle.loadString(assetPath);
+    //
+    // return base64Encode(utf8.encode(svgString));
+
+    final String svgString = await rootBundle.loadString(assetPath);
+    return base64Encode(utf8.encode(svgString));
+  }
+
+// Method to convert an icon to base64
+
+  var image64;
+  File? pickedImageFile;
+  var pikedImagePath = ''.obs;
+  final ImagePicker picker = ImagePicker();
+  List<XFile> images = [];
+  List<String> listimagepath = [];
+  var selectedfilecount = 0.obs;
+
+  Future pickImageGallery() async {
+    try {
+      final image = await ImagePicker().pickImage(
+          source: ImageSource.gallery,
+          imageQuality: 85,
+          maxHeight: 300,
+          maxWidth: 300);
+      if (image == null) return;
+      pickedImageFile = File(image.path);
+      final bytes = File(image!.path).readAsBytesSync();
+      String base64Image = base64Encode(bytes);
+      image64 = base64Image;
+      pikedImagePath.value = pickedImageFile!.path;
+      pickedIconPath.value = '';
+      print(pikedImagePath);
+      Get.back();
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
+
+  Future pickImageCamera() async {
+    try {
+      final image = await ImagePicker().pickImage(
+          source: ImageSource.camera,
+          imageQuality: 85,
+          maxHeight: 300,
+          maxWidth: 300);
+      if (image == null) return;
+      pickedImageFile = File(image.path);
+      final bytes = File(image!.path).readAsBytesSync();
+      String base64Image = base64Encode(bytes);
+      image64 = base64Image;
+      //  final temppath = File(image!.path);
+      pikedImagePath.value = pickedImageFile!.path;
+      pickedIconPath.value = '';
+      print(image64);
+      Get.back();
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
+
+  var tanggal = TextEditingController().obs;
+  DateFormat dateFormat = DateFormat("dd-MM-yyyy");
+
+  stringdate() {
+    var ff = dateFormat.format(datedata.first!);
+    tanggal.value.text = ff;
+  }
+}

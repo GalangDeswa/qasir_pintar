@@ -26,7 +26,7 @@ class customDropdown extends StatelessWidget {
     this.iconColor = Colors.black,
     this.customButton,
     this.dropdownColor = Colors.redAccent,
-    this.dropdownWidth = 150,
+    this.dropdownWidth = 140,
   });
 
   @override
@@ -34,7 +34,7 @@ class customDropdown extends StatelessWidget {
     return DropdownButtonHideUnderline(
       child: DropdownButton2(
         customButton:
-            customButton ?? const Icon(Icons.list, size: 46, color: Colors.red),
+            customButton ?? const Icon(Icons.list, size: 20, color: Colors.red),
         items: items.map((item) {
           if (item['divider'] == true) {
             return const DropdownMenuItem<Divider>(
@@ -48,8 +48,7 @@ class customDropdown extends StatelessWidget {
               children: [
                 Icon(item['icon'], color: item['color'] ?? iconColor, size: 20),
                 const SizedBox(width: 10),
-                Text(item['title'],
-                    style: const TextStyle(color: Colors.black)),
+                Text(item['title'], style: AppFont.regular()),
               ],
             ),
           );
@@ -106,8 +105,12 @@ class EmptyData extends StatelessWidget {
         children: [
           Container(
               height: 100,
-              margin: EdgeInsets.only(bottom: 10),
-              child: Image.asset(AppString.empty)),
+              margin: EdgeInsets.only(bottom: 15),
+              child: Image.asset(
+                AppString.empty,
+                height: 85,
+                width: 85,
+              )),
           Text(
             "Data Kosong",
             style: AppFont.regular(),
@@ -244,7 +247,7 @@ class toast {
       backgroundColor: AppColor.warning,
       borderRadius: 20,
       margin: EdgeInsets.all(15),
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 2),
       isDismissible: true,
       dismissDirection: DismissDirection.horizontal,
       forwardAnimationCurve: Curves.elasticInOut,
@@ -345,7 +348,7 @@ class AppbarCustomMain extends StatelessWidget implements PreferredSizeWidget {
               child: FaIcon(
                 FontAwesomeIcons.list,
                 color: Colors.white,
-                size: 25,
+                size: 21,
               ),
             );
           },
@@ -488,7 +491,10 @@ class custom_list extends StatelessWidget {
     return Column(
       children: [
         usingGambar == false
-            ? _buildSimpleListTile()
+            ? GestureDetector(
+                onTap: () =>
+                    Get.toNamed(gestureroute, arguments: gestureArgument),
+                child: _buildSimpleListTile())
             : GestureDetector(
                 onTap: () =>
                     Get.toNamed(gestureroute, arguments: gestureArgument),
@@ -501,7 +507,12 @@ class custom_list extends StatelessWidget {
 
   Widget _buildSimpleListTile() {
     return ListTile(
-      title: Text(title, style: AppFont.regular()),
+      title: isDeleted == false
+          ? Text(title, style: AppFont.regular_bold())
+          : Text(
+              title + '- Nonaktif',
+              style: TextStyle(color: AppColor.warning),
+            ),
       subtitle: subtitle,
       trailing: trailing,
     );
@@ -514,7 +525,12 @@ class custom_list extends StatelessWidget {
       leading: ClipOval(
         child: hasValidImage ? _buildValidImage() : _buildDefaultImage(),
       ),
-      title: Text(title, style: AppFont.regular()),
+      title: isDeleted == false
+          ? Text(title, style: AppFont.regular_bold())
+          : Text(
+              title + '- Nonaktif',
+              style: TextStyle(color: AppColor.warning),
+            ),
       subtitle: subtitle,
       trailing: trailing,
     );
@@ -535,13 +551,13 @@ class custom_list extends StatelessWidget {
               base64Decode(gambar!),
               width: 45,
               height: 45,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
             )
           : Image.memory(
               base64Decode(gambar!),
               width: 45,
               height: 45,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
             ),
     );
   }
@@ -557,210 +573,11 @@ class custom_list extends StatelessWidget {
         AppString.defaultImg,
         width: 45,
         height: 45,
-        fit: BoxFit.cover,
+        fit: BoxFit.contain,
       ),
     );
   }
 }
-
-// class custom_list extends StatelessWidget {
-//   custom_list(
-//       {super.key,
-//       this.gestureArgument,
-//       this.gestureroute,
-//       this.trailing,
-//       this.gambar,
-//       this.title,
-//       this.subtitle,
-//       this.controller,
-//       this.usingGambar,
-//       this.isDeleted});
-//
-//   final gestureArgument;
-//   final gestureroute;
-//   final trailing;
-//   final gambar;
-//   final title;
-//   final subtitle;
-//   final controller;
-//   bool? usingGambar = true;
-//   bool? isDeleted = false;
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return isDeleted == true
-//         ? Container(
-//             color: Colors.grey[300],
-//             child: Column(
-//               children: [
-//                 usingGambar == false
-//                     ? ListTile(
-//                         title: Column(
-//                           crossAxisAlignment: CrossAxisAlignment.start,
-//                           children: [
-//                             Text(
-//                               title,
-//                               style: AppFont.regular(),
-//                             ),
-//                             Text(
-//                               'Nonaktif',
-//                               style: AppFont.regular_warning(),
-//                             ),
-//                           ],
-//                         ),
-//                         subtitle: subtitle,
-//                         trailing: trailing,
-//                       )
-//                     : ListTile(
-//                         leading: ClipOval(
-//                           child: gambar != '-' && gambar != null && gambar != ''
-//                               ? controller.isBase64Svg(gambar!)
-//                                   ? GestureDetector(
-//                                       onTap: () {
-//                                         String val = 'icon';
-//                                         heroPop(
-//                                             tag: gambar,
-//                                             image: gambar,
-//                                             type: val);
-//                                       },
-//                                       child: SvgPicture.memory(
-//                                         base64Decode(gambar!),
-//                                         width: 45,
-//                                         height: 45,
-//                                         fit: BoxFit.cover,
-//                                       ),
-//                                     )
-//                                   : GestureDetector(
-//                                       onTap: () {
-//                                         String val = 'memory';
-//                                         heroPop(
-//                                             tag: gambar,
-//                                             image: gambar,
-//                                             type: val);
-//                                       },
-//                                       child: Image.memory(
-//                                         base64Decode(gambar!),
-//                                         width: 45,
-//                                         height: 45,
-//                                         fit: BoxFit.cover,
-//                                       ),
-//                                     )
-//                               : GestureDetector(
-//                                   onTap: () {
-//                                     String val = 'asset';
-//                                     heroPop(
-//                                         tag: gambar, image: gambar, type: val);
-//                                   },
-//                                   child: Image.asset(
-//                                     AppString.defaultImg,
-//                                     width: 45,
-//                                     height: 45,
-//                                     fit: BoxFit.cover,
-//                                   ),
-//                                 ),
-//                         ),
-//                         title: Column(
-//                           crossAxisAlignment: CrossAxisAlignment.start,
-//                           children: [
-//                             Text(
-//                               title,
-//                               style: AppFont.regular(),
-//                             ),
-//                             Text(
-//                               'Nonaktif',
-//                               style: AppFont.regular_warning(),
-//                             ),
-//                           ],
-//                         ),
-//                         subtitle: subtitle,
-//                         trailing: trailing,
-//                       ),
-//                 Container(
-//                   height: 0.5,
-//                   color: Colors.black,
-//                 )
-//               ],
-//             ),
-//           )
-//         : Column(
-//             children: [
-//               usingGambar == false
-//                   ? ListTile(
-//                       title: Text(
-//                         title,
-//                         style: AppFont.regular(),
-//                       ),
-//                       subtitle: subtitle,
-//                       trailing: trailing,
-//                     )
-//                   : GestureDetector(
-//                       onTap: () {
-//                         Get.toNamed(gestureroute, arguments: gestureArgument);
-//                       },
-//                       child: ListTile(
-//                         leading: ClipOval(
-//                           child: gambar != '-' && gambar != null
-//                               ? controller.isBase64Svg(gambar!)
-//                                   ? GestureDetector(
-//                                       onTap: () {
-//                                         String val = 'icon';
-//                                         heroPop(
-//                                             tag: gambar,
-//                                             image: gambar,
-//                                             type: val);
-//                                       },
-//                                       child: SvgPicture.memory(
-//                                         base64Decode(gambar!),
-//                                         width: 45,
-//                                         height: 45,
-//                                         fit: BoxFit.cover,
-//                                       ),
-//                                     )
-//                                   : GestureDetector(
-//                                       onTap: () {
-//                                         String val = 'memory';
-//                                         heroPop(
-//                                             tag: gambar,
-//                                             image: gambar,
-//                                             type: val);
-//                                       },
-//                                       child: Image.memory(
-//                                         base64Decode(gambar!),
-//                                         width: 45,
-//                                         height: 45,
-//                                         fit: BoxFit.cover,
-//                                       ),
-//                                     )
-//                               : GestureDetector(
-//                                   onTap: () {
-//                                     String val = 'asset';
-//                                     heroPop(
-//                                         tag: gambar, image: gambar, type: val);
-//                                   },
-//                                   child: Image.asset(
-//                                     AppString.defaultImg,
-//                                     width: 45,
-//                                     height: 45,
-//                                     fit: BoxFit.cover,
-//                                   ),
-//                                 ),
-//                         ),
-//                         title: Text(
-//                           title,
-//                           style: AppFont.regular(),
-//                         ),
-//                         subtitle: subtitle,
-//                         trailing: trailing,
-//                       ),
-//                     ),
-//               Container(
-//                 height: 0.5,
-//                 color: Colors.black,
-//               )
-//             ],
-//           );
-//   }
-// }
 
 class custom_list_produk extends StatelessWidget {
   custom_list_produk({
@@ -807,7 +624,10 @@ class custom_list_produk extends StatelessWidget {
     return Column(
       children: [
         usingGambar == false
-            ? _buildSimpleListTile()
+            ? GestureDetector(
+                onTap: () =>
+                    Get.toNamed(gestureroute, arguments: gestureArgument),
+                child: _buildSimpleListTile())
             : GestureDetector(
                 onTap: () =>
                     Get.toNamed(gestureroute, arguments: gestureArgument),
@@ -820,7 +640,12 @@ class custom_list_produk extends StatelessWidget {
 
   Widget _buildSimpleListTile() {
     return ListTile(
-      title: Text(title, style: AppFont.regular()),
+      title: isDeleted == false
+          ? Text(title, style: AppFont.regular_bold())
+          : Text(
+              title + '- Nonaktif',
+              style: TextStyle(color: AppColor.warning),
+            ),
       subtitle: subtitle,
       trailing: trailing,
     );
@@ -831,11 +656,20 @@ class custom_list_produk extends StatelessWidget {
 
     return ListTile(
       leading: Container(
-        decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-        width: Get.width * 0.25,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10),
+          // color: Colors.cyan,
+        ),
+        width: Get.width * 0.13,
+        height: Get.height * 0.13,
         child: hasValidImage ? _buildValidImage() : _buildDefaultImage(),
       ),
-      title: Text(title, style: AppFont.regular()),
+      title: isDeleted == false
+          ? Text(title, style: AppFont.regular_bold())
+          : Text(
+              title + ' - Nonaktif',
+              style: TextStyle(color: AppColor.warning),
+            ),
       subtitle: subtitle,
       trailing: trailing,
     );
@@ -856,13 +690,13 @@ class custom_list_produk extends StatelessWidget {
               base64Decode(gambar!),
               width: 45,
               height: 45,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
             )
           : Image.memory(
               base64Decode(gambar!),
               width: 45,
               height: 45,
-              fit: BoxFit.cover,
+              fit: BoxFit.contain,
             ),
     );
   }
@@ -874,12 +708,92 @@ class custom_list_produk extends StatelessWidget {
         image: AppString.defaultImg,
         type: 'asset',
       ),
-      child: Image.asset(
-        AppString.defaultImg,
-        width: 45,
-        height: 45,
-        fit: BoxFit.cover,
+      child: Container(
+        child: Image.asset(
+          AppString.defaultImg,
+          width: 45,
+          height: 45,
+          fit: BoxFit.contain,
+        ),
       ),
     );
+  }
+}
+
+class DashedBorderContainer extends StatelessWidget {
+  final Widget child;
+  const DashedBorderContainer({super.key, required this.child});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      painter: DashedBorderPainter(),
+      child: Padding(
+        padding: const EdgeInsets.all(30),
+        child: child,
+      ),
+    );
+  }
+}
+
+class DashedBorderPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final Paint paint = Paint()
+      ..color = AppColor.primary
+      ..strokeWidth = 1.0
+      ..style = PaintingStyle.stroke;
+
+    const double dashWidth = 5.0;
+    const double dashSpace = 5.0;
+    double startX = 3;
+
+    // Top side
+    while (startX < size.width) {
+      canvas.drawLine(
+        Offset(startX, 0),
+        Offset(startX + dashWidth, 0),
+        paint,
+      );
+      startX += dashWidth + dashSpace;
+    }
+
+    // Right side
+    double startY = 0;
+    while (startY < size.height) {
+      canvas.drawLine(
+        Offset(size.width, startY),
+        Offset(size.width, startY + dashWidth),
+        paint,
+      );
+      startY += dashWidth + dashSpace;
+    }
+
+    // Bottom side
+    startX = 3;
+    while (startX < size.width) {
+      canvas.drawLine(
+        Offset(startX, size.height),
+        Offset(startX + dashWidth, size.height),
+        paint,
+      );
+      startX += dashWidth + dashSpace;
+    }
+
+    // Left side
+    startY = 3;
+    while (startY < size.height) {
+      canvas.drawLine(
+        Offset(0, startY),
+        Offset(0, startY + dashWidth),
+        paint,
+      );
+      startY += dashWidth + dashSpace;
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) {
+    return false;
   }
 }

@@ -11,25 +11,25 @@ import 'package:intro_slider/intro_slider.dart';
 import 'package:lottie/lottie.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:qasir_pintar/Config/config.dart';
-import 'package:qasir_pintar/Modules/Karyawan/controller_karyawan.dart';
-import 'package:qasir_pintar/Modules/Karyawan/model_karyawan.dart';
-import 'package:qasir_pintar/Modules/Pelanggan/List%20kategori%20pelanggan/controller_kategoripelanggan.dart';
-import 'package:qasir_pintar/Modules/Pelanggan/List%20kategori%20pelanggan/model_kategoriPelanggan.dart';
-import 'package:qasir_pintar/Modules/Produk/Data%20produk/model_produk.dart';
-import 'package:qasir_pintar/Modules/Produk/Kategori/model_subkategoriproduk.dart';
-import 'package:qasir_pintar/Modules/Produk/Produk/model_kategoriproduk.dart';
-import 'package:qasir_pintar/Modules/Produk/controller_basemenuproduk.dart';
-import 'package:qasir_pintar/Modules/Supplier/controller_supplier.dart';
-import 'package:qasir_pintar/Modules/Supplier/model_supplier.dart';
+import 'package:qasir_pintar/Modules - P.O.S/Karyawan/controller_karyawan.dart';
+import 'package:qasir_pintar/Modules - P.O.S/Karyawan/model_karyawan.dart';
+import 'package:qasir_pintar/Modules - P.O.S/Pelanggan/List%20kategori%20pelanggan/controller_kategoripelanggan.dart';
+import 'package:qasir_pintar/Modules - P.O.S/Pelanggan/List%20kategori%20pelanggan/model_kategoriPelanggan.dart';
+import 'package:qasir_pintar/Modules - P.O.S/Produk/Data%20produk/model_produk.dart';
+import 'package:qasir_pintar/Modules - P.O.S/Produk/Kategori/model_subkategoriproduk.dart';
+import 'package:qasir_pintar/Modules - P.O.S/Produk/Produk/model_kategoriproduk.dart';
+import 'package:qasir_pintar/Modules - P.O.S/Produk/controller_basemenuproduk.dart';
+import 'package:qasir_pintar/Modules - P.O.S/Supplier/controller_supplier.dart';
+import 'package:qasir_pintar/Modules - P.O.S/Supplier/model_supplier.dart';
 import 'package:qasir_pintar/Widget/widget.dart';
 
-import '../Modules/Kasir - Pembayaran/controller_pembayaran.dart';
-import '../Modules/Kasir/controller_kasir.dart';
-import '../Modules/Pelanggan/Edit kategori pelanggan/controller_editkategoripelanggan.dart';
-import '../Modules/Pelanggan/List Pelanggan/controller_pelanggan.dart';
-import '../Modules/Pelanggan/List Pelanggan/model_pelanggan.dart';
-import '../Modules/Promo/controller_promo.dart';
-import '../Modules/Promo/model_promo.dart';
+import '../Modules - P.O.S/Kasir - Pembayaran/controller_pembayaran.dart';
+import '../Modules - P.O.S/Kasir/controller_kasir.dart';
+import '../Modules - P.O.S/Pelanggan/Edit kategori pelanggan/controller_editkategoripelanggan.dart';
+import '../Modules - P.O.S/Pelanggan/List Pelanggan/controller_pelanggan.dart';
+import '../Modules - P.O.S/Pelanggan/List Pelanggan/model_pelanggan.dart';
+import '../Modules - P.O.S/Promo/controller_promo.dart';
+import '../Modules - P.O.S/Promo/model_promo.dart';
 
 // class heroPop extends StatelessWidget {
 //   const heroPop({super.key, required this.tag, required this.image});
@@ -1090,87 +1090,97 @@ class Popscreen {
                 //     // Text(controller.namakasir, style: font().reguler_bold),
                 //   ],
                 // ),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //   children: [
-                //     Text('Meja:', style: AppFont.regular()),
-                //   ],
-                // ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Total item : ' + controller.totalItem.toString(),
-                        style: AppFont.regular()),
-                    // Text(
-                    //     controller.cache
-                    //         .map((e) => e.qty)
-                    //         .fold(
-                    //         0, (previous, current) => previous + current)
-                    //         .toString(),
-                    //     style: font().reguler_bold),
+                    Text('Pelanggan :', style: AppFont.regular()),
+                    Text(
+                      controller.namaPelanggan.value != ''
+                          ? controller.namaPelanggan.value
+                          : '-',
+                      style: AppFont.regular_bold(),
+                    ),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Subtotal : ' + controller.subtotal.toString(),
-                        style: AppFont.regular()),
-                    // Text(
-                    //     'Rp. ' +
-                    //         controller.total
-                    //             .toStringAsFixed(0)
-                    //             .replaceAll(RegExp(r'[^\w\s]+'), '')
-                    //             .replaceAllMapped(
-                    //             RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                    //                 (Match m) => '${m[1]},'),
-                    //     style: font().reguler_bold),
+                    Text('Total item : ', style: AppFont.regular()),
+                    Text(
+                      controller.totalItem.toString(),
+                      style: AppFont.regular_bold(),
+                    )
+                  ],
+                ),
+                controller.displaydiskon.value == 0.0
+                    ? Container()
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Diskon : ', style: AppFont.regular()),
+                          Text(
+                            'Rp. ' +
+                                AppFormat().numFormat(
+                                    controller.jumlahdiskonkasir.value),
+                            style: AppFont.regular_bold(),
+                          )
+                        ],
+                      ),
+                controller.promolistvalue == null
+                    ? Container()
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Promo : ', style: AppFont.regular()),
+                          Text(
+                            controller.namaPromo.value,
+                            style: AppFont.regular_bold(),
+                          )
+                        ],
+                      ),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Subtotal : ', style: AppFont.regular()),
+                    Text(
+                      'Rp. ' + AppFormat().numFormat(controller.subtotal.value),
+                      style: AppFont.regular_bold(),
+                    )
                   ],
                 ),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Total : ' + controller.total.toString(),
-                        style: AppFont.regular()),
-                    // Text(
-                    //     'Rp. ' +
-                    //         controller.total
-                    //             .toStringAsFixed(0)
-                    //             .replaceAll(RegExp(r'[^\w\s]+'), '')
-                    //             .replaceAllMapped(
-                    //             RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-                    //                 (Match m) => '${m[1]},'),
-                    //     style: font().reguler_bold),
+                    Text('Total : ', style: AppFont.regular()),
+                    Text(
+                      'Rp. ' + AppFormat().numFormat(controller.total.value),
+                      style: AppFont.regular_bold(),
+                    ),
                   ],
                 ),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Text('Pembayaran: ', style: AppFont.regular()),
                     Text(
-                        'Pembayaran: ' + controller.bayarvalue.value.toString(),
-                        style: AppFont.regular()),
-                    // Text(
-                    //     controller.keypadController.value.text.isNotEmpty
-                    //         ? 'Rp. ' + controller.keypadController.value.text
-                    //         : '-',
-                    //     style: font().reguler_bold),
+                      'Rp. ' +
+                          AppFormat().numFormat(controller.bayarvalue.value),
+                      style: AppFont.regular_bold(),
+                    ),
                   ],
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
+                    Text('Kembalian : ', style: AppFont.regular()),
                     Text(
-                        'Kembalian : ' +
-                            (controller.bayarvalue.value -
-                                    controller.total.value)
-                                .toString(),
-                        style: AppFont.regular()),
-                    // Text(
-                    //     controller.kembalian.value.text.isNotEmpty
-                    //         ? 'Rp. ' + controller.kembalian.value.text
-                    //         : '0',
-                    //     style: font().reguler_bold),
+                        style: AppFont.regular_bold(),
+                        'Rp. ' +
+                            AppFormat().numFormat((controller.bayarvalue.value -
+                                controller.total.value))),
                   ],
                 ),
                 // Row(
@@ -1231,74 +1241,82 @@ class Popscreen {
     ));
   }
 
-  berhasilbayar() {
-    Get.dialog(AlertDialog(
-      insetPadding: EdgeInsets.zero,
-      contentPadding: EdgeInsets.zero,
-      content: Builder(
-        builder: (context) {
-          var height = MediaQuery.of(context).size.height;
-          var width = MediaQuery.of(context).size.width;
+  berhasilbayar(
+    PembayaranController controller,
+  ) {
+    Get.dialog(
+        barrierDismissible: false,
+        AlertDialog(
+          insetPadding: EdgeInsets.zero,
+          contentPadding: EdgeInsets.zero,
+          content: Builder(
+            builder: (context) {
+              var height = MediaQuery.of(context).size.height;
+              var width = MediaQuery.of(context).size.width;
 
-          return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: Colors.white,
-            ),
-            padding: EdgeInsets.all(20),
-            width: width - 30,
-            height: height - 200,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.check_circle,
-                  size: 100,
-                  color: Colors.green,
+              return Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.white,
                 ),
-                SizedBox(height: 20),
-                Text(
-                  'Transaksi Berhasil!',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  'Pembayaran berhasil dilakukan.',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.black54,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                Spacer(), // This will push the buttons to the bottom
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                padding: EdgeInsets.all(20),
+                width: width - 30,
+                height: height - 200,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
+                    Icon(
+                      Icons.check_circle,
+                      size: 100,
+                      color: Colors.green,
+                    ),
+                    SizedBox(height: 20),
+                    Text(
+                      'Transaksi Berhasil!',
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    SizedBox(height: 10),
+                    Text(
+                      'Pembayaran berhasil dilakukan.',
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black54,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    Spacer(), // This will push the buttons to the bottom
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        button_border_custom(
+                            onPressed: () {}, child: Text('Share'), width: 150),
+                        button_border_custom(
+                            onPressed: () {
+                              controller.printstruk();
+                            },
+                            child: Text('Print struk'),
+                            width: 150),
+                      ],
+                    ),
                     button_border_custom(
-                        onPressed: () {}, child: Text('Share'), width: 150),
-                    button_border_custom(
-                        onPressed: () {}, child: Text('Print'), width: 150),
+                      onPressed: () {
+                        Get.offAllNamed("/basemenu");
+                      },
+                      child: Text('Selesai'),
+                      width: context.res_width,
+                    ),
+                    SizedBox(height: 20), // Add some space at the bottom
                   ],
                 ),
-                button_border_custom(
-                  onPressed: () {
-                    Get.offAllNamed("/basemenu");
-                  },
-                  child: Text('Selesai'),
-                  width: context.res_width,
-                ),
-                SizedBox(height: 20), // Add some space at the bottom
-              ],
-            ),
-          );
-        },
-      ),
-    ));
+              );
+            },
+          ),
+        ));
   }
 
   karyawanLogin(KasirController controller) {

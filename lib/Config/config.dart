@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:intl/intl.dart';
 
 final ThemeData appTheme = ThemeData(
   fontFamily: GoogleFonts.montserrat().fontFamily,
@@ -22,7 +23,7 @@ class AppColor {
 }
 
 class AppFont {
-  static TextStyle regular({double fontSize = 15, Color color = Colors.black}) {
+  static TextStyle regular({double fontSize = 12, Color color = Colors.black}) {
     return TextStyle(
       fontSize: fontSize,
       color: color,
@@ -30,14 +31,22 @@ class AppFont {
   }
 
   static TextStyle regular_warning(
-      {double fontSize = 15, Color color = AppColor.warning}) {
+      {double fontSize = 12, Color color = AppColor.warning}) {
     return TextStyle(
       fontSize: fontSize,
       color: color,
     );
   }
 
-  static TextStyle small({double fontSize = 12, Color color = Colors.black}) {
+  static TextStyle small({double fontSize = 10, Color color = Colors.black}) {
+    return TextStyle(
+      fontSize: fontSize,
+      color: color,
+    );
+  }
+
+  static TextStyle small_white(
+      {double fontSize = 10, Color color = Colors.white}) {
     return TextStyle(
       fontSize: fontSize,
       color: color,
@@ -45,7 +54,7 @@ class AppFont {
   }
 
   static TextStyle regular_bold(
-      {double fontSize = 15, Color color = Colors.black}) {
+      {double fontSize = 12, Color color = Colors.black}) {
     return TextStyle(
       fontSize: fontSize,
       color: color,
@@ -54,7 +63,7 @@ class AppFont {
   }
 
   static TextStyle regular_white(
-      {double fontSize = 15, Color color = Colors.white}) {
+      {double fontSize = 12, Color color = Colors.white}) {
     return TextStyle(
       fontSize: fontSize,
       color: color,
@@ -62,7 +71,7 @@ class AppFont {
   }
 
   static TextStyle regular_white_bold(
-      {double fontSize = 15, Color color = Colors.white}) {
+      {double fontSize = 12, Color color = Colors.white}) {
     return TextStyle(
       fontSize: fontSize,
       color: color,
@@ -80,12 +89,12 @@ class AppFont {
   }
 
   static TextStyle AppBarTitle(
-      {double fontSize = 18, Color color = Colors.white}) {
+      {double fontSize = 14, Color color = Colors.white}) {
     return TextStyle(
         fontSize: fontSize, fontWeight: FontWeight.bold, color: color);
   }
 
-  static TextStyle bold({double fontSize = 15, Color color = Colors.black}) {
+  static TextStyle bold({double fontSize = 12, Color color = Colors.black}) {
     return TextStyle(
       fontSize: fontSize,
       fontWeight: FontWeight.bold,
@@ -93,7 +102,7 @@ class AppFont {
     );
   }
 
-  static TextStyle italic({double fontSize = 15, Color color = Colors.black}) {
+  static TextStyle italic({double fontSize = 12, Color color = Colors.black}) {
     return TextStyle(
       fontSize: fontSize,
       fontStyle: FontStyle.italic,
@@ -165,4 +174,28 @@ extension MediaQueryValues on BuildContext {
 class AppString {
   static String defaultImg = 'assets/images/login_toko.png';
   static String empty = 'assets/icons/box.png';
+}
+
+class AppFormat {
+  /// Converts a double like 50000.0 → "Rp 50.000"
+  String formatRupiah(double amount) {
+    final NumberFormat currencyFmt = NumberFormat.currency(
+      locale: 'id_ID',
+      symbol: 'Rp',
+      decimalDigits: 0,
+    );
+    return currencyFmt.format(amount);
+  }
+
+  numFormat(num) {
+    return NumberFormat('#,###').format(num);
+  }
+
+  doubleFormat(num) {
+    return double.parse(num.replaceAll(',', ''));
+  }
+
+  intFormat(num) {
+    return int.parse(num.replaceAll(',', ''));
+  }
 }
