@@ -7,6 +7,7 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:meta/meta.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Karyawan/model_karyawan.dart';
 import 'package:smooth_sheets/smooth_sheets.dart';
 
@@ -243,6 +244,7 @@ class KasirController extends GetxController {
   }
 
   addKeranjang(DataProduk produkCahce) async {
+    var produk = Get.find<CentralProdukController>().produk;
     var check =
         produk.where((element) => element.uuid == produkCahce.uuid).first;
     print('add keranjang ===>' + produkCahce.nama_produk!);

@@ -1034,7 +1034,7 @@ class TambahProdukController extends GetxController {
         //     .fetchProdukLocal(id_toko: id_toko);
         Get.find<BaseMenuProdukController>().fetchPajakLocal(id_toko: id_toko);
         Get.find<BaseMenuProdukController>().fetchUkuranLocal(id_toko: id_toko);
-        // Get.find<KasirController>().fetchProdukLocal(id_toko: id_toko);
+
         await Get.find<CentralProdukController>()
             .fetchProdukLocal(id_toko: id_toko);
         Get.back(closeOverlays: true);
