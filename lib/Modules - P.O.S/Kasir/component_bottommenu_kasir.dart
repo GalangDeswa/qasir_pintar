@@ -6,9 +6,75 @@ import 'package:get/get.dart';
 import 'package:qasir_pintar/Config/config.dart';
 
 import 'package:qasir_pintar/Modules - P.O.S/Kasir/controller_kasir.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Kasir%20-%20Pembayaran/view_pembayaran.dart';
 import 'package:qasir_pintar/Widget/widget.dart';
+import 'package:smooth_sheets/smooth_sheets.dart';
 
+import '../../Controllers/CentralController.dart';
 import '../../Widget/popscreen.dart';
+
+class BottomMenuKasirv2 extends GetView<KasirController> {
+  const BottomMenuKasirv2({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      initialChildSize: 0.42,
+      minChildSize: 0.42,
+      maxChildSize: 0.9,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                spreadRadius: 2,
+              )
+            ],
+          ),
+          child: Column(
+            children: [
+              // Drag handle indicator
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(top: 8, bottom: 8),
+                decoration: BoxDecoration(
+                  color: Colors.grey[400],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+
+              // Cart content
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  children: [
+                    Container(
+                      height: 100,
+                      color: Colors.cyan,
+                    ),
+                    Container(
+                      height: 100,
+                      color: Colors.green,
+                    ),
+                    // Add more cart items here
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
 
 class BottomMenuKasir extends GetView<KasirController> {
   const BottomMenuKasir({super.key});
@@ -127,13 +193,13 @@ class BottomMenuKasir extends GetView<KasirController> {
               Expanded(
                 child: button_border_custom(
                     onPressed: () {
-                      if (controller.keranjang.isEmpty) {
+                      if (controller.keranjangv2.isEmpty) {
                         Get.showSnackbar(toast().bottom_snackbar_error(
                             'error', 'Keranjang Kosong'));
                         return;
                       }
                       Get.toNamed('/pembayaran', arguments: {
-                        'keranjang': controller.keranjang.value,
+                        'keranjang': controller.keranjangv2,
                         'totalItem': controller.totalitem.value,
                         'subtotal': controller.subtotal.value,
                       });
@@ -198,4 +264,29 @@ class BottomMenuMeja extends GetView<KasirController> {
       ],
     );
   }
+}
+
+popaddprodukv2() {
+  var con = Get.find<CentralProdukController>();
+  Get.dialog(SheetViewport(
+      child: Sheet(
+    scrollConfiguration: SheetScrollConfiguration(),
+    initialOffset: const SheetOffset(0.5),
+    physics: BouncingSheetPhysics(),
+    snapGrid: MultiSnapGrid(snaps: [SheetOffset(0.5), SheetOffset(1)]),
+    child: Material(
+      color: Colors.transparent,
+      child: Obx(() {
+        return Container(
+            decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(20),
+                    topRight: Radius.circular(20))),
+            padding: AppPading.defaultBodyPadding(),
+            height: Get.height * 0.5,
+            child: Column(children: [Pembayaran()]));
+      }),
+    ),
+  )));
 }

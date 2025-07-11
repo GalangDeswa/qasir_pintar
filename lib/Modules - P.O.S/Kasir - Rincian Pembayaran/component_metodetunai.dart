@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:qasir_pintar/Config/config.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Kasir%20-%20Pembayaran/controller_pembayaran.dart';
 
-class MetodeTunai extends GetView<PembayaranController> {
+import '../Kasir/controller_kasir.dart';
+
+class MetodeTunai extends GetView<KasirController> {
   const MetodeTunai({super.key});
 
   @override

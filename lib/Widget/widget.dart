@@ -143,9 +143,12 @@ class button_solid_custom extends StatelessWidget {
     return Container(
       margin: margin,
       width: width,
-      child: TextButton(
-        style: TextButton.styleFrom(
-            foregroundColor: Colors.white, backgroundColor: AppColor.secondary),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+            foregroundColor: Colors.white,
+            backgroundColor: AppColor.secondary,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10))),
         onPressed: onPressed,
         child: child,
       ),
@@ -172,13 +175,15 @@ class button_border_custom extends StatelessWidget {
     return Container(
       margin: margin, // Use the optional margin
       width: width,
-      child: TextButton(
-        style: TextButton.styleFrom(
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
           side: BorderSide(
             color: AppColor.secondary,
           ),
           foregroundColor: AppColor.secondary,
           backgroundColor: Colors.white,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
         onPressed: onPressed,
         child: child,
@@ -189,6 +194,7 @@ class button_border_custom extends StatelessWidget {
 
 class toast {
   void showErrorSnackbar(Map<String, dynamic> errorResponse) {
+    Get.closeAllSnackbars();
     // Check if the response has errors
     if (errorResponse['status'] == false && errorResponse['errors'] != null) {
       StringBuffer errorMessage = StringBuffer();
@@ -219,6 +225,7 @@ class toast {
 
   void showDBErrorSnackbar(data) {
     // Check if the response has errors
+    Get.closeAllSnackbars();
     if (data == null) {
       Get.showSnackbar(
         toast().bottom_snackbar_error(
@@ -233,6 +240,7 @@ class toast {
     String title,
     mesaage,
   ) {
+    Get.closeAllSnackbars();
     return GetSnackBar(
       title: title,
       message: mesaage,
@@ -257,6 +265,7 @@ class toast {
   }
 
   bottom_snackbar_success(String title, mesaage) {
+    Get.closeAllSnackbars();
     return GetSnackBar(
       title: title,
       message: mesaage,
@@ -273,7 +282,7 @@ class toast {
       backgroundColor: Colors.cyan,
       borderRadius: 20,
       margin: EdgeInsets.all(15),
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 2),
       isDismissible: true,
       dismissDirection: DismissDirection.horizontal,
       forwardAnimationCurve: Curves.elasticInOut,

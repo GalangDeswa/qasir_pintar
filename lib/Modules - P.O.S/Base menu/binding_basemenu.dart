@@ -5,6 +5,7 @@ import 'package:qasir_pintar/Modules - P.O.S/Kasir/controller_kasir.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Pelanggan/List%20Pelanggan/controller_pelanggan.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Users/controller_user.dart';
 
+import '../Kasir - Pembayaran/controller_pembayaran.dart';
 import '../pengaturan/controller_pengaturan.dart';
 
 class BasemenuBinding extends Bindings {
@@ -14,6 +15,7 @@ class BasemenuBinding extends Bindings {
     Get.put(CentralPaketController());
     Get.put(CentralSupplierController());
     Get.put(CentralPelangganController());
+    Get.put(PembayaranController());
     //Get.put(CentralPelangganController());
     //Get.lazyPut<CentralPelangganController>(() => CentralPelangganController());
     // Get.lazyPut<BasemenuController>(() => BasemenuController(), fenix: true);

@@ -163,6 +163,53 @@ class DataProduk {
   }
 }
 
+class DataKeranjang {
+  final String uuid;
+  final String idToko;
+  int qty;
+  final String? pajak;
+  final double? hpp;
+  final double? nominalpajak;
+  final String? namaPajak;
+  final String? idPaket;
+  final dynamic gambar;
+
+  // Product-specific fields
+  final String? namaProduk;
+  final double? hargaEceran;
+
+  // Package-specific fields
+  final String? namaPaket;
+  final double? hargaPaket;
+
+  final bool isPaket;
+
+  DataKeranjang({
+    required this.uuid,
+    required this.idToko,
+    this.qty = 1,
+    this.idPaket,
+    this.pajak,
+    this.hpp,
+    this.nominalpajak,
+    this.namaPajak,
+    this.gambar,
+    // Product
+    this.namaProduk,
+    this.hargaEceran,
+    // Package
+    this.namaPaket,
+    this.hargaPaket,
+    required this.isPaket,
+  });
+
+  // Helper getter for display name
+  String get displayName => isPaket ? namaPaket! : namaProduk!;
+
+  // Helper getter for price
+  double get price => isPaket ? hargaPaket! : hargaEceran!;
+}
+
 class DataProdukTemp {
   DataProdukTemp(
       {this.id,
@@ -561,6 +608,7 @@ class DataPaketProduk {
     this.aktif,
     this.namapajak,
     this.nominalpajak,
+    this.hitungStock,
   });
 
   final int? id;
@@ -577,6 +625,7 @@ class DataPaketProduk {
   final int? aktif;
   final double? nominalpajak;
   final String? namapajak;
+  final int? hitungStock;
 
   factory DataPaketProduk.fromJsondb(Map<String, dynamic> json) {
     return DataPaketProduk(
@@ -594,6 +643,7 @@ class DataPaketProduk {
       aktif: json["aktif"],
       nominalpajak: json["nominal_pajak"],
       namapajak: json["nama_pajak"],
+      hitungStock: json["hitung_stock"],
     );
   }
 
@@ -611,6 +661,7 @@ class DataPaketProduk {
     map['tampilkan_di_paket'] = tampilkan_di_paket;
     map['sync'] = sync;
     map['aktif'] = aktif;
+    map['hitung_stock'] = hitungStock;
     return map;
   }
 }

@@ -20,10 +20,8 @@ import '../../Region/model_regency.dart';
 import '../../Users/model_user.dart';
 import '../List kategori pelanggan/model_kategoriPelanggan.dart';
 
-import 'dart:convert';
 import 'dart:typed_data';
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
+
 import 'package:image/image.dart' as img;
 
 import '../Tambah Pelanggan/controller_tambahpelanggan.dart'; // For image manipulation

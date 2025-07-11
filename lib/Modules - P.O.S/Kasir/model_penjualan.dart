@@ -99,8 +99,11 @@ class DataDetailPenjualan {
       this.idToko,
       this.idPenjualan,
       this.idProduk,
+      this.idPaket,
+      this.namaPaket,
       this.qty,
       this.subtotal,
+      this.subtotalPaket,
       this.discPersen,
       this.discNominal,
       this.totalHarga,
@@ -110,11 +113,14 @@ class DataDetailPenjualan {
 
   final int? id;
   final String? uuid;
+  final String? idPaket;
+  final String? namaPaket;
   final String? idToko;
   final String? idPenjualan;
   final String? idProduk;
   final int? qty;
   final double? subtotal;
+  final double? subtotalPaket;
   final double? discPersen;
   final double? discNominal;
   final double? totalHarga;
@@ -129,13 +135,16 @@ class DataDetailPenjualan {
       idToko: json["id_toko"],
       idPenjualan: json["id_penjualan"],
       idProduk: json["id_produk"],
+      idPaket: json['id_paket'],
       qty: json["qty"] ?? 0,
       subtotal: json["subtotal"] ?? 0.0,
+      subtotalPaket: json["subtotal_paket"] ?? 0.0,
       discPersen: json["disc_persen"] ?? 0.0,
       discNominal: json["disc_nominal"] ?? 0.0,
       totalHarga: json["total_harga"] ?? 0.0,
       sync: json["sync"],
       nama_produk: json["nama_produk"],
+      namaPaket: json["nama_paket"],
       harga_jual_eceran: json["harga_jual_eceran"],
     );
   }
@@ -147,8 +156,10 @@ class DataDetailPenjualan {
     map['id_toko'] = idToko;
     map['id_penjualan'] = idPenjualan;
     map['id_produk'] = idProduk;
+    map['id_paket'] = idPaket;
     map['qty'] = qty;
     map['subtotal'] = subtotal;
+    map['subtotal_paket'] = subtotalPaket;
     map['disc_persen'] = discPersen;
     map['disc_nominal'] = discNominal;
     map['total_harga'] = totalHarga;

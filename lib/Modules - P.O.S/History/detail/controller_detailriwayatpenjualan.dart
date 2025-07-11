@@ -1121,12 +1121,15 @@ class DetailHistoryPenjualanController extends GetxController {
   SELECT 
      detail_penjualan.*, 
      produk.nama_produk AS nama_produk,
-     produk.harga_jual_eceran AS harga_jual_eceran
+     produk.harga_jual_eceran AS harga_jual_eceran,
+     paket_produk.nama_paket AS nama_paket
    
   FROM 
       detail_penjualan 
   LEFT JOIN 
      produk ON detail_penjualan.id_produk = produk.uuid
+  LEFT JOIN 
+     paket_produk ON detail_penjualan.id_paket = paket_produk.uuid
   WHERE 
       detail_penjualan.id_toko = "$id_toko" AND detail_penjualan.id_penjualan = "$id_penjualan"
 

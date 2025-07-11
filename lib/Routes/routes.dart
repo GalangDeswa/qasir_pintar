@@ -86,6 +86,7 @@ import 'package:qasir_pintar/Modules - P.O.S/pengaturan/binding_pengaturan.dart'
 import 'package:qasir_pintar/Modules - P.O.S/pengaturan/view_pengaturan.dart';
 import 'package:qasir_pintar/Modules%20-%20Distributor/Base%20Menu/view_basemenu_distributor.dart';
 import 'package:qasir_pintar/Modules%20-%20Distributor/Produk/view_produk_list_distributor.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Kasir/binding_kasir.dart';
 
 import '../Modules - Distributor/Base Menu/binding_basemenu_distributor.dart';
 import '../Modules - Distributor/Produk/binding_produk_list_distributor.dart';
@@ -296,7 +297,7 @@ final List<GetPage<dynamic>> route = [
   GetPage(
       name: "/rincianpembayaran",
       page: () => RincianPembayaran(),
-      binding: PembayaranBinding()),
+      binding: KasirBinding()),
 
   // ======================== CUSTOMER MANAGEMENT ========================
   GetPage(

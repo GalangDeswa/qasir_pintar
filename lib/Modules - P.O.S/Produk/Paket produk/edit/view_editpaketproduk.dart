@@ -271,7 +271,6 @@ class EditPaketProduk extends GetView<EditPaketProdukController> {
                                           ),
                                         ),
                                       ),
-                                      //TODO : cehck qty poroses
                                       IconButton(
                                           onPressed: () {
                                             print('min-------------->' +
@@ -328,54 +327,64 @@ class EditPaketProduk extends GetView<EditPaketProdukController> {
                                           },
                                           icon: Icon(Icons.remove)),
                                       IconButton(
+                                          iconSize: 20.0,
+                                          padding: EdgeInsets.zero,
+                                          constraints: const BoxConstraints(),
                                           onPressed: () {
-                                            print('add-------------->' +
-                                                customer[index].nama_produk! +
-                                                'index ==>' +
-                                                customer[index].toString());
+                                            var check = con.produk
+                                                .where((element) =>
+                                                    element.uuid ==
+                                                    customer[index].uuid)
+                                                .first;
+                                            final existingIndex = controller
+                                                .produktemp
+                                                .indexWhere((item) =>
+                                                    item.uuid ==
+                                                    customer[index].uuid);
+                                            if (check.qty! <= 0 &&
+                                                check.hitung_stok == 1 &&
+                                                check.tampilkan_di_produk ==
+                                                    1) {
+                                              Get.showSnackbar(toast()
+                                                  .bottom_snackbar_error(
+                                                      "Error",
+                                                      'Stock sudah habis! harap isi stock terlebih dahulu'));
+                                              return;
+                                            }
+                                            if (controller
+                                                        .produktemp[
+                                                            existingIndex]
+                                                        .qty >
+                                                    check.qty! &&
+                                                check.tampilkan_di_produk ==
+                                                    1 &&
+                                                check.hitung_stok == 1) {
+                                              Get.showSnackbar(toast()
+                                                  .bottom_snackbar_error(
+                                                      "Error",
+                                                      'Stock tidak mencukupi'));
+
+                                              return;
+                                            }
+
                                             customer[index].qty++;
-                                            final hargajualitem =
-                                                customer[index].harga_beli!;
-                                            final hppPerItem =
-                                                customer[index].hpp!;
 
                                             controller.harga_modal.value +=
-                                                hargajualitem;
-
+                                                customer[index].harga_beli!;
                                             controller.harga_hpp.value +=
-                                                hppPerItem;
-
-                                            if (controller.hargaModal.value.text
-                                                .isNotEmpty) {
-                                              final currentValue = double.parse(
-                                                  controller
-                                                      .hargaModal.value.text
-                                                      .replaceAll(',', ''));
-                                              controller.hargaModal.value.text =
-                                                  AppFormat().numFormat(
-                                                      (currentValue +
-                                                          hargajualitem));
-                                            } else {
-                                              controller.hargaModal.value.text =
-                                                  controller.harga_modal.value
-                                                      .toString();
-                                            }
-
-                                            if (controller
-                                                .hpp.value.text.isNotEmpty) {
-                                              final currentValue = double.parse(
-                                                  controller.hpp.value.text
-                                                      .replaceAll(',', ''));
-                                              controller.hpp.value.text =
-                                                  AppFormat().numFormat(
-                                                      (currentValue +
-                                                          hppPerItem));
-                                            } else {
-                                              controller.hpp.value.text =
-                                                  controller.harga_hpp.value
-                                                      .toString();
-                                            }
-
+                                                customer[index].hpp!;
+                                            controller.hargaModal.value.text =
+                                                AppFormat().numFormat(controller
+                                                    .harga_modal.value);
+                                            controller.hpp.value.text =
+                                                AppFormat().numFormat(
+                                                    controller.harga_hpp.value);
+                                            print('sum harga modal --->' +
+                                                controller.harga_modal.value
+                                                    .toString());
+                                            print('sum harga hpp --->' +
+                                                controller.harga_hpp.value
+                                                    .toString());
                                             controller.produktemp.refresh();
                                           },
                                           icon: Icon(Icons.add))
@@ -657,12 +666,20 @@ class EditPaketProduk extends GetView<EditPaketProdukController> {
                 }),
                 button_solid_custom(
                     onPressed: () {
+                      if (controller.produktemp.isEmpty) {
+                        Get.showSnackbar(toast().bottom_snackbar_error(
+                            "Error", "Tidak ada produk"));
+                        return;
+                      }
                       if (controller.registerKey2.value.currentState!
                           .validate()) {
                         controller.editPaketProduk();
                       }
                     },
-                    child: Text('Edit'),
+                    child: Text(
+                      'Edit',
+                      style: AppFont.regular_white_bold(),
+                    ),
                     width: context.res_width)
               ],
             ),

@@ -674,7 +674,7 @@ class PenerimaanProdukController extends GetxController {
     try {
       final image = await ImagePicker().pickImage(
           source: ImageSource.camera,
-          imageQuality: 85,
+          imageQuality: 100,
           maxHeight: 300,
           maxWidth: 300);
       if (image == null) return;
@@ -1028,9 +1028,9 @@ class PenerimaanProdukController extends GetxController {
 
       await Get.find<BasemenuStockController>()
           .fetchPenerimaanLocal(id_toko: id_toko);
-      await Get.find<KasirController>().fetchProdukLocal(id_toko: id_toko);
-      // await Get.find<BaseMenuProdukController>()
-      //     .fetchProdukLocal(id_toko: id_toko);
+      await Get.find<CentralProdukController>()
+          .fetchProdukLocal(id_toko: id_toko);
+
       Get.back(closeOverlays: true);
       Get.showSnackbar(toast().bottom_snackbar_success('Sukses', 'Berhasil'));
     } else {

@@ -26,6 +26,5 @@ class ProdukListDistributor extends GetView<ProdukListDistributorController> {
         );
       },
     );
-    ;
   }
 }

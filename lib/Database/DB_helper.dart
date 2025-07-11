@@ -192,6 +192,30 @@ class DBHelper {
     }
   }
 
+  UPDATEDETAILPAKET(
+      {required String table,
+      required dynamic data,
+      required dynamic id}) async {
+    try {
+      print(
+          "-------------- Updating data : $table ----------------------------");
+      var dbClient = await db;
+      var query = await dbClient!
+          .update(table, data, where: 'id_produk = ?', whereArgs: [id]);
+
+      // return {'result': query, 'error': null}; // Return result and no error
+      return query;
+    } catch (e, stackTrace) {
+      print('---------------------------errorr-----------');
+      print(e);
+      print(stackTrace);
+      // Get.back(closeOverlays: true);
+      Get.showSnackbar(toast().bottom_snackbar_error('Error', e.toString()));
+      //   return {'result': null, 'error': e}; // Return result and no error
+      return null;
+    }
+  }
+
   Future<int> incrementQty({
     required String table,
     required int increment,
@@ -245,6 +269,25 @@ class DBHelper {
       var dbClient = await db;
       var query =
           await dbClient!.delete(table, where: 'uuid = ?', whereArgs: [id]);
+
+      //return {'result': query, 'error': null}; // Return result and no error
+      return query;
+    } catch (e) {
+      Get.back();
+      Get.back();
+      //Get.back(closeOverlays: true);
+      Get.showSnackbar(toast().bottom_snackbar_error('Error', e.toString()));
+      print(e);
+      //return {'result': null, 'error': e}; // Return result and no error
+      return null;
+    }
+  }
+
+  DELETEDETAILPAKET({required String table, id}) async {
+    try {
+      var dbClient = await db;
+      var query = await dbClient!
+          .delete(table, where: 'id_produk = ?', whereArgs: [id]);
 
       //return {'result': query, 'error': null}; // Return result and no error
       return query;

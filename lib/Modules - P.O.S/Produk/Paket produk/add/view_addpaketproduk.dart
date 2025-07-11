@@ -178,197 +178,244 @@ class TambahPaketProduk extends GetView<TambahPaketProdukController> {
                       child: Text('Tambah produk kedalam paket'),
                       width: context.res_width),
                 ),
-
                 Obx(() {
-                  return Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(10),
-                        border: Border.all(color: Colors.black, width: 0.5)),
-                    height: 200,
-                    margin: AppPading.customBottomPadding(),
-                    child: controller.produktemp.isNotEmpty
-                        ? ListView.builder(
-                            itemCount: controller.produktemp.length,
-                            itemBuilder: (context, index) {
-                              final customer = controller.produktemp;
+                  return controller.produktemp.isEmpty
+                      ? Container()
+                      : Obx(() {
+                          return Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(
+                                    color: Colors.black, width: 0.5)),
+                            height: 200,
+                            margin: AppPading.customBottomPadding(),
+                            child: controller.produktemp.isNotEmpty
+                                ? ListView.builder(
+                                    itemCount: controller.produktemp.length,
+                                    itemBuilder: (context, index) {
+                                      final customer = controller.produktemp;
 
-                              return Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: ListTile(
-                                          leading: customer[index]
-                                                          .gambar_produk_utama !=
-                                                      '' &&
-                                                  customer[index]
-                                                          .gambar_produk_utama !=
-                                                      null
-                                              ? controller.isBase64Svg(
-                                                      customer[index]
-                                                          .gambar_produk_utama!)
-                                                  ? SvgPicture.memory(
-                                                      base64Decode(customer[
-                                                              index]
-                                                          .gambar_produk_utama!),
-                                                      width: 30,
-                                                      height: 30,
-                                                      fit: BoxFit.contain,
-                                                    )
-                                                  : Image.memory(
-                                                      base64Decode(customer[
-                                                              index]
-                                                          .gambar_produk_utama!),
-                                                      width: 30,
-                                                      height: 30,
-                                                      fit: BoxFit.contain,
-                                                    )
-                                              : Image.asset(
-                                                  AppString.defaultImg,
-                                                  width: 30,
-                                                  height: 30,
-                                                  fit: BoxFit.contain,
-                                                ),
-                                          title: Text(
-                                            customer[index].nama_produk!,
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                          trailing: Text(
-                                            'Qty : ' +
-                                                customer[index].qty.toString(),
-                                            style: AppFont.small(),
-                                          ),
-                                          subtitle: Column(
-                                            crossAxisAlignment:
-                                                CrossAxisAlignment.start,
+                                      return Column(
+                                        children: [
+                                          Row(
                                             children: [
-                                              Text(
-                                                'Modal : ' +
-                                                    AppFormat().numFormat(
+                                              Expanded(
+                                                child: ListTile(
+                                                  leading: customer[index]
+                                                                  .gambar_produk_utama !=
+                                                              '' &&
+                                                          customer[index]
+                                                                  .gambar_produk_utama !=
+                                                              null
+                                                      ? controller.isBase64Svg(
+                                                              customer[index]
+                                                                  .gambar_produk_utama!)
+                                                          ? SvgPicture.memory(
+                                                              base64Decode(customer[
+                                                                      index]
+                                                                  .gambar_produk_utama!),
+                                                              width: 30,
+                                                              height: 30,
+                                                              fit: BoxFit
+                                                                  .contain,
+                                                            )
+                                                          : Image.memory(
+                                                              base64Decode(customer[
+                                                                      index]
+                                                                  .gambar_produk_utama!),
+                                                              width: 30,
+                                                              height: 30,
+                                                              fit: BoxFit
+                                                                  .contain,
+                                                            )
+                                                      : Image.asset(
+                                                          AppString.defaultImg,
+                                                          width: 30,
+                                                          height: 30,
+                                                          fit: BoxFit.contain,
+                                                        ),
+                                                  title: Text(
+                                                    customer[index]
+                                                        .nama_produk!,
+                                                    style: TextStyle(
+                                                      fontSize: 13,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  trailing: Text(
+                                                    'Qty : ' +
                                                         customer[index]
-                                                            .harga_beli),
-                                                style: AppFont.small(),
+                                                            .qty
+                                                            .toString(),
+                                                    style: AppFont.small(),
+                                                  ),
+                                                  subtitle: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'Modal : ' +
+                                                            AppFormat().numFormat(
+                                                                customer[index]
+                                                                    .harga_beli),
+                                                        style: AppFont.small(),
+                                                      ),
+                                                      Text(
+                                                          'HPP : ' +
+                                                              AppFormat().numFormat(
+                                                                  customer[
+                                                                          index]
+                                                                      .hpp),
+                                                          style:
+                                                              AppFont.small())
+                                                    ],
+                                                  ),
+                                                ),
                                               ),
-                                              Text(
-                                                  'HPP : ' +
-                                                      AppFormat().numFormat(
-                                                          customer[index].hpp),
-                                                  style: AppFont.small())
+                                              IconButton(
+                                                  iconSize: 20.0,
+                                                  padding: EdgeInsets.zero,
+                                                  constraints:
+                                                      const BoxConstraints(),
+                                                  onPressed: () {
+                                                    print('min-------------->');
+                                                    customer[index].qty--;
+
+                                                    // Get the individual product values to subtract
+                                                    final hargaBeliPerItem =
+                                                        customer[index]
+                                                            .harga_beli!;
+                                                    final hppPerItem =
+                                                        customer[index].hpp!;
+
+                                                    // Subtract from totals
+                                                    controller.harga_modal
+                                                            .value -=
+                                                        hargaBeliPerItem;
+                                                    controller.harga_hpp
+                                                        .value -= hppPerItem;
+
+                                                    controller.hargaModal.value
+                                                            .text =
+                                                        AppFormat().numFormat(
+                                                            controller
+                                                                .harga_modal
+                                                                .value);
+                                                    controller.hpp.value.text =
+                                                        AppFormat().numFormat(
+                                                            controller.harga_hpp
+                                                                .value);
+
+                                                    if (customer[index].qty <=
+                                                        0) {
+                                                      var x = customer
+                                                          .removeAt(index);
+                                                      controller
+                                                          .deletedDetailIds
+                                                          .add(x.uuid!);
+                                                      controller.produktemp
+                                                          .refresh();
+                                                    }
+
+                                                    controller.produktemp
+                                                        .refresh();
+                                                  },
+                                                  icon: Icon(Icons.remove)),
+                                              IconButton(
+                                                  iconSize: 20.0,
+                                                  padding: EdgeInsets.zero,
+                                                  constraints:
+                                                      const BoxConstraints(),
+                                                  onPressed: () {
+                                                    var check = con.produk
+                                                        .where((element) =>
+                                                            element.uuid ==
+                                                            customer[index]
+                                                                .uuid)
+                                                        .first;
+                                                    final existingIndex =
+                                                        controller
+                                                            .produktemp
+                                                            .indexWhere((item) =>
+                                                                item.uuid ==
+                                                                customer[index]
+                                                                    .uuid);
+                                                    if (check.qty == 0 &&
+                                                        check.hitung_stok ==
+                                                            1 &&
+                                                        check.tampilkan_di_produk ==
+                                                            1) {
+                                                      Get.showSnackbar(toast()
+                                                          .bottom_snackbar_error(
+                                                              "Error",
+                                                              'Stock sudah habis! harap isi stock terlebih dahulu'));
+                                                      return;
+                                                    }
+                                                    if (controller
+                                                                .produktemp[
+                                                                    existingIndex]
+                                                                .qty >=
+                                                            check.qty! &&
+                                                        check.tampilkan_di_produk ==
+                                                            1 &&
+                                                        check.hitung_stok ==
+                                                            1) {
+                                                      Get.showSnackbar(toast()
+                                                          .bottom_snackbar_error(
+                                                              "Error",
+                                                              'Stock tidak mencukupi'));
+
+                                                      return;
+                                                    }
+                                                    customer[index].qty++;
+                                                    controller.harga_modal
+                                                            .value +=
+                                                        customer[index]
+                                                            .harga_beli!;
+                                                    controller
+                                                            .harga_hpp.value +=
+                                                        customer[index].hpp!;
+                                                    controller.hargaModal.value
+                                                            .text =
+                                                        AppFormat().numFormat(
+                                                            controller
+                                                                .harga_modal
+                                                                .value);
+                                                    controller.hpp.value.text =
+                                                        AppFormat().numFormat(
+                                                            controller.harga_hpp
+                                                                .value);
+                                                    print(
+                                                        'sum harga modal --->' +
+                                                            controller
+                                                                .harga_modal
+                                                                .value
+                                                                .toString());
+                                                    print('sum harga hpp --->' +
+                                                        controller
+                                                            .harga_hpp.value
+                                                            .toString());
+                                                    controller.produktemp
+                                                        .refresh();
+                                                  },
+                                                  icon: Icon(Icons.add))
                                             ],
                                           ),
-                                        ),
-                                      ),
-                                      IconButton(
-                                          iconSize: 20.0,
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(),
-                                          onPressed: () {
-                                            print('min-------------->');
-                                            customer[index].qty--;
-
-                                            // Get the individual product values to subtract
-                                            final hargaBeliPerItem =
-                                                customer[index].harga_beli!;
-                                            final hppPerItem =
-                                                customer[index].hpp!;
-
-                                            // Subtract from totals
-                                            controller.harga_modal.value -=
-                                                hargaBeliPerItem;
-                                            controller.harga_hpp.value -=
-                                                hppPerItem;
-
-                                            controller.hargaModal.value.text =
-                                                AppFormat().numFormat(controller
-                                                    .harga_modal.value);
-                                            controller.hpp.value.text =
-                                                AppFormat().numFormat(
-                                                    controller.harga_hpp.value);
-
-                                            if (customer[index].qty <= 0) {
-                                              var x = customer.removeAt(index);
-                                              controller.deletedDetailIds
-                                                  .add(x.uuid!);
-                                              controller.produktemp.refresh();
-                                            }
-
-                                            controller.produktemp.refresh();
-                                          },
-                                          icon: Icon(Icons.remove)),
-                                      IconButton(
-                                          iconSize: 20.0,
-                                          padding: EdgeInsets.zero,
-                                          constraints: const BoxConstraints(),
-                                          onPressed: () {
-                                            var check = con.produk
-                                                .where((element) =>
-                                                    element.uuid ==
-                                                    customer[index].uuid)
-                                                .first;
-                                            final existingIndex = controller
-                                                .produktemp
-                                                .indexWhere((item) =>
-                                                    item.uuid ==
-                                                    customer[index].uuid);
-                                            if (check.qty == 0 &&
-                                                check.tampilkan_di_produk ==
-                                                    1) {
-                                              Get.showSnackbar(toast()
-                                                  .bottom_snackbar_error(
-                                                      "Error",
-                                                      'Stock sudah habis! harap isi stock terlebih dahulu'));
-                                              return;
-                                            }
-                                            if (controller
-                                                        .produktemp[
-                                                            existingIndex]
-                                                        .qty >=
-                                                    check.qty! &&
-                                                check.tampilkan_di_produk ==
-                                                    1) {
-                                              Get.showSnackbar(toast()
-                                                  .bottom_snackbar_error(
-                                                      "Error",
-                                                      'Stock tidak mencukupi'));
-
-                                              return;
-                                            }
-                                            customer[index].qty++;
-                                            controller.harga_modal.value +=
-                                                customer[index].harga_beli!;
-                                            controller.harga_hpp.value +=
-                                                customer[index].hpp!;
-                                            controller.hargaModal.value.text =
-                                                AppFormat().numFormat(controller
-                                                    .harga_modal.value);
-                                            controller.hpp.value.text =
-                                                AppFormat().numFormat(
-                                                    controller.harga_hpp.value);
-                                            print('sum harga modal --->' +
-                                                controller.harga_modal.value
-                                                    .toString());
-                                            print('sum harga hpp --->' +
-                                                controller.harga_hpp.value
-                                                    .toString());
-                                            controller.produktemp.refresh();
-                                          },
-                                          icon: Icon(Icons.add))
-                                    ],
-                                  ),
-                                  Container(
-                                    height: 0.5,
-                                    color: Colors.black,
+                                          Container(
+                                            height: 0.5,
+                                            color: Colors.black,
+                                          )
+                                        ],
+                                      );
+                                    },
                                   )
-                                ],
-                              );
-                            },
-                          )
-                        : Center(child: Text('Paket kosong')),
-                  );
+                                : Center(child: Text('Paket kosong')),
+                          );
+                        });
                 }),
+
                 Obx(() {
                   return Padding(
                       padding: AppPading.customBottomPadding(),
@@ -521,7 +568,7 @@ class TambahPaketProduk extends GetView<TambahPaketProdukController> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Pajak ?',
+                          'Pajak',
                           style: AppFont.regular(),
                         ),
                         Switch(
@@ -632,6 +679,23 @@ class TambahPaketProduk extends GetView<TambahPaketProdukController> {
                     ),
                   );
                 }),
+                // Obx(() {
+                //   return Padding(
+                //     padding: AppPading.customBottomPadding(),
+                //     child: Row(
+                //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                //       children: [
+                //         Text('Hitung Stock'),
+                //         Switch(
+                //           value: controller.hitung_stock.value,
+                //           onChanged: (value) {
+                //             controller.hitung_stock.value = value;
+                //           },
+                //         ),
+                //       ],
+                //     ),
+                //   );
+                // }),
                 button_solid_custom(
                     onPressed: () {
                       if (controller.registerKey2.value.currentState!
@@ -639,7 +703,7 @@ class TambahPaketProduk extends GetView<TambahPaketProdukController> {
                         controller.tambahPaketProduk();
                       }
                     },
-                    child: Text('tambah'),
+                    child: Text('Tambah', style: AppFont.regular_white()),
                     width: context.res_width)
               ],
             ),

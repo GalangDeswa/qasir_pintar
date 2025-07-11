@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:meta/meta.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/Data%20produk/model_produk.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/Produk/model_kategoriproduk.dart';
 
@@ -97,7 +98,8 @@ class BaseMenuProdukController extends GetxController {
       if (index != -1) {
         paketproduk.removeAt(index);
       }
-      await fetchPaketLocal(id_toko: id_toko);
+      await Get.find<CentralPaketController>()
+          .fetchPaketLocal(id_toko: id_toko);
       Get.back();
       Get.back();
       Get.showSnackbar(

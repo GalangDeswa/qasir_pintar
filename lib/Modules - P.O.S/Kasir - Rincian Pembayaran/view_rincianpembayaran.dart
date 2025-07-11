@@ -5,10 +5,11 @@ import 'package:qasir_pintar/Modules - P.O.S/Kasir%20-%20Pembayaran/controller_p
 import 'package:qasir_pintar/Modules - P.O.S/Kasir%20-%20Rincian%20Pembayaran/component_Uppermenu_rincian.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Kasir%20-%20Rincian%20Pembayaran/component_bottommenu_rincian.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Kasir%20-%20Rincian%20Pembayaran/component_metodebayar.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Kasir/controller_kasir.dart';
 
 import 'package:qasir_pintar/Widget/widget.dart';
 
-class RincianPembayaran extends GetView<PembayaranController> {
+class RincianPembayaran extends GetView<KasirController> {
   const RincianPembayaran({super.key});
 
   @override

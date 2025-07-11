@@ -9,8 +9,9 @@ import 'package:qasir_pintar/Widget/widget.dart';
 
 import '../../Controllers/printerController.dart';
 import '../Kasir - Pembayaran/controller_pembayaran.dart';
+import '../Kasir/controller_kasir.dart';
 
-class BottommenuRincian extends GetView<PembayaranController> {
+class BottommenuRincian extends GetView<KasirController> {
   const BottommenuRincian({super.key});
 
   @override

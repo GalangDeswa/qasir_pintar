@@ -3,11 +3,12 @@ import 'package:get/get.dart';
 import 'package:qasir_pintar/Config/config.dart';
 import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Kasir%20-%20Pembayaran/controller_pembayaran.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Kasir/controller_kasir.dart';
 import 'package:qasir_pintar/Widget/widget.dart';
 
 import '../../Widget/popscreen.dart';
 
-class BottomMenuPembayaran extends GetView<PembayaranController> {
+class BottomMenuPembayaran extends GetView<KasirController> {
   const BottomMenuPembayaran({super.key});
 
   @override
@@ -17,12 +18,29 @@ class BottomMenuPembayaran extends GetView<PembayaranController> {
       children: [
         Obx(() {
           return Container(
+            // decoration: BoxDecoration(border: Border.all(color: Colors.black)),
+            // color: Colors.red,
             padding: AppPading.defaultBodyPadding(),
-            decoration: BoxDecoration(border: Border.all(color: Colors.black)),
             child: Column(
               children: [
+                Padding(
+                  padding: AppPading.customBottomPaddingSmall(),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text('Subtotal :', style: AppFont.regular()),
+                      Text(
+                          'Rp. ' +
+                              AppFormat().numFormat(controller.subtotal.value),
+                          style: AppFont.regular_bold()),
+                    ],
+                  ),
+                ),
+                Divider(),
                 Obx(() {
                   return ExpansionTile(
+                    dense: true,
+                    visualDensity: VisualDensity.compact,
                     title: Text('Detail :', style: AppFont.regular()),
                     shape: const Border(),
                     childrenPadding: EdgeInsets.zero,
@@ -33,7 +51,7 @@ class BottomMenuPembayaran extends GetView<PembayaranController> {
                       controller.displaydiskon.value == 0.0
                           ? Container()
                           : Padding(
-                              padding: AppPading.customBottomPadding(),
+                              padding: AppPading.customBottomPaddingSmall(),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -42,19 +60,35 @@ class BottomMenuPembayaran extends GetView<PembayaranController> {
                                     'Diskon',
                                     style: AppFont.regular(),
                                   ),
-                                  Text(
-                                    'Rp, ' +
-                                        AppFormat().numFormat(
-                                            controller.jumlahdiskonkasir.value),
-                                    style: AppFont.regular_bold(),
-                                  ),
+                                  Row(
+                                    children: [
+                                      Text(
+                                        'Rp, ' +
+                                            AppFormat().numFormat(controller
+                                                .jumlahdiskonkasir.value),
+                                        style: AppFont.regular_bold(),
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      controller.metode_diskon == 1
+                                          ? Text(
+                                              "(" +
+                                                  controller.displaydiskon.value
+                                                      .toStringAsFixed(0) +
+                                                  '%)'.toString(),
+                                              style: AppFont.regular_bold(),
+                                            )
+                                          : Container(),
+                                    ],
+                                  )
                                 ],
                               ),
                             ),
                       controller.promolistvalue == null
                           ? Container()
                           : Padding(
-                              padding: AppPading.customBottomPadding(),
+                              padding: AppPading.customBottomPaddingSmall(),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -110,10 +144,10 @@ class BottomMenuPembayaran extends GetView<PembayaranController> {
                                 ],
                               ),
                             ),
-                      controller.pelangganvalue == ''
+                      controller.pelangganvalue.value == ''
                           ? Container()
                           : Padding(
-                              padding: AppPading.customBottomPadding(),
+                              padding: AppPading.customBottomPaddingSmall(),
                               child: Row(
                                 mainAxisAlignment:
                                     MainAxisAlignment.spaceBetween,
@@ -136,25 +170,12 @@ class BottomMenuPembayaran extends GetView<PembayaranController> {
                     ],
                   );
                 }),
-                Padding(
-                  padding: AppPading.customBottomPadding(),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Subtotal :', style: AppFont.regular()),
-                      Text(
-                          'Rp. ' +
-                              AppFormat().numFormat(controller.subtotal.value),
-                          style: AppFont.regular_bold()),
-                    ],
-                  ),
-                ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
                       'Total :',
-                      style: AppFont.regular(),
+                      style: AppFont.regular_bold(),
                     ),
                     Text(
                       'Rp. ' + AppFormat().numFormat(controller.total.value),
@@ -167,8 +188,9 @@ class BottomMenuPembayaran extends GetView<PembayaranController> {
           );
         }),
         Container(
-          height: 80,
+          //height: 80,
           //width: context.res_width,
+          padding: EdgeInsets.symmetric(vertical: 12),
           color: AppColor.primary,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -187,7 +209,12 @@ class BottomMenuPembayaran extends GetView<PembayaranController> {
                       child: button_border_custom(
                           margin: EdgeInsets.symmetric(horizontal: 10),
                           onPressed: () {
-                            Get.toNamed('/rincianpembayaran');
+                            if (controller.keranjangv2.isEmpty) {
+                              Get.showSnackbar(toast().bottom_snackbar_error(
+                                  "Error", 'Keranjang kosong'));
+                            } else {
+                              Get.toNamed('/rincianpembayaran');
+                            }
                           },
                           child: Text('Bayar'),
                           width: context.res_width),

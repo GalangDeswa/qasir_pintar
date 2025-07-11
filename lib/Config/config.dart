@@ -152,6 +152,10 @@ class AppPading {
     return const EdgeInsets.only(bottom: 20);
   }
 
+  static EdgeInsets customBottomPaddingSmall() {
+    return const EdgeInsets.only(bottom: 10);
+  }
+
   static EdgeInsets customTopPadding() {
     return const EdgeInsets.only(top: 20);
   }

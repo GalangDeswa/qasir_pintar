@@ -32,8 +32,6 @@ class EditPaketProdukController extends GetxController {
     // TODO: implement onInit
     super.onInit();
     await fetchdetailpaket(id_toko: id_toko, id_paket_produk: data.uuid);
-    // await Get.find<CentralProdukController>()
-    //     .fetchProdukLocal(id_toko: id_toko);
     await fetchProdukLocal(id_toko: id_toko);
     await fetchpajak(id_toko: id_toko);
     namaPaket.value.text = data.nama_paket!;
@@ -43,6 +41,8 @@ class EditPaketProdukController extends GetxController {
     pajakdisplay.value = data.pajak != null ? true : false;
     pajakValue = data.pajak ?? null;
     tampilkanDiProduk.value = data.tampilkan_di_paket == 1 ? true : false;
+    harga_hpp.value = data.hpp ?? 0;
+    harga_modal.value = data.harga_modal ?? 0;
   }
 
   void deleteImage() {
@@ -185,9 +185,9 @@ class EditPaketProdukController extends GetxController {
         ));
       }
 
-      //TODO : check format harga pas tambah2 qty
-
       //print(data.first.uuid);
+      print('detail paket oninit');
+      print(detailpaket);
       return data;
     } else {
       print('empty');
@@ -691,20 +691,31 @@ class EditPaketProdukController extends GetxController {
           harga_modal: double.parse(hargaModal.value.text.replaceAll(',', '')),
         ));
     if (paket == 1) {
-      for (DataDetailPaketProduk detailPaketlist in detailpaket) {
-        if (detailPaketlist.uuid != null) {
+      for (DataProdukTemp detailPaketlist in produktemp) {
+        final exist =
+            detailpaket.any((e) => e.id_produk == detailPaketlist.uuid);
+        if (exist) {
           // UPDATE existing detail
-          await DBHelper().UPDATE(
+          // final paketlocal = detailpaket.firstWhere(
+          //   (e) => e.id_produk == detailPaketlist.uuid,
+          // );
+          print('update isi paket yg ada  -->');
+          print(detailPaketlist.nama_produk);
+          print(detailPaketlist.qty);
+          print(detailPaketlist.uuid);
+          await DBHelper().UPDATEDETAILPAKET(
             id: detailPaketlist.uuid,
             table: 'detail_paket_produk',
             data: detaildataedit(
               sub_hpp: detailPaketlist.hpp,
               qty: detailPaketlist.qty,
-              sub_hargamodal: detailPaketlist.harga_modal,
+              sub_hargamodal: detailPaketlist.harga_jual_eceran,
             ),
           );
         } else {
           // INSERT new detail
+          print('insert item paket baru -->');
+          print(detailPaketlist.nama_produk);
           var uuuidDetauilpaket = Uuid().v4();
           var detail = await DBHelper().INSERT(
               'detail_paket_produk',
@@ -712,12 +723,12 @@ class EditPaketProdukController extends GetxController {
                       aktif: 1,
                       uuid: uuuidDetauilpaket,
                       hpp: detailPaketlist.hpp,
-                      id_produk: detailPaketlist.id_produk,
+                      id_produk: detailPaketlist.uuid,
                       id_toko: id_toko,
-                      harga_modal: detailPaketlist.harga_modal,
+                      harga_modal: detailPaketlist.harga_beli,
                       id_paket_produk: data.uuid,
                       qty: detailPaketlist.qty,
-                      sub_harga_modal: detailPaketlist.hargaeceranproduk! *
+                      sub_harga_modal: detailPaketlist.harga_jual_eceran! *
                           detailPaketlist.qty,
                       sub_hpp: detailPaketlist.hpp! * detailPaketlist.qty)
                   .DB());
@@ -725,7 +736,8 @@ class EditPaketProdukController extends GetxController {
       }
 
       for (var deletedId in deletedDetailIds) {
-        await DBHelper().DELETE(table: 'detail_paket_produk', id: deletedId);
+        await DBHelper()
+            .DELETEDETAILPAKET(table: 'detail_paket_produk', id: deletedId);
       }
 
       await Get.find<CentralPaketController>()
@@ -737,40 +749,7 @@ class EditPaketProdukController extends GetxController {
     } else {
       Get.back(closeOverlays: true);
       Get.showSnackbar(
-          toast().bottom_snackbar_error('error', 'gagal edit data local'));
-    }
-  }
-
-  editPaketProdukv2() async {
-    print('-------------------edit paket produk local---------------------');
-
-    Get.dialog(const showloading(), barrierDismissible: false);
-
-    var paket = await DBHelper().UPDATE(
-        id: data.uuid,
-        table: 'paket_produk',
-        data: dataedit(
-          id_toko: id_toko,
-          hpp: double.parse(hpp.value.text.replaceAll(',', '')),
-          tampilkan_di_paket: tampilkanDiProduk.value == true ? 1 : 0,
-          harga_jual_paket:
-              double.parse(hargaJualPaket.value.text.replaceAll(',', '')),
-          gambar_utama: image64,
-          pajak: pajakValue,
-          nama_paket: namaPaket.value.text,
-          harga_modal: double.parse(hargaModal.value.text.replaceAll(',', '')),
-        ));
-    if (paket == 1) {
-      await Get.find<BaseMenuProdukController>()
-          .fetchPaketLocal(id_toko: id_toko);
-      Get.back();
-      Get.back();
-      Get.showSnackbar(
-          toast().bottom_snackbar_success('sukses', 'berhasil diedit'));
-    } else {
-      Get.back(closeOverlays: true);
-      Get.showSnackbar(
-          toast().bottom_snackbar_error('error', 'gagal edit data local'));
+          toast().bottom_snackbar_error('error', 'gagal edit paket'));
     }
   }
 
@@ -1189,6 +1168,8 @@ class EditPaketProdukController extends GetxController {
 
   var customqty = TextEditingController().obs;
 
+  //TODO: buat reversal di penjualan
+
   popaddqty(DataProduk data) {
     var con = Get.find<CentralProdukController>();
     Get.dialog(AlertDialog(
@@ -1205,13 +1186,16 @@ class EditPaketProdukController extends GetxController {
           return Container(
               height: Get.height * 0.25,
               width: context.res_width,
+              padding: AppPading.defaultBodyPadding(),
               child: Column(children: [
                 Expanded(child: Text('Qty')),
                 Expanded(
                   child: TextField(
                     controller: customqty.value,
-                    decoration:
-                        InputDecoration(hintText: 'Masukan jumlah produk'),
+                    decoration: InputDecoration(
+                      hintText: 'Masukan jumlah produk',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
                 ),
 
@@ -1219,13 +1203,15 @@ class EditPaketProdukController extends GetxController {
                 Expanded(
                   child: button_solid_custom(
                       onPressed: () {
+                        final con = Get.find<CentralProdukController>();
                         final existingIndex = produktemp
                             .indexWhere((item) => item.uuid == data.uuid);
                         final qty = int.parse(customqty.value.text);
-                        var check = con.produk
-                            .where((element) => element.uuid == data.uuid)
-                            .first;
-                        if (check.qty == 0 && check.tampilkan_di_produk == 1) {
+                        final check =
+                            con.produk.firstWhere((e) => e.uuid == data.uuid);
+
+                        // Stock checks...
+                        if (check.hitung_stok == 1 && check.qty! == 0) {
                           Get.showSnackbar(toast().bottom_snackbar_error(
                               "Error",
                               'Stock sudah habis! harap isi stock terlebih dahulu'));
@@ -1270,42 +1256,38 @@ class EditPaketProdukController extends GetxController {
 
                           produktemp.refresh();
                         } else {
-                          if (produktemp[existingIndex].qty >= check.qty! &&
-                              check.tampilkan_di_produk == 1) {
+                          // update qty of existing
+                          if (produktemp[existingIndex].qty + qty >
+                                  check.qty! &&
+                              check.hitung_stok == 1) {
                             Get.showSnackbar(toast().bottom_snackbar_error(
                                 "Error", 'Stock tidak mencukupi'));
-
                             return;
                           }
                           produktemp[existingIndex].qty += qty;
-                          produktemp.refresh();
                         }
-                        var modalval =
-                            harga_modal.value += data.harga_beli! * qty;
-                        var hppval = harga_hpp.value += data.hpp! * qty;
-                        if (hargaModal.value.text.isNotEmpty) {
-                          final currentValue = double.parse(
-                              hargaModal.value.text.replaceAll(',', ''));
-                          hargaModal.value.text =
-                              AppFormat().numFormat((currentValue + modalval));
-                        }
-                        if (hpp.value.text.isNotEmpty) {
-                          final currentValue =
-                              double.parse(hpp.value.text.replaceAll(',', ''));
-                          hpp.value.text =
-                              AppFormat().numFormat((currentValue + hppval));
-                        }
+                        produktemp.refresh();
 
-                        // hargaModal.value.text =
-                        //     AppFormat().numFormat(harga_modal.value);
-                        // hpp.value.text = AppFormat().numFormat(harga_hpp.value);
-                        // print('sum harga modal --->' +
-                        //     harga_modal.value.toString());
-                        // print(
-                        //     'sum harga hpp --->' + harga_hpp.value.toString());
+                        // 1) compute new totals
+                        final newModalTotal =
+                            harga_modal.value + data.harga_beli! * qty;
+                        final newHppTotal = harga_hpp.value + data.hpp! * qty;
+
+                        // 2) write them back
+                        harga_modal.value = newModalTotal;
+                        harga_hpp.value = newHppTotal;
+
+                        // 3) update the text controllers in one shot
+                        hargaModal.value.text =
+                            AppFormat().numFormat(newModalTotal);
+                        hpp.value.text = AppFormat().numFormat(newHppTotal);
+
                         Get.back();
                       },
-                      child: Text('Tambah'),
+                      child: Text(
+                        'Tambah',
+                        style: AppFont.regular_white_bold(),
+                      ),
                       width: Get.width),
                 )
               ]));
@@ -1352,7 +1334,6 @@ class EditPaketProdukController extends GetxController {
                           itemCount: con.produk.length,
                           itemBuilder: (context, index) {
                             final produk = con.produk;
-                            //TODO : check nambah item edit ga ikut index yg udh ada
                             return produk[index].tampilkan_di_produk == 1
                                 ? GestureDetector(
                                     onTap: () {
@@ -1365,8 +1346,9 @@ class EditPaketProdukController extends GetxController {
                                       final existingIndex =
                                           produktemp.indexWhere((item) =>
                                               item.uuid == produk[index].uuid);
-                                      if (check.qty == 0 &&
-                                          check.tampilkan_di_produk == 1) {
+                                      if (check.qty! <= 0 &&
+                                          check.tampilkan_di_produk == 1 &&
+                                          check.hitung_stok == 1) {
                                         Get.showSnackbar(toast()
                                             .bottom_snackbar_error("Error",
                                                 'Stock sudah habis! harap isi stock terlebih dahulu'));
@@ -1428,9 +1410,10 @@ class EditPaketProdukController extends GetxController {
 
                                         produktemp.refresh();
                                       } else {
-                                        if (produktemp[existingIndex].qty >=
+                                        if (produktemp[existingIndex].qty >
                                                 check.qty! &&
-                                            check.tampilkan_di_produk == 1) {
+                                            check.tampilkan_di_produk == 1 &&
+                                            check.hitung_stok == 1) {
                                           Get.showSnackbar(toast()
                                               .bottom_snackbar_error("Error",
                                                   'Stock tidak mencukupi'));
@@ -1464,18 +1447,6 @@ class EditPaketProdukController extends GetxController {
                                         hpp.value.text = AppFormat().numFormat(
                                             (currentValue + hppPerItem));
                                       }
-
-                                      // harga_modal.value +=
-                                      //     produk[index].harga_beli!;
-                                      // harga_hpp.value += produk[index].hpp!;
-                                      // hargaModal.value.text = AppFormat()
-                                      //     .numFormat(harga_modal.value);
-                                      // hpp.value.text = AppFormat()
-                                      //     .numFormat(harga_hpp.value);
-                                      // print('sum harga modal --->' +
-                                      //     harga_modal.value.toString());
-                                      // print('sum harga hpp --->' +
-                                      //     harga_hpp.value.toString());
                                     },
                                     child: Column(
                                       children: [
@@ -1549,8 +1520,9 @@ class EditPaketProdukController extends GetxController {
                                                   popaddqty(produk[index]);
                                                 },
                                                 child: Text(
-                                                  '+ Kelipatan',
-                                                  style: AppFont.small_white(),
+                                                  '+ Qty',
+                                                  style: AppFont
+                                                      .regular_white_bold(),
                                                 ),
                                                 width: 100)
                                           ],

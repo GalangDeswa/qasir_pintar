@@ -1050,7 +1050,7 @@ class Popscreen {
 
   konfirmasibayar(
     List<DataProdukTemp> keranjang,
-    PembayaranController controller,
+    KasirController controller,
   ) {
     Get.dialog(AlertDialog(
       insetPadding: EdgeInsets.zero,
@@ -1224,6 +1224,7 @@ class Popscreen {
                       onPressed: () async {
                         print('bayar local------------------------------->');
                         await controller.pembayaran();
+                        //controller.checktipe();
                       },
                       child: Text(
                         'bayar',
@@ -1242,7 +1243,7 @@ class Popscreen {
   }
 
   berhasilbayar(
-    PembayaranController controller,
+    KasirController controller,
   ) {
     Get.dialog(
         barrierDismissible: false,

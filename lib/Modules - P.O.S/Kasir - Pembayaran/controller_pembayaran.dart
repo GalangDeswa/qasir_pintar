@@ -267,7 +267,7 @@ class PembayaranController extends GetxController {
             id_produk: produk.uuid!,
             decrement: produk.qty);
       }
-      Popscreen().berhasilbayar(this);
+      //Popscreen().berhasilbayar(this);
       await Get.find<KasirController>().fetchProdukLocal(id_toko: id_toko);
       clearAll();
 

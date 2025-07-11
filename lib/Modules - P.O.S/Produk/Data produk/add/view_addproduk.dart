@@ -1239,6 +1239,73 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
+                          'Hitung Stok',
+                          style: AppFont.regular(),
+                        ),
+                        Switch(
+                          value: controller.hitungStok.value,
+                          onChanged: (value) {
+                            controller.hitungStok.value = value;
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                Obx(() {
+                  return controller.hitungStok.value == true
+                      ? Padding(
+                          padding: AppPading.customBottomPadding(),
+                          child: TextFormField(
+                            controller: controller.stockawal.value,
+                            decoration: InputDecoration(
+                              labelText: 'Stock awal',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            keyboardType: TextInputType.number,
+                            // validator: (value) {
+                            //            if (value!.isEmpty) {
+                            //              return 'Pajak harus diisi';
+                            //            }
+                            //            return null;
+                            //          },
+                          ))
+                      : Container();
+                }),
+                Obx(() {
+                  return controller.hitungStok.value == true
+                      ? Padding(
+                          padding: AppPading.customBottomPadding(),
+                          child: TextFormField(
+                            controller: controller.infostock.value,
+                            decoration: InputDecoration(
+                              labelText: 'Info stock habis',
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (controller.hitungStok.value == true &&
+                                  value!.isEmpty) {
+                                return 'Stock habis harus diisi';
+                              }
+                              if (value!.isNotEmpty && int.parse(value) < 0)
+                                return 'Stock habis tidak boleh lebih kecil dari 0';
+                            },
+                          ))
+                      : Container();
+                }),
+
+                Obx(() {
+                  return Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
                           'Diskon',
                           style: AppFont.regular(),
                         ),
@@ -1350,73 +1417,6 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
                           );
                   },
                 ),
-
-                Obx(() {
-                  return Padding(
-                    padding: AppPading.customBottomPadding(),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Hitung Stok',
-                          style: AppFont.regular(),
-                        ),
-                        Switch(
-                          value: controller.hitungStok.value,
-                          onChanged: (value) {
-                            controller.hitungStok.value = value;
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-                Obx(() {
-                  return controller.hitungStok.value == true
-                      ? Padding(
-                          padding: AppPading.customBottomPadding(),
-                          child: TextFormField(
-                            controller: controller.stockawal.value,
-                            decoration: InputDecoration(
-                              labelText: 'Stock awal',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            // validator: (value) {
-                            //            if (value!.isEmpty) {
-                            //              return 'Pajak harus diisi';
-                            //            }
-                            //            return null;
-                            //          },
-                          ))
-                      : Container();
-                }),
-                Obx(() {
-                  return controller.hitungStok.value == true
-                      ? Padding(
-                          padding: AppPading.customBottomPadding(),
-                          child: TextFormField(
-                            controller: controller.infostock.value,
-                            decoration: InputDecoration(
-                              labelText: 'Info stock habis',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            validator: (value) {
-                              if (controller.hitungStok.value == true &&
-                                  value!.isEmpty) {
-                                return 'Stock habis harus diisi';
-                              }
-                              if (value!.isNotEmpty && int.parse(value) < 0)
-                                return 'Stock habis tidak boleh lebih kecil dari 0';
-                            },
-                          ))
-                      : Container();
-                }),
 
                 Obx(() {
                   return Padding(

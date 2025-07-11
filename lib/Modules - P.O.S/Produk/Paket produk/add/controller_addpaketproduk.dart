@@ -45,6 +45,7 @@ class TambahPaketProdukController extends GetxController {
   var ukurandisplay = false.obs;
   var dimensi = false.obs;
   var tampilkanDiProduk = true.obs;
+  var hitung_stock = false.obs;
   var registerKey = GlobalKey<FormState>().obs;
   var registerKey2 = GlobalKey<FormState>().obs;
   var pajakkey = GlobalKey<FormState>().obs;
@@ -634,6 +635,7 @@ class TambahPaketProdukController extends GetxController {
         nama_paket: namaPaket.value.text,
         harga_modal: harga_modal.value,
         tampilkan_di_paket: tampilkanDiProduk.value == true ? 1 : 0,
+        // hitungStock: hitung_stock.value == true ? 1 : 0,
       ).DB(),
     );
 
@@ -1257,7 +1259,7 @@ class TambahPaketProdukController extends GetxController {
 
                                         produktemp.refresh();
                                       } else {
-                                        if (produktemp[existingIndex].qty >=
+                                        if (produktemp[existingIndex].qty >
                                                 check.qty! &&
                                             check.tampilkan_di_produk == 1 &&
                                             check.hitung_stok == 1) {
@@ -1358,7 +1360,7 @@ class TambahPaketProdukController extends GetxController {
                                                   popaddqty(customer[index]);
                                                 },
                                                 child: Text(
-                                                  '+ Kelipatan',
+                                                  '+ Qty',
                                                   style: AppFont.small_white(),
                                                 ),
                                                 width: 100)
@@ -1457,14 +1459,15 @@ class TambahPaketProdukController extends GetxController {
           return Container(
               height: Get.height * 0.25,
               width: context.res_width,
+              padding: AppPading.defaultBodyPadding(),
               child: Column(children: [
                 Expanded(child: Text('Qty')),
                 Expanded(
                   child: TextField(
-                    controller: customqty.value,
-                    decoration:
-                        InputDecoration(hintText: 'Masukan jumlah produk'),
-                  ),
+                      controller: customqty.value,
+                      decoration: InputDecoration(
+                          hintText: 'Masukan jumlah produk',
+                          border: OutlineInputBorder())),
                 ),
 
                 //tambah add - qty di list
@@ -1477,7 +1480,9 @@ class TambahPaketProdukController extends GetxController {
                         var check = con.produk
                             .where((element) => element.uuid == data.uuid)
                             .first;
-                        if (check.qty == 0 && check.tampilkan_di_produk == 1) {
+                        if (check.qty == 0 &&
+                            check.tampilkan_di_produk == 1 &&
+                            check.hitung_stok == 1) {
                           Get.showSnackbar(toast().bottom_snackbar_error(
                               "Error",
                               'Stock sudah habis! harap isi stock terlebih dahulu'));
@@ -1522,8 +1527,9 @@ class TambahPaketProdukController extends GetxController {
 
                           produktemp.refresh();
                         } else {
-                          if (produktemp[existingIndex].qty >= check.qty! &&
-                              check.tampilkan_di_produk == 1) {
+                          if (produktemp[existingIndex].qty > check.qty! &&
+                              check.tampilkan_di_produk == 1 &&
+                              check.hitung_stok == 1) {
                             Get.showSnackbar(toast().bottom_snackbar_error(
                                 "Error", 'Stock tidak mencukupi'));
 

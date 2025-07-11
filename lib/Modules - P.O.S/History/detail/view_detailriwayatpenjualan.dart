@@ -113,7 +113,23 @@ class DetailHistoryPenjualan extends GetView<DetailHistoryPenjualanController> {
                       style: AppFont.regular(),
                     ),
                     children: [
-                      Text('Produk'),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Produk',
+                              style: AppFont.regular(),
+                            ),
+                            Text(
+                              'Subtotal',
+                              style: AppFont.regular(),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Divider(),
                       Padding(
                         padding: AppPading.defaultBodyPadding(),
                         child: Align(
@@ -122,12 +138,33 @@ class DetailHistoryPenjualan extends GetView<DetailHistoryPenjualanController> {
                             List<Widget> x = [];
 
                             for (final group in controller.detailpenjualan) {
-                              x.add(Text(
-                                '${group.nama_produk}',
-                                style: AppFont.regular_bold(),
+                              x.add(Padding(
+                                padding: EdgeInsets.only(bottom: 1),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      '${group.nama_produk != null ? group.nama_produk : group.namaPaket}',
+                                      style: AppFont.regular_bold(),
+                                    ),
+                                    Text(
+                                      'Rp. ' +
+                                          AppFormat().numFormat(
+                                            group.subtotal!,
+                                          ),
+                                      style: AppFont.regular(),
+                                    )
+                                  ],
+                                ),
                               ));
-                              x.add(Text('Qty :  ${group.qty}',
-                                  style: AppFont.small()));
+                              x.add(Padding(
+                                padding: EdgeInsets.only(bottom: 1),
+                                child: Text('Qty :  ${group.qty}',
+                                    style: AppFont.small()),
+                              ));
+                              x.add(Divider());
                             }
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -224,7 +261,7 @@ class DetailHistoryPenjualan extends GetView<DetailHistoryPenjualanController> {
                                   .numFormat(controller.data.nilaiBayar)),
                       Divider(height: 0, thickness: 0.5),
                       _buildDetailTile(
-                          title: 'Jumlah produk',
+                          title: 'Kembalian',
                           value: 'Rp, ' +
                               AppFormat().numFormat(controller.data.kembalian)),
                       Divider(height: 0, thickness: 0.5),

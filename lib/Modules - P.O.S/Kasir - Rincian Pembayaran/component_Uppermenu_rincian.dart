@@ -3,7 +3,9 @@ import 'package:get/get.dart';
 import 'package:qasir_pintar/Config/config.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Kasir%20-%20Pembayaran/controller_pembayaran.dart';
 
-class UppermenuRincian extends GetView<PembayaranController> {
+import '../Kasir/controller_kasir.dart';
+
+class UppermenuRincian extends GetView<KasirController> {
   const UppermenuRincian({super.key});
 
   @override

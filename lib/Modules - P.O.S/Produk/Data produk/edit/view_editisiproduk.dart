@@ -637,19 +637,19 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                                 ),
                               ),
                               keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Harga Jual eceran harus diisi';
-                                }
-                                if (double.parse(controller
-                                        .hargaJualPelanggan.value.text
-                                        .replaceAll(',', '')) <
-                                    double.parse(controller.hpp.value.text
-                                        .replaceAll(',', ''))) {
-                                  return 'harga jual pelanggan harus >= HPP';
-                                }
-                                return null;
-                              },
+                              // validator: (value) {
+                              //   if (value!.isEmpty) {
+                              //     return 'Harga Jual eceran harus diisi';
+                              //   }
+                              //   if (double.parse(controller
+                              //           .hargaJualPelanggan.value.text
+                              //           .replaceAll(',', '')) <
+                              //       double.parse(controller.hpp.value.text
+                              //           .replaceAll(',', ''))) {
+                              //     return 'harga jual pelanggan harus >= HPP';
+                              //   }
+                              //   return null;
+                              // },
                             ),
                           ),
                           // Container(
