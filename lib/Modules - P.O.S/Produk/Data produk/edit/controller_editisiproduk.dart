@@ -80,9 +80,15 @@ class EditIsiProdukController extends GetxController {
             data.volume_tinggi != 0.0
         ? true
         : false;
-
-    diskon.value.text = data.diskon.toString();
+    diskonvalue.value = data.diskon ?? 0.0;
+    diskon.value.text = data.diskon.toString() ?? 'qwe';
+    print('diskon-->');
+    print(data.diskon);
     showdiskon.value = data.diskon != 0.0 ? true : false;
+
+    if (opsidiskon.isNotEmpty) {
+      selecteddiskon.value = opsidiskon[0]; // Default to first option (Rp.)
+    }
 
     // Images
     // if (data.gambar_produk_utama.isNotEmpty) {}
@@ -159,6 +165,7 @@ class EditIsiProdukController extends GetxController {
     volume_tinggi,
     id_gambar,
     jenis_produk,
+    diskon,
   }) {
     var map = <String, dynamic>{};
 
@@ -186,6 +193,7 @@ class EditIsiProdukController extends GetxController {
     map['volume_lebar'] = volume_lebar;
     map['volume_tinggi'] = volume_tinggi;
     map['jenis_produk'] = jenis_produk;
+    map['diskon'] = diskon;
 
     return map;
   }
@@ -792,6 +800,11 @@ class EditIsiProdukController extends GetxController {
               double.parse(volumeTinggi.value.text.replaceAll(',', '')),
           id_gambar:
               image64List.isEmpty ? data.gambar_produk_utama : gambartemp.first,
+          diskon: selecteddiskon.value == 'Rp.'
+              ? diskonvalue.value
+              : (double.parse(hargaJualEceran.value.text.replaceAll(',', '')) *
+                  diskonvalue.value /
+                  100),
         ));
     if (produk == 1) {
       await Get.find<CentralProdukController>()

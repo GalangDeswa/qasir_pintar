@@ -1472,8 +1472,9 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
                                     return DropdownMenuItem(
                                       child: Text(x.nama_pajak! +
                                           ' - ' +
-                                          '% ' +
-                                          x.nominal_pajak!.toString()),
+                                          '' +
+                                          x.nominal_pajak!.toString() +
+                                          '%'),
                                       value: x.uuid,
                                     );
                                   }).toList(),

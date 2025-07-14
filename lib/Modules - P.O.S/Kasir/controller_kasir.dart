@@ -90,6 +90,7 @@ class KasirController extends GetxController {
   var subtotal = 0.0.obs;
   var totalbayar = 0.0.obs;
   var total = 0.0.obs;
+  var totalTax = 0.0.obs;
 
   var data = Get.arguments;
   var sub;
@@ -187,7 +188,10 @@ class KasirController extends GetxController {
 
   totalval() {
     print('total val--->');
-    var total1 = subtotal.value - jumlahdiskonkasir.value - promovalue.value;
+    var total1 = subtotal.value -
+        jumlahdiskonkasir.value -
+        promovalue.value +
+        totalTax.value;
     var ppn1 = 11 / 100 * total1;
     if (ppnSwitch.value == true) {
       ppn.value = ppn1;
@@ -221,8 +225,6 @@ class KasirController extends GetxController {
     }
   }
 
-  //TODo : buat cara pengurangan qty untuk beli paket
-
   pembayaran() async {
     print('-------------------pembayaran---------------------');
 
@@ -251,7 +253,8 @@ class KasirController extends GetxController {
               totalQty: totalItem.value,
               totalDiskon: displaydiskon.value ?? 0.0,
               namaPelanggan: namaPelanggan.value,
-              namaPromo: namaPromo.value)
+              namaPromo: namaPromo.value,
+              totalPajak: totalTax.value)
           .DB(),
     );
 
@@ -1252,7 +1255,6 @@ class KasirController extends GetxController {
     return reserved;
   }
 
-  //TODO : check update paket, qty per ite ga terupdate
   Future<void> _addProductFromCart(DataKeranjang produk) async {
     print('add product from cart -->');
     var prod = Get.find<CentralProdukController>().produk;
@@ -1296,7 +1298,9 @@ class KasirController extends GetxController {
         namaPajak: prodById.namaPajak,
         gambar: prodById.gambar_produk_utama,
         namaProduk: prodById.nama_produk,
-        hargaEceran: prodById.harga_jual_eceran,
+        hargaEceran: prodById.diskon != 0.0
+            ? prodById.harga_jual_eceran! - prodById.harga_jual_eceran!
+            : prodById.harga_jual_eceran,
         isPaket: false,
       ));
     } else {
@@ -1374,7 +1378,9 @@ class KasirController extends GetxController {
         namaPajak: selectpaket.namapajak,
         gambar: selectpaket.gambar_utama,
         namaPaket: selectpaket.nama_paket,
-        hargaPaket: selectpaket.harga_jual_paket,
+        hargaPaket: selectpaket.diskon != 0.0
+            ? selectpaket.harga_jual_paket! - selectpaket.diskon!
+            : selectpaket.harga_jual_paket,
         isPaket: true,
       ));
     } else {
@@ -1425,7 +1431,9 @@ class KasirController extends GetxController {
         namaPajak: produk.namaPajak,
         gambar: produk.gambar_produk_utama,
         namaProduk: produk.nama_produk,
-        hargaEceran: produk.harga_jual_eceran,
+        hargaEceran: produk.diskon != 0.0
+            ? produk.harga_jual_eceran! - produk.diskon!
+            : produk.harga_jual_eceran,
         isPaket: false,
       ));
     } else {
@@ -1530,7 +1538,9 @@ class KasirController extends GetxController {
         namaPajak: paket.namapajak,
         gambar: paket.gambar_utama,
         namaPaket: paket.nama_paket,
-        hargaPaket: paket.harga_jual_paket,
+        hargaPaket: paket.diskon != 0.0
+            ? paket.harga_jual_paket! - paket.diskon!
+            : paket.harga_jual_paket,
         isPaket: true,
       ));
     } else {
@@ -1701,10 +1711,16 @@ class KasirController extends GetxController {
     totalItem.value = keranjangv2.fold(0, (sum, item) => sum + item.qty);
     subtotal.value =
         keranjangv2.fold(0.0, (sum, item) => sum + (item.price * item.qty));
+    totalTax.value = keranjangv2.fold(
+      0.0,
+      (sum, item) => sum + ((item.price * item.nominalpajak! / 100) * item.qty),
+    );
     print('total item --->');
     print(totalItem.value);
     print('subtotal --->');
     print(subtotal.value);
+    print('total TAX --->');
+    print(totalTax.value);
     hitungPembayaran();
     keranjangv2.refresh();
   }

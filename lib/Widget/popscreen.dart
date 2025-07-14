@@ -1069,7 +1069,7 @@ class Popscreen {
             width: width - 30,
             height: height - 200,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 Container(
                   padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
@@ -1112,32 +1112,6 @@ class Popscreen {
                     )
                   ],
                 ),
-                controller.displaydiskon.value == 0.0
-                    ? Container()
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Diskon : ', style: AppFont.regular()),
-                          Text(
-                            'Rp. ' +
-                                AppFormat().numFormat(
-                                    controller.jumlahdiskonkasir.value),
-                            style: AppFont.regular_bold(),
-                          )
-                        ],
-                      ),
-                controller.promolistvalue == null
-                    ? Container()
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Promo : ', style: AppFont.regular()),
-                          Text(
-                            controller.namaPromo.value,
-                            style: AppFont.regular_bold(),
-                          )
-                        ],
-                      ),
 
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1150,10 +1124,56 @@ class Popscreen {
                   ],
                 ),
 
+                Divider(),
+                controller.displaydiskon.value == 0.0
+                    ? Container()
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Diskon : ', style: AppFont.regular()),
+                          // Text(controller.metode_diskon == 1 ? '%' : 'Rp. ',
+                          //     style: AppFont.regular()),
+                          Text(
+                            'Rp. ' +
+                                AppFormat().numFormat(
+                                    controller.jumlahdiskonkasir.value),
+                            style: AppFont.regular_bold(),
+                          ),
+                        ],
+                      ),
+                controller.promolistvalue == null
+                    ? Container()
+                    : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Promo : ', style: AppFont.regular()),
+                          Text(
+                            'Rp. ' +
+                                AppFormat()
+                                    .numFormat(controller.promovalue.value) +
+                                ' (' +
+                                controller.namaPromo.value +
+                                ')',
+                            style: AppFont.regular_bold(),
+                          )
+                        ],
+                      ),
+
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Total : ', style: AppFont.regular()),
+                    Text('Pajak : ', style: AppFont.regular()),
+                    Text(
+                      'Rp. ' + AppFormat().numFormat(controller.totalTax.value),
+                      style: AppFont.regular_bold(),
+                    ),
+                  ],
+                ),
+                Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Total : ', style: AppFont.regular_bold()),
                     Text(
                       'Rp. ' + AppFormat().numFormat(controller.total.value),
                       style: AppFont.regular_bold(),

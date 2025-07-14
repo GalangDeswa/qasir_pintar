@@ -117,7 +117,7 @@ class DataProduk {
       namasubKategori: json["nama_subkategori"],
       harga_jual_pelanggan: json["harga_jual_pelanggan"] ?? 0,
       jenisProduk: json["jenis_produk"],
-      nominalpajak: json["nominal_pajak"],
+      nominalpajak: json["nominal_pajak"] ?? 0.0,
       stockawal: json["stock_awal"],
       qty: json["qty"],
       diskon: json["diskon"] ?? 0.0,
@@ -609,6 +609,7 @@ class DataPaketProduk {
     this.namapajak,
     this.nominalpajak,
     this.hitungStock,
+    this.diskon,
   });
 
   final int? id;
@@ -626,6 +627,7 @@ class DataPaketProduk {
   final double? nominalpajak;
   final String? namapajak;
   final int? hitungStock;
+  final double? diskon;
 
   factory DataPaketProduk.fromJsondb(Map<String, dynamic> json) {
     return DataPaketProduk(
@@ -641,9 +643,10 @@ class DataPaketProduk {
       tampilkan_di_paket: json["tampilkan_di_paket"],
       sync: json["sync"],
       aktif: json["aktif"],
-      nominalpajak: json["nominal_pajak"],
+      nominalpajak: json["nominal_pajak"] ?? 0.0,
       namapajak: json["nama_pajak"],
       hitungStock: json["hitung_stock"],
+      diskon: json["diskon"] ?? 0,
     );
   }
 
@@ -662,6 +665,7 @@ class DataPaketProduk {
     map['sync'] = sync;
     map['aktif'] = aktif;
     map['hitung_stock'] = hitungStock;
+    map['diskon'] = diskon;
     return map;
   }
 }

@@ -124,11 +124,16 @@ class ViewIsiproduk extends GetView<IsiProdukController> {
                         title: 'Harga Jual Pelanggan',
                         value:
                             'Rp ${NumberFormat('#,###').format(controller.data.harga_jual_eceran)}'),
+                    _buildDetailTile(
+                        title: 'Diskon',
+                        value: controller.data.diskon != null
+                            ? 'Rp ${NumberFormat('#,###').format(controller.data.diskon)}'
+                            : '-'),
                     Divider(height: 0, thickness: 0.5),
                     _buildDetailTile(
                         title: controller.data.namaPajak ?? 'Pajak',
                         value: controller.data.namaPajak != null
-                            ? 'Rp ${NumberFormat('#,###').format(controller.data.nominalpajak)}'
+                            ? ' ${NumberFormat('#,###').format(controller.data.nominalpajak)} %'
                             : '-'),
                     // 'Rp ${NumberFormat('#,###').format(controller.data.pajak)}'),
                   ],

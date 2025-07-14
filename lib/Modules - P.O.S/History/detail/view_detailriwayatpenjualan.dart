@@ -253,6 +253,11 @@ class DetailHistoryPenjualan extends GetView<DetailHistoryPenjualanController> {
                           value: 'Rp, ' +
                               AppFormat()
                                   .numFormat(controller.data.nilaiPromo)),
+                      _buildDetailTile(
+                          title: 'Total Pajak',
+                          value: 'Rp, ' +
+                              AppFormat()
+                                  .numFormat(controller.data.totalPajak)),
                       Divider(height: 0, thickness: 0.5),
                       _buildDetailTile(
                           title: 'Jumlah bayar',

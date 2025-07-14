@@ -20,6 +20,7 @@ class DataPenjualan {
     this.kembalian,
     this.sync,
     this.namaPromo,
+    this.totalPajak,
   });
 
   final int? id;
@@ -41,6 +42,7 @@ class DataPenjualan {
   final double? nilaiBayar;
   final double? kembalian;
   final String? namaPromo;
+  final double? totalPajak;
   final int? sync; // 0/1 boolean equivalent
 
   factory DataPenjualan.fromJsondb(Map<String, dynamic> json) {
@@ -65,6 +67,7 @@ class DataPenjualan {
       sync: json["sync"],
       namaPelanggan: json["nama_pelanggan"],
       namaPromo: json["nama_promo"],
+      totalPajak: json["total_pajak"] ?? 0.0,
     );
   }
 
@@ -88,6 +91,7 @@ class DataPenjualan {
     map['nilai_bayar'] = nilaiBayar;
     map['kembalian'] = kembalian;
     map['sync'] = sync;
+    map['total_pajak'] = totalPajak;
     return map;
   }
 }

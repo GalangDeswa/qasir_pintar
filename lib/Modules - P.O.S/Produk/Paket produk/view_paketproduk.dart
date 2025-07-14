@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:intl/intl.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/Data%20produk/model_produk.dart';
 
 import '../../../Config/config.dart';
@@ -89,9 +90,55 @@ class PaketProduk extends GetView<BaseMenuProdukController> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Rp. ' +
-                                AppFormat()
-                                    .numFormat(paket[index].harga_jual_paket)),
+                            paket[index].diskon != 0.0
+                                ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        overflow: TextOverflow.ellipsis,
+                                        'Rp ${NumberFormat('#,###').format(
+                                          paket[index].harga_jual_paket!,
+                                        )}',
+                                        style: TextStyle(
+                                            decoration:
+                                                TextDecoration.lineThrough,
+                                            fontSize: 8),
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'Rp. ' +
+                                                AppFormat().numFormat(
+                                                  paket[index]
+                                                          .harga_jual_paket! -
+                                                      paket[index].diskon!,
+                                                ),
+                                            style: AppFont.small(),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.all(3),
+                                            margin: EdgeInsets.only(left: 5),
+                                            decoration: BoxDecoration(
+                                                color: Colors.green,
+                                                borderRadius:
+                                                    BorderRadius.circular(5)),
+                                            child: Text(
+                                                (paket[index].diskon! /
+                                                            paket[index]
+                                                                .harga_jual_paket! *
+                                                            100)
+                                                        .toStringAsFixed(0) +
+                                                    '%',
+                                                style: AppFont.small_white()),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  )
+                                : Text('Rp. ' +
+                                    AppFormat().numFormat(
+                                        paket[index].harga_jual_paket)),
                           ],
                         ),
                         trailing: customDropdown(

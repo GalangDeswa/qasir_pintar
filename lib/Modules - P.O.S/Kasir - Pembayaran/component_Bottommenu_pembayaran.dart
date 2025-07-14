@@ -166,7 +166,27 @@ class BottomMenuPembayaran extends GetView<KasirController> {
                                       style: AppFont.regular_bold())
                                 ],
                               ),
-                            )
+                            ),
+                      Padding(
+                        padding: AppPading.customBottomPaddingSmall(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Pajak :',
+                              style: AppFont.regular(),
+                            ),
+                            Text(
+                              'Rp. ' +
+                                  AppFormat()
+                                      .numFormat(controller.totalTax.value),
+                              style: AppFont.regular_bold(),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Divider()
+                      //TODO : check pajak & diskon di display konfirmasi, histori
                     ],
                   );
                 }),
@@ -198,13 +218,12 @@ class BottomMenuPembayaran extends GetView<KasirController> {
               Expanded(
                 child: Row(
                   children: [
-                    // Expanded(
-                    //   child: button_border_custom(
-                    //       margin: EdgeInsets.all(20),
-                    //       onPressed: () {},
-                    //       child: Text('Simpan order'),
-                    //       width: context.res_width),
-                    // ),
+                    button_border_custom(
+                        //TODO ; buat simpan order / prebill
+                        margin: EdgeInsets.all(20),
+                        onPressed: () {},
+                        child: Text('Simpan'),
+                        width: context.width * 0.3),
                     Expanded(
                       child: button_border_custom(
                           margin: EdgeInsets.symmetric(horizontal: 10),

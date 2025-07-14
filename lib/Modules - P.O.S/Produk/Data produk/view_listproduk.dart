@@ -63,13 +63,59 @@ class ListProduk extends GetView<BaseMenuProdukController> {
                               produk[index].namaKategori!,
                               style: AppFont.small(),
                             ),
-                            Text(
-                              'Rp. ' +
-                                  AppFormat().numFormat(
-                                    produk[index].harga_jual_eceran!,
+                            produk[index].diskon != 0.0
+                                ? Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Rp. ' +
+                                            AppFormat().numFormat(
+                                              produk[index].harga_jual_eceran!,
+                                            ),
+                                        style: TextStyle(
+                                            decoration:
+                                                TextDecoration.lineThrough,
+                                            fontSize: 8),
+                                      ),
+                                      SizedBox(
+                                        width: 5,
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            'Rp. ' +
+                                                AppFormat().numFormat(
+                                                  produk[index]
+                                                          .harga_jual_eceran! -
+                                                      produk[index].diskon!,
+                                                ),
+                                            style: AppFont.small(),
+                                          ),
+                                          Container(
+                                            padding: EdgeInsets.all(3),
+                                            margin: EdgeInsets.only(left: 5),
+                                            color: Colors.green,
+                                            child: Text(
+                                                (produk[index].diskon! /
+                                                            produk[index]
+                                                                .harga_jual_eceran! *
+                                                            100)
+                                                        .toStringAsFixed(0) +
+                                                    '%',
+                                                style: AppFont.small_white()),
+                                          )
+                                        ],
+                                      ),
+                                    ],
+                                  )
+                                : Text(
+                                    'Rp. ' +
+                                        AppFormat().numFormat(
+                                          produk[index].harga_jual_eceran!,
+                                        ),
+                                    style: AppFont.small(),
                                   ),
-                              style: AppFont.small(),
-                            ),
                             Text(
                               produk[index].hitung_stok == 1
                                   ? 'Qty :' + produk[index].qty.toString()

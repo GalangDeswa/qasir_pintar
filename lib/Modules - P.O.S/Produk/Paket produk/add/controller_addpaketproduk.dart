@@ -117,6 +117,14 @@ class TambahPaketProdukController extends GetxController {
   var ukuranValue;
   var ukuranList = <DataUkuranProduk>[].obs;
 
+  var selecteddiskon = ''.obs;
+  var diskonnominal = 0.0.obs;
+  var diskonvalue = 0.0.obs;
+  var diskonpersen = 0.0.obs;
+  var diskon = TextEditingController().obs;
+  var opsidiskon = ['Rp.', '%'].obs;
+  var showdiskon = false.obs;
+
   pilihsourcefoto() {
     Get.dialog(
       AlertDialog(
@@ -635,6 +643,11 @@ class TambahPaketProdukController extends GetxController {
         nama_paket: namaPaket.value.text,
         harga_modal: harga_modal.value,
         tampilkan_di_paket: tampilkanDiProduk.value == true ? 1 : 0,
+        diskon: selecteddiskon.value == 'Rp.'
+            ? diskonvalue.value
+            : (double.parse(hargaJualPaket.value.text.replaceAll(',', '')) *
+                diskonvalue.value /
+                100),
         // hitungStock: hitung_stock.value == true ? 1 : 0,
       ).DB(),
     );
@@ -1255,6 +1268,7 @@ class TambahPaketProdukController extends GetxController {
                                           namaPajak: customer[index].namaPajak,
                                           namaukuran:
                                               customer[index].namaukuran,
+                                          diskon: customer[index].diskon,
                                         ));
 
                                         produktemp.refresh();

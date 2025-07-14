@@ -146,7 +146,6 @@ class DetailPaketProduk extends GetView<DetailPaketProdukController> {
                       title: 'Harga modal',
                       value:
                           'Rp ${NumberFormat('#,###').format(controller.data.harga_modal)}'),
-                  Divider(height: 0, thickness: 0.5),
                   _buildDetailTile(
                       title: 'HPP',
                       value:
@@ -155,6 +154,16 @@ class DetailPaketProduk extends GetView<DetailPaketProdukController> {
                       title: 'Harga jual paket',
                       value:
                           'Rp ${NumberFormat('#,###').format(controller.data.harga_jual_paket)}'),
+                  Divider(height: 0, thickness: 0.5),
+                  _buildDetailTile(
+                      title: 'Diskon',
+                      value:
+                          'Rp ${NumberFormat('#,###').format(controller.data.diskon)}'),
+                  _buildDetailTile(
+                      title: controller.data.namapajak ?? 'Pajak',
+                      value: controller.data.namapajak != null
+                          ? ' ${NumberFormat('#,###').format(controller.data.nominalpajak)} %'
+                          : '-'),
                 ],
               ),
 

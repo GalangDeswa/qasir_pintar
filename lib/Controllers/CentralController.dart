@@ -534,41 +534,6 @@ class CentralPaketController extends GetxController {
   var subsearch = TextEditingController().obs;
   var penerimaan = <DataPenerimaanProduk>[].obs;
 
-  // searchProdukLocal({id_toko, search}) async {
-  //   print('-------------------fetch produk local---------------------');
-  //
-  //   List<Map<String, Object?>> query = await DBHelper().FETCH('''
-  //   SELECT
-  //       produk.*,
-  //       kelompok_produk.Nama_Kelompok AS nama_kategori,
-  //       Sub_kelompok_produk.Nama_Sub_Kelompok AS nama_subkategori,
-  //       pajak_produk.nama_pajak AS nama_pajak,
-  //       ukuran_produk.ukuran as nama_ukuran
-  //   FROM
-  //       produk
-  //   LEFT JOIN
-  //      Kelompok_produk ON produk.id_kelompok_produk = Kelompok_produk.uuid
-  //   LEFT JOIN
-  //      Sub_kelompok_produk ON produk.id_sub_kelompok_produk = Sub_kelompok_produk.uuid
-  //   LEFT JOIN
-  //      pajak_produk ON produk.pajak = pajak_produk.uuid
-  //   LEFT JOIN
-  //      ukuran_produk ON produk.ukuran = ukuran_produk.uuid
-  //   WHERE
-  //       produk.id_toko = "$id_toko" AND produk.nama_produk LIKE "%${searchproduk.value.text}%"
-  // ''');
-  //   if (query.isNotEmpty) {
-  //     List<DataProduk> data =
-  //         query.map((e) => DataProduk.fromJsondb(e)).toList();
-  //     produk.value = data;
-  //     //logo.value = userList.value.first.logo!;
-  //     return data;
-  //   } else {
-  //     print('empty');
-  //     return null;
-  //   }
-  // }
-
   searchPaketLocal({id_toko, search}) async {
     print('-------------------fetch produk local---------------------');
 

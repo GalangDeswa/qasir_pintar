@@ -568,6 +568,124 @@ class TambahPaketProduk extends GetView<TambahPaketProdukController> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
+                          'Diskon',
+                          style: AppFont.regular(),
+                        ),
+                        Switch(
+                          value: controller.showdiskon.value,
+                          onChanged: (value) {
+                            controller.showdiskon.value = value;
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+                Obx(
+                  () {
+                    // Update text field when radio changes
+                    final isNominal = controller.selecteddiskon.value ==
+                        controller.opsidiskon[0];
+                    final currentValue = isNominal
+                        ? controller.diskonvalue.value.toStringAsFixed(0)
+                        : controller.diskonvalue.value.toStringAsFixed(0);
+
+                    // Update controller text when value changes
+                    if (controller.diskon.value.text != currentValue) {
+                      controller.diskon.value.text = currentValue;
+                    }
+
+                    return controller.showdiskon.value == false
+                        ? Container()
+                        : Padding(
+                            padding: AppPading.customBottomPadding(),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: TextFormField(
+                                    controller: controller.diskon.value,
+                                    decoration: InputDecoration(
+                                      prefixIcon: isNominal
+                                          ? const Icon(Icons.money)
+                                          : const Icon(Icons.percent),
+                                      labelText: 'Nilai Diskon',
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty)
+                                        return 'Diskon harus diisi';
+                                      final parsed = double.tryParse(value);
+                                      if (parsed == null)
+                                        return 'Masukkan angka valid';
+                                      if (isNominal && parsed <= 0)
+                                        return 'Nominal harus > 0';
+                                      if (!isNominal &&
+                                          (parsed <= 0 || parsed > 100)) {
+                                        return 'Persen harus 1-100';
+                                      }
+                                      return null;
+                                    },
+                                    onChanged: (value) {
+                                      final parsed = double.tryParse(value);
+                                      if (parsed == null) return;
+
+                                      if (isNominal) {
+                                        controller.diskonvalue.value = parsed;
+                                      } else {
+                                        controller.diskonvalue.value = parsed;
+                                      }
+                                    },
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Obx(
+                                    () => Row(
+                                      children: [
+                                        Expanded(
+                                          child: RadioMenuButton(
+                                            value: controller.opsidiskon[0],
+                                            groupValue:
+                                                controller.selecteddiskon.value,
+                                            onChanged: (x) {
+                                              controller.selecteddiskon.value =
+                                                  x!;
+                                            },
+                                            child: const Text('Rp.'),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: RadioMenuButton(
+                                            value: controller.opsidiskon[1],
+                                            groupValue:
+                                                controller.selecteddiskon.value,
+                                            onChanged: (x) {
+                                              controller.selecteddiskon.value =
+                                                  x!;
+                                            },
+                                            child: const Text('%'),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                  },
+                ),
+
+                Obx(() {
+                  return Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
                           'Pajak',
                           style: AppFont.regular(),
                         ),
@@ -615,7 +733,7 @@ class TambahPaketProduk extends GetView<TambahPaketProdukController> {
                                     return DropdownMenuItem(
                                       child: Text(x.nama_pajak! +
                                           ' - ' +
-                                          'Rp ${NumberFormat('#,###').format(x.nominal_pajak)}'),
+                                          ' ${NumberFormat('#,###').format(x.nominal_pajak)} %'),
                                       value: x.uuid,
                                     );
                                   }).toList(),
