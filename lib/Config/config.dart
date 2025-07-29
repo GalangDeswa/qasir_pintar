@@ -202,4 +202,9 @@ class AppFormat {
   intFormat(num) {
     return int.parse(num.replaceAll(',', ''));
   }
+
+  dateFormat(date) {
+    final dateformat = DateFormat('dd-MM-yyyy');
+    return dateformat.format(DateTime.parse(date));
+  }
 }

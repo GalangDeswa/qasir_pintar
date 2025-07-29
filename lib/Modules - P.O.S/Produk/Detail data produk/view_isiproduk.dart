@@ -164,11 +164,24 @@ class ViewIsiproduk extends GetView<IsiProdukController> {
                     _buildSwitchTile(
                         title: 'Hitung Stok',
                         value: controller.data.hitung_stok == 1),
-                    Divider(height: 0, thickness: 0.5),
-                    _buildDetailTile(
-                        title: 'Stock awal',
-                        value: controller.data.stockawal?.toString() ?? '0'),
-                    Divider(height: 0, thickness: 0.5),
+                    controller.data.hitung_stok == 0
+                        ? Divider()
+                        : Column(
+                            children: [
+                              _buildDetailTile(
+                                  title: 'Stock awal',
+                                  value:
+                                      controller.data.stockawal?.toString() ??
+                                          '0'),
+                              _buildDetailTile(
+                                  title: 'Minimum Stock',
+                                  value: controller.data.info_stok_habis
+                                          ?.toString() ??
+                                      '0'),
+                              Divider(height: 0, thickness: 0.5),
+                            ],
+                          ),
+
                     _buildSwitchTile(
                         title: 'Tampilkan di Produk',
                         value: controller.data.tampilkan_di_produk == 1),

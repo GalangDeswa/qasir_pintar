@@ -2,6 +2,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Kasir/model_penjualan.dart';
+import 'package:qasir_pintar/Widget/popscreen.dart';
 
 import '../../../Config/config.dart';
 import '../../../Widget/widget.dart';
@@ -38,6 +39,22 @@ class DetailHistoryPenjualan extends GetView<DetailHistoryPenjualanController> {
                         ),
                         Text(
                           controller.data.noFaktur!,
+                          style: AppFont.regular_bold(),
+                        )
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Kasir',
+                          style: AppFont.regular(),
+                        ),
+                        Text(
+                          controller.data.id_karyawan ?? '',
                           style: AppFont.regular_bold(),
                         )
                       ],
@@ -86,7 +103,10 @@ class DetailHistoryPenjualan extends GetView<DetailHistoryPenjualanController> {
                           ),
                         ),
                   button_border_custom(
-                      onPressed: () {},
+                      onPressed: () {
+                        //controller.reversal(controller.data.uuid);
+                        Popscreen().reversalpop(controller, controller.data);
+                      },
                       child: Text('Reversal'),
                       width: Get.width),
                   Padding(

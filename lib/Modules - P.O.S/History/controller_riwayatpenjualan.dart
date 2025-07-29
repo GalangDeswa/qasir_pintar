@@ -29,7 +29,7 @@ class HistoryPenjualanController extends GetxController {
     print('-------------------fetch produk local---------------------');
 
     List<Map<String, Object?>> query = await DBHelper().FETCH(
-        'SELECT penjualan.*,pelanggan.nama_pelanggan as nama_pelanggan,promo.nama_promo as nama_promo FROM penjualan LEFT JOIN pelanggan ON penjualan.id_pelanggan = pelanggan.uuid LEFT JOIN promo ON penjualan.kode_promo = promo.uuid WHERE penjualan.id_toko = "$id_toko"');
+        'SELECT penjualan.*,pelanggan.nama_pelanggan as nama_pelanggan,promo.nama_promo as nama_promo,Karyawan.Nama_Karyawan as nama_karyawan FROM penjualan LEFT JOIN pelanggan ON penjualan.id_pelanggan = pelanggan.uuid LEFT JOIN promo ON penjualan.kode_promo = promo.uuid LEFT JOIN Karyawan ON penjualan.id_karyawan = Karyawan.uuid WHERE penjualan.id_toko = "$id_toko"');
     if (query.isNotEmpty) {
       List<DataPenjualan> data =
           query.map((e) => DataPenjualan.fromJsondb(e)).toList();

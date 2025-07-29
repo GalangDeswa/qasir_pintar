@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Karyawan/add/controller_tambahkaryawan.dart';
@@ -99,6 +100,46 @@ class TambahKaryawan extends GetView<TambahKaryawanController> {
                           }
                           return null;
                         },
+                      ),
+                    );
+                  }),
+                  Obx(() {
+                    return Padding(
+                      padding: AppPading.customBottomPadding(),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField2(
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Jabatan harus dipilih';
+                                }
+                                return null;
+                              },
+                              isExpanded: true,
+                              dropdownStyleData: DropdownStyleData(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.white)),
+                              hint: Text('Jabatan', style: AppFont.regular()),
+                              value: controller.rolevalue,
+                              items: controller.rolelist.map((x) {
+                                return DropdownMenuItem(
+                                  child: Text(x),
+                                  value: x,
+                                );
+                              }).toList(),
+                              onChanged: (val) async {
+                                controller.rolevalue = val;
+                              },
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   }),

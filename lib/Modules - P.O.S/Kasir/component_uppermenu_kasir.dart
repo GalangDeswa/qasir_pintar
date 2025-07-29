@@ -162,6 +162,35 @@ class UpperMenuKasir extends GetView<KasirController> {
               //     ],
               //   ),
               // ),
+              Padding(
+                padding: EdgeInsets.only(right: 10),
+                child: Stack(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        controller.openSavedCart();
+                      },
+                      icon: Icon(
+                        FontAwesomeIcons.receipt,
+                      ),
+                    ),
+                    Positioned(
+                      right: 3,
+                      child: Container(
+                        padding: EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle, color: AppColor.accent),
+                        child: Obx(() {
+                          return Text(
+                            controller.savedCart.length.toString(),
+                            style: AppFont.regular_bold(),
+                          );
+                        }),
+                      ),
+                    )
+                  ],
+                ),
+              )
             ],
           ),
         ),

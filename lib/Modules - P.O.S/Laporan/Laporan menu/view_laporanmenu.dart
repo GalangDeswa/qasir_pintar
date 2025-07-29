@@ -16,43 +16,61 @@ class LaporanMenu extends GetView<LaporanMenuController> {
         title: 'Laporan',
         NeedBottom: false,
       ),
-      body: ListView(
-        padding: EdgeInsets.all(10),
-        children: [
-          Text('Operasional'),
-          Container(
-            height: 0.9,
-            color: Colors.black,
-            margin: EdgeInsets.only(bottom: 10),
-            width: context.res_width,
-          ),
-          ListTile(
-            onTap: () {
-              Get.toNamed('/ringkasanpenjualan');
-            },
-            leading: Icon(Icons.account_box),
-            title: Text('Ringkasan penjualan'),
-          ),
-          ListTile(
-            onTap: () {},
-            leading: Icon(Icons.account_box),
-            title: Text('10 laporan teratas'),
-          ),
-          ListTile(
-            onTap: () {
-              Get.toNamed('/laporankasir');
-            },
-            leading: Icon(Icons.account_box),
-            title: Text('Kasir'),
-          ),
-          ListTile(
-            onTap: () {
-              Get.toNamed('/kaskasir');
-            },
-            leading: Icon(Icons.account_box),
-            title: Text('Kas Kasir'),
-          ),
-        ],
+      body: Padding(
+        padding: AppPading.defaultBodyPadding(),
+        child: ListView(
+          padding: EdgeInsets.all(10),
+          children: [
+            Text(
+              'Operasional',
+              style: AppFont.regular(),
+            ),
+            Container(
+              height: 0.9,
+              color: Colors.black,
+              margin: EdgeInsets.only(bottom: 10, top: 5),
+              width: context.res_width,
+            ),
+            ListTile(
+              onTap: () {
+                Get.toNamed('/ringkasanpenjualan');
+              },
+              leading: Icon(Icons.account_box),
+              title: Text(
+                'Umum',
+                style: AppFont.regular(),
+              ),
+            ),
+            ListTile(
+              onTap: () {},
+              leading: Icon(Icons.account_box),
+              title: Text(
+                'Penjualan',
+                style: AppFont.regular(),
+              ),
+            ),
+            ListTile(
+              onTap: () {
+                Get.toNamed('/laporankasir');
+              },
+              leading: Icon(Icons.account_box),
+              title: Text(
+                'Beban',
+                style: AppFont.regular(),
+              ),
+            ),
+            ListTile(
+              onTap: () {
+                Get.toNamed('/kaskasir');
+              },
+              leading: Icon(Icons.account_box),
+              title: Text(
+                'Reversal',
+                style: AppFont.regular(),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

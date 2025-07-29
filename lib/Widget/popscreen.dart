@@ -21,10 +21,16 @@ import 'package:qasir_pintar/Modules - P.O.S/Produk/Produk/model_kategoriproduk.
 import 'package:qasir_pintar/Modules - P.O.S/Produk/controller_basemenuproduk.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Supplier/controller_supplier.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Supplier/model_supplier.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Beban/controller_basemenu_beban.dart';
 import 'package:qasir_pintar/Widget/widget.dart';
 
+import '../Controllers/CentralController.dart';
+import '../Modules - P.O.S/Base menu/controller_basemenu.dart';
+import '../Modules - P.O.S/Beban/model_beban.dart';
+import '../Modules - P.O.S/History/detail/controller_detailriwayatpenjualan.dart';
 import '../Modules - P.O.S/Kasir - Pembayaran/controller_pembayaran.dart';
 import '../Modules - P.O.S/Kasir/controller_kasir.dart';
+import '../Modules - P.O.S/Kasir/model_penjualan.dart';
 import '../Modules - P.O.S/Pelanggan/Edit kategori pelanggan/controller_editkategoripelanggan.dart';
 import '../Modules - P.O.S/Pelanggan/List Pelanggan/controller_pelanggan.dart';
 import '../Modules - P.O.S/Pelanggan/List Pelanggan/model_pelanggan.dart';
@@ -192,6 +198,65 @@ class header extends StatelessWidget {
 }
 
 class Popscreen {
+  reversalpop(DetailHistoryPenjualanController controller, DataPenjualan arg) {
+    Get.dialog(AlertDialog(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      title: header(
+        title: 'Reversal Transaksi',
+        icon: Icons.warning,
+        icon_color: AppColor.warning,
+      ),
+      contentPadding: EdgeInsets.all(10),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(12.0),
+        ),
+      ),
+      content: Builder(
+        builder: (context) {
+          return Container(
+              margin: EdgeInsets.all(10),
+              width: context.res_width / 2.6,
+              height: context.res_height / 4.5,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Batalkan transaksi ini?',
+                    style: AppFont.regular_bold(),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  button_solid_custom(
+                    onPressed: () async {
+                      //Get.back();
+                      await controller.reversal(arg.uuid);
+                    },
+                    child: Text(
+                      'Reversal',
+                      style: AppFont.regular_white_bold(),
+                    ),
+                    width: context.res_width,
+                  ),
+                  button_border_custom(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    child: Text(
+                      'Batal',
+                      style: AppFont.regular(),
+                    ),
+                    width: context.res_width,
+                  )
+                ],
+              ));
+        },
+      ),
+    ));
+  }
+
   deletePromo(PromoController controller, DataPromo arg) {
     Get.dialog(AlertDialog(
       backgroundColor: Colors.white,
@@ -612,6 +677,67 @@ class Popscreen {
     ));
   }
 
+  deleteBeban(BasemenuBebanController controller, DataBeban arg) {
+    Get.dialog(AlertDialog(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      title: header(
+        title: 'Batalkan beban',
+        icon: Icons.warning,
+        icon_color: AppColor.warning,
+      ),
+      contentPadding: EdgeInsets.all(10),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(12.0),
+        ),
+      ),
+      content: Builder(
+        builder: (context) {
+          return Container(
+              margin: EdgeInsets.all(10),
+              width: context.res_width / 2.6,
+              height: context.res_height / 4.5,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "Baltalkan " + arg.namaBeban! + '?',
+                    style: AppFont.regular_bold(),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  button_solid_custom(
+                    onPressed: () async {
+                      //Get.back();
+                      await controller.hapusbebanv2(arg.uuid);
+
+                      //controller.deleteproduk(arg.id.toString());
+                    },
+                    child: Text(
+                      'Hapus',
+                      style: AppFont.regular_white_bold(),
+                    ),
+                    width: context.res_width,
+                  ),
+                  button_border_custom(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    child: Text(
+                      'Batal',
+                      style: AppFont.regular(),
+                    ),
+                    width: context.res_width,
+                  )
+                ],
+              ));
+        },
+      ),
+    ));
+  }
+
   deleteSupllier(SupplierController controller, DataSupplier arg) {
     Get.dialog(AlertDialog(
       backgroundColor: Colors.white,
@@ -928,38 +1054,55 @@ class Popscreen {
   }
 
   bukakasir() {
-    Get.dialog(AlertDialog(
-      surfaceTintColor: Colors.white,
-      title: Text('qweq'),
-      contentPadding: EdgeInsets.all(10),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.all(
-          Radius.circular(12.0),
+    Get.dialog(
+      // still prevents taps outside
+      barrierDismissible: false,
+      // wrap your dialog in WillPopScope
+      PopScope(
+        // this callback is run when 'back' is pressed; returning false prevents the pop
+        canPop: false,
+        onPopInvokedWithResult: (didPop, result) {
+          print('pop');
+          var con = Get.find<BasemenuController>();
+          con.index.value = 0;
+          Get.back();
+        },
+        child: AlertDialog(
+          surfaceTintColor: Colors.white,
+          title: Text('qweq'),
+          contentPadding: EdgeInsets.all(10),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(
+              Radius.circular(12.0),
+            ),
+          ),
+          content: Builder(
+            builder: (context) {
+              return Container(
+                margin: EdgeInsets.all(10),
+                width: context.res_width / 2.6,
+                height: context.res_height / 2.6,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Text('Halo! sudah siap buka kasir?'),
+                    SizedBox(height: 10),
+                    button_solid_custom(
+                      onPressed: () {
+                        // this still lets you programmatically close it
+                        Get.back(closeOverlays: true);
+                      },
+                      child: Text('13qwe'),
+                      width: context.res_width / 2.6,
+                    ),
+                  ],
+                ),
+              );
+            },
+          ),
         ),
       ),
-      content: Builder(
-        builder: (context) {
-          return Container(
-              margin: EdgeInsets.all(10),
-              width: context.res_width / 2.6,
-              height: context.res_height / 2.6,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Text('Halo! sudah siap buka kasir?'),
-                  SizedBox(
-                    height: 10,
-                  ),
-                  button_solid_custom(
-                    onPressed: () {},
-                    child: Text('13qwe'),
-                    width: context.res_width / 2.6,
-                  )
-                ],
-              ));
-        },
-      ),
-    ));
+    );
   }
 
   toursplash() {
@@ -1048,218 +1191,259 @@ class Popscreen {
     ));
   }
 
-  konfirmasibayar(
-    List<DataProdukTemp> keranjang,
-    KasirController controller,
-  ) {
+  noKaryawan() {
     Get.dialog(AlertDialog(
       insetPadding: EdgeInsets.zero,
       contentPadding: EdgeInsets.zero,
+      surfaceTintColor: Colors.white,
       content: Builder(
         builder: (context) {
           var height = MediaQuery.of(context).size.height;
           var width = MediaQuery.of(context).size.width;
 
           return Container(
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(10)),
-              color: Colors.white,
-            ),
-            padding: EdgeInsets.all(20),
             width: width - 30,
             height: height - 200,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
-                Container(
-                  padding: EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  decoration: BoxDecoration(
-                      color: AppColor.primary,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Center(
-                    child: Text(
-                      'Detail Penjualan',
-                      style: AppFont.regular_white(),
-                    ),
-                  ),
-                ),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //   children: [
-                //     Text('sales person :', style: AppFont.regular()),
-                //     // Text(controller.namakasir, style: font().reguler_bold),
-                //   ],
-                // ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Pelanggan :', style: AppFont.regular()),
-                    Text(
-                      controller.namaPelanggan.value != ''
-                          ? controller.namaPelanggan.value
-                          : '-',
-                      style: AppFont.regular_bold(),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Total item : ', style: AppFont.regular()),
-                    Text(
-                      controller.totalItem.toString(),
-                      style: AppFont.regular_bold(),
-                    )
-                  ],
-                ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Subtotal : ', style: AppFont.regular()),
-                    Text(
-                      'Rp. ' + AppFormat().numFormat(controller.subtotal.value),
-                      style: AppFont.regular_bold(),
-                    )
-                  ],
-                ),
-
-                Divider(),
-                controller.displaydiskon.value == 0.0
-                    ? Container()
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Diskon : ', style: AppFont.regular()),
-                          // Text(controller.metode_diskon == 1 ? '%' : 'Rp. ',
-                          //     style: AppFont.regular()),
-                          Text(
-                            'Rp. ' +
-                                AppFormat().numFormat(
-                                    controller.jumlahdiskonkasir.value),
-                            style: AppFont.regular_bold(),
-                          ),
-                        ],
-                      ),
-                controller.promolistvalue == null
-                    ? Container()
-                    : Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text('Promo : ', style: AppFont.regular()),
-                          Text(
-                            'Rp. ' +
-                                AppFormat()
-                                    .numFormat(controller.promovalue.value) +
-                                ' (' +
-                                controller.namaPromo.value +
-                                ')',
-                            style: AppFont.regular_bold(),
-                          )
-                        ],
-                      ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Pajak : ', style: AppFont.regular()),
-                    Text(
-                      'Rp. ' + AppFormat().numFormat(controller.totalTax.value),
-                      style: AppFont.regular_bold(),
-                    ),
-                  ],
-                ),
-                Divider(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Total : ', style: AppFont.regular_bold()),
-                    Text(
-                      'Rp. ' + AppFormat().numFormat(controller.total.value),
-                      style: AppFont.regular_bold(),
-                    ),
-                  ],
-                ),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Pembayaran: ', style: AppFont.regular()),
-                    Text(
-                      'Rp. ' +
-                          AppFormat().numFormat(controller.bayarvalue.value),
-                      style: AppFont.regular_bold(),
-                    ),
-                  ],
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text('Kembalian : ', style: AppFont.regular()),
-                    Text(
-                        style: AppFont.regular_bold(),
-                        'Rp. ' +
-                            AppFormat().numFormat((controller.bayarvalue.value -
-                                controller.total.value))),
-                  ],
-                ),
-                // Row(
-                //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //   children: [
-                //     Text('Metode bayar :', style: AppFont.regular()),
-                //     // Text(
-                //     //     controller.groupindex.value == 1
-                //     //         ? 'Tunai'
-                //     //         : controller.groupindex.value == 2
-                //     //         ? 'Hutang'
-                //     //         : '-',
-                //     //     style: font().reguler_bold),
-                //   ],
-                // ),
-                // Container(
-                //   width: double.infinity,
-                //   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
-                //   color: color_template().primary,
-                //   child: Text(
-                //     'Kembalian',
-                //     style: font().header,
-                //   ),
-                // ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    button_border_custom(
-                      onPressed: () {
-                        //Navigator.of(context).pop();
-                        Get.back();
-                        print('back');
-                      },
-                      child: Text(
-                        'Batal',
-                        style: TextStyle(color: Colors.black),
-                      ),
-                      width: 100,
-                    ),
-                    button_solid_custom(
-                      onPressed: () async {
-                        print('bayar local------------------------------->');
-                        await controller.pembayaran();
-                        //controller.checktipe();
-                      },
-                      child: Text(
-                        'bayar',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      width: 100,
-                    ),
-                  ],
-                )
+                Text('Karyawan belum ada, masukan karyawan terlebih dahulu'),
+                button_solid_custom(
+                    onPressed: () {
+                      Get.toNamed('/tambahkaryawan',
+                          arguments: Get.put(KaryawanController()));
+                    },
+                    child: Text('Tambah Karyawan'),
+                    width: width)
               ],
             ),
           );
         },
       ),
     ));
+  }
+
+  konfirmasibayar(
+    List<DataProdukTemp> keranjang,
+    KasirController controller,
+  ) {
+    Get.dialog(
+        barrierDismissible: false,
+        AlertDialog(
+          insetPadding: EdgeInsets.zero,
+          contentPadding: EdgeInsets.zero,
+          content: Builder(
+            builder: (context) {
+              var height = MediaQuery.of(context).size.height;
+              var width = MediaQuery.of(context).size.width;
+
+              return Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.all(Radius.circular(10)),
+                  color: Colors.white,
+                ),
+                padding: EdgeInsets.all(20),
+                width: width - 30,
+                height: height - 200,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    Container(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 15, vertical: 10),
+                      decoration: BoxDecoration(
+                          color: AppColor.primary,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Center(
+                        child: Text(
+                          'Detail Penjualan',
+                          style: AppFont.regular_white(),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Kasir :', style: AppFont.regular()),
+                        Text(controller.namaKaryawan.value,
+                            style: AppFont.regular_bold()),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Pelanggan :', style: AppFont.regular()),
+                        Text(
+                          controller.namaPelanggan.value != ''
+                              ? controller.namaPelanggan.value
+                              : '-',
+                          style: AppFont.regular_bold(),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Total item : ', style: AppFont.regular()),
+                        Text(
+                          controller.totalItem.toString(),
+                          style: AppFont.regular_bold(),
+                        )
+                      ],
+                    ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Subtotal : ', style: AppFont.regular()),
+                        Text(
+                          'Rp. ' +
+                              AppFormat().numFormat(controller.subtotal.value),
+                          style: AppFont.regular_bold(),
+                        )
+                      ],
+                    ),
+
+                    Divider(),
+                    controller.displaydiskon.value == 0.0
+                        ? Container()
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Diskon : ', style: AppFont.regular()),
+                              // Text(controller.metode_diskon == 1 ? '%' : 'Rp. ',
+                              //     style: AppFont.regular()),
+                              Text(
+                                'Rp. ' +
+                                    AppFormat().numFormat(
+                                        controller.jumlahdiskonkasir.value),
+                                style: AppFont.regular_bold(),
+                              ),
+                            ],
+                          ),
+                    controller.promolistvalue == null
+                        ? Container()
+                        : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Promo : ', style: AppFont.regular()),
+                              Text(
+                                'Rp. ' +
+                                    AppFormat().numFormat(
+                                        controller.promovalue.value) +
+                                    ' (' +
+                                    controller.namaPromo.value +
+                                    ')',
+                                style: AppFont.regular_bold(),
+                              )
+                            ],
+                          ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Total pajak : ', style: AppFont.regular()),
+                        Text(
+                          'Rp. ' +
+                              AppFormat().numFormat(controller.totalTax.value),
+                          style: AppFont.regular_bold(),
+                        ),
+                      ],
+                    ),
+                    Divider(),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Total : ', style: AppFont.regular_bold()),
+                        Text(
+                          'Rp. ' +
+                              AppFormat().numFormat(controller.total.value),
+                          style: AppFont.regular_bold(),
+                        ),
+                      ],
+                    ),
+
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Pembayaran: ', style: AppFont.regular()),
+                        Text(
+                          'Rp. ' +
+                              AppFormat()
+                                  .numFormat(controller.bayarvalue.value),
+                          style: AppFont.regular_bold(),
+                        ),
+                      ],
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text('Kembalian : ', style: AppFont.regular()),
+                        Text(
+                            style: AppFont.regular_bold(),
+                            'Rp. ' +
+                                AppFormat().numFormat(
+                                    (controller.bayarvalue.value -
+                                        controller.total.value))),
+                      ],
+                    ),
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    //   children: [
+                    //     Text('Metode bayar :', style: AppFont.regular()),
+                    //     // Text(
+                    //     //     controller.groupindex.value == 1
+                    //     //         ? 'Tunai'
+                    //     //         : controller.groupindex.value == 2
+                    //     //         ? 'Hutang'
+                    //     //         : '-',
+                    //     //     style: font().reguler_bold),
+                    //   ],
+                    // ),
+                    // Container(
+                    //   width: double.infinity,
+                    //   padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                    //   color: color_template().primary,
+                    //   child: Text(
+                    //     'Kembalian',
+                    //     style: font().header,
+                    //   ),
+                    // ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        button_border_custom(
+                          onPressed: () {
+                            //Navigator.of(context).pop();
+                            Get.back();
+                            print('back');
+                          },
+                          child: Text(
+                            'Batal',
+                            style: TextStyle(color: Colors.black),
+                          ),
+                          width: 100,
+                        ),
+                        button_solid_custom(
+                          onPressed: () async {
+                            print(
+                                'bayar local------------------------------->');
+                            await controller.pembayaran();
+                            //controller.checktipe();
+                          },
+                          child: Text(
+                            'bayar',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          width: 100,
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+              );
+            },
+          ),
+        ));
   }
 
   berhasilbayar(
@@ -1327,6 +1511,7 @@ class Popscreen {
                     button_border_custom(
                       onPressed: () {
                         Get.offAllNamed("/basemenu");
+                        controller.clearAll();
                       },
                       child: Text('Selesai'),
                       width: context.res_width,
@@ -1340,7 +1525,8 @@ class Popscreen {
         ));
   }
 
-  karyawanLogin(KasirController controller) {
+  karyawanLogin() {
+    var con = Get.find<CentralKaryawanController>();
     Get.dialog(AlertDialog(
       insetPadding: EdgeInsets.zero,
       contentPadding: EdgeInsets.zero,
@@ -1358,14 +1544,6 @@ class Popscreen {
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Padding(
-                        //   padding: const EdgeInsets.only(bottom: 50),
-                        //   child: Text(
-                        //     'Toko Berkah',
-                        //     style: TextStyle(
-                        //         fontSize: 25, fontWeight: FontWeight.bold),
-                        //   ),
-                        // ),
                         DropdownButtonFormField2(
                           decoration: InputDecoration(
                             contentPadding: EdgeInsets.symmetric(
@@ -1387,20 +1565,32 @@ class Popscreen {
                                   color: Colors.white)),
                           hint:
                               Text('Pilih Karyawan', style: AppFont.regular()),
-                          value: controller.karyawanvalue,
-                          items: controller.karyawanlist.map((x) {
+                          value: con.karyawanvalue,
+                          items: con.karyawanList.map((x) {
                             return DropdownMenuItem(
                               child: Text(x.nama_karyawan!),
                               value: x.uuid,
                             );
                           }).toList(),
                           onChanged: (val) {
-                            controller.karyawanvalue = val!.toString();
-                            print(controller.karyawanvalue);
+                            con.karyawanvalue = val!.toString();
+                            con.namaKaryawan.value = con.karyawanList
+                                .where((x) => x.uuid == val.toString())
+                                .first
+                                .nama_karyawan!;
+                            con.role = con.karyawanList
+                                .where((x) => x.uuid == val.toString())
+                                .first
+                                .role!;
+                            print(con.karyawanvalue);
+                            print(con.namaKaryawan);
                           },
                         ),
                         button_border_custom(
-                            onPressed: () {},
+                            onPressed: () {
+                              Get.toNamed('/tambahkaryawan',
+                                  arguments: Get.put(KaryawanController()));
+                            },
                             child: Text('Tambah Karyawan'),
                             width: Get.width),
                         SizedBox(height: 100.0),
@@ -1411,10 +1601,11 @@ class Popscreen {
                       margin: EdgeInsets.symmetric(horizontal: 15),
                       width: 350,
                       child: Form(
-                        key: controller.formKey,
+                        // key: controller.formKey,
                         child: Column(
                           children: [
                             PinCodeTextField(
+                              keyboardType: TextInputType.number,
                               length: 6,
                               obscureText: true,
                               animationType: AnimationType.fade,
@@ -1427,13 +1618,13 @@ class Popscreen {
                                   inactiveColor: AppColor.primary),
                               animationDuration: Duration(milliseconds: 300),
                               //backgroundColor: Colors.blue.shade50,
-                              controller: controller.verifikasi_kode.value,
+                              controller: con.verifikasi_kode.value,
                               onCompleted: (v) {
                                 print("Completed");
                               },
                               onChanged: (value) {
                                 print('verifikasi code -->' + value);
-                                print(controller.verifikasi_kode.value.text);
+                                print(con.verifikasi_kode.value.text);
                               },
                               beforeTextPaste: (text) {
                                 print("Allowing to paste $text");
@@ -1451,9 +1642,11 @@ class Popscreen {
                                     foregroundColor: Colors.white,
                                     backgroundColor: AppColor.secondary),
                                 onPressed: () {
-                                  controller.loginKaryawan(
-                                      controller.karyawanvalue,
-                                      controller.verifikasi_kode.value.text);
+                                  con.loginKaryawan(
+                                    con.karyawanvalue,
+                                    con.verifikasi_kode.value.text,
+                                    con.role,
+                                  );
                                 },
                                 child: Text('Masuk'),
                               ),
@@ -1461,19 +1654,6 @@ class Popscreen {
                             SizedBox(
                               height: 15,
                             ),
-                            // RichText(
-                            //     text: TextSpan(
-                            //         text: 'Kode tidak terkirim? ',
-                            //         style: TextStyle(color: Colors.black),
-                            //         children: <TextSpan>[
-                            //       TextSpan(
-                            //           text: ' kirim ulang',
-                            //           recognizer: TapGestureRecognizer()
-                            //             ..onTap = () {
-                            //               Get.offAndToNamed('/loginpin');
-                            //             },
-                            //           style: TextStyle(color: Colors.blue))
-                            //     ])),
                           ],
                         ),
                       ),
@@ -1486,5 +1666,84 @@ class Popscreen {
         },
       ),
     ));
+    return con.role;
+  }
+
+  Future<String?> karyawanLoginv2() async {
+    final con = Get.find<CentralKaryawanController>();
+
+    // showDialog returns Future<T?> where T is the type you pass to `result`
+    final selectedRole = await Get.dialog<String>(
+      AlertDialog(
+        insetPadding: EdgeInsets.zero,
+        contentPadding: EdgeInsets.zero,
+        content: Builder(
+          builder: (context) {
+            return Column(
+              children: [
+                // ... your DropdownButtonFormField2 and other widgets ...
+                SizedBox(height: 100.0),
+                // PIN entry and button
+                PinCodeTextField(
+                  keyboardType: TextInputType.number,
+                  length: 6,
+                  obscureText: true,
+                  animationType: AnimationType.fade,
+                  pinTheme: PinTheme(
+                      shape: PinCodeFieldShape.circle,
+                      borderRadius: BorderRadius.circular(5),
+                      fieldHeight: 50,
+                      fieldWidth: 40,
+                      activeFillColor: Colors.white,
+                      inactiveColor: AppColor.primary),
+                  animationDuration: Duration(milliseconds: 300),
+                  //backgroundColor: Colors.blue.shade50,
+                  controller: con.verifikasi_kode.value,
+                  onCompleted: (v) {
+                    print("Completed");
+                  },
+                  onChanged: (value) {
+                    print('verifikasi code -->' + value);
+                    print(con.verifikasi_kode.value.text);
+                  },
+                  beforeTextPaste: (text) {
+                    print("Allowing to paste $text");
+                    //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
+                    //but you can show anything you want here, like your pop up saying wrong paste format or etc
+                    return true;
+                  },
+                  appContext: context,
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 10),
+                  width: 350,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: AppColor.secondary,
+                    ),
+                    onPressed: () {
+                      // You may want to validate code first, then:
+                      con.loginKaryawan(
+                        con.karyawanvalue,
+                        con.verifikasi_kode.value.text,
+                        con.role,
+                      );
+                      // Close the dialog, returning the role:
+                      Get.back(result: con.role);
+                    },
+                    child: Text('Masuk'),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+      barrierDismissible: false, // optional: force the user to pick
+    );
+
+    // selectedRole will be the con.role passed above (or null if dismissed)
+    return selectedRole;
   }
 }

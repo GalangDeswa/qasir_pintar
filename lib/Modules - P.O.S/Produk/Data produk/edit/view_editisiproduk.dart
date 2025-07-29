@@ -962,7 +962,7 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                           child: TextFormField(
                             controller: controller.infostock.value,
                             decoration: InputDecoration(
-                              labelText: 'Info stock habis',
+                              labelText: 'Minimum Stock',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),

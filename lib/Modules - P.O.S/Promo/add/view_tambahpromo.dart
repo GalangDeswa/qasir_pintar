@@ -27,157 +27,6 @@ class TambahPromo extends GetView<TambahPromoController> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Obx(() {
-                  //   return Padding(
-                  //     padding: EdgeInsets.only(bottom: 100, top: 50),
-                  //     child: Row(
-                  //       mainAxisAlignment: MainAxisAlignment.center,
-                  //       crossAxisAlignment: CrossAxisAlignment.center,
-                  //       children: [
-                  //         controller.pikedImagePath.value == '' &&
-                  //             controller.pickedIconPath.value == ''
-                  //             ? Stack(
-                  //           alignment: Alignment.center,
-                  //           children: [
-                  //             Container(
-                  //               width: 120,
-                  //               height: 120,
-                  //               decoration: BoxDecoration(
-                  //                 shape: BoxShape.circle,
-                  //                 color: AppColor.primary,
-                  //               ),
-                  //               child: Icon(
-                  //                 FontAwesomeIcons.image,
-                  //                 color: Colors.white,
-                  //                 size: 55,
-                  //               ),
-                  //             ),
-                  //             Positioned(
-                  //               bottom: 0,
-                  //               right: 0,
-                  //               child: TextButton(
-                  //                 style: TextButton.styleFrom(
-                  //                   shape: CircleBorder(),
-                  //                   padding: EdgeInsets.all(8),
-                  //                   backgroundColor: AppColor.secondary,
-                  //                 ),
-                  //                 onPressed: () async {
-                  //                   DeviceInfoPlugin deviceInfo =
-                  //                   DeviceInfoPlugin();
-                  //                   AndroidDeviceInfo androidInfo =
-                  //                   await deviceInfo.androidInfo;
-                  //                   if (androidInfo.version.sdkInt >=
-                  //                       33) {
-                  //                     var status =
-                  //                     await Permission.camera.status;
-                  //                     if (!status.isGranted) {
-                  //                       await Permission.camera.request();
-                  //                     }
-                  //                   } else {
-                  //                     var status =
-                  //                     await Permission.camera.status;
-                  //                     if (!status.isGranted) {
-                  //                       await Permission.camera.request();
-                  //                     }
-                  //                   }
-                  //
-                  //                   controller.pilihsourcefoto();
-                  //                 },
-                  //                 child: Icon(
-                  //                   Icons.add,
-                  //                   color: Colors.white,
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         )
-                  //             : Stack(
-                  //           alignment: Alignment.center,
-                  //           children: [
-                  //             Container(
-                  //               width: 120,
-                  //               height: 120,
-                  //               decoration: BoxDecoration(
-                  //                 shape: BoxShape.circle,
-                  //                 color: AppColor.primary,
-                  //               ),
-                  //               child: ClipOval(
-                  //                 child: controller.pikedImagePath != ''
-                  //                     ? Image.file(
-                  //                   File(controller
-                  //                       .pickedImageFile!.path),
-                  //                   width: 120,
-                  //                   height: 120,
-                  //                   fit: BoxFit.cover,
-                  //                 )
-                  //                     : SvgPicture.asset(
-                  //                   controller.pickedIconPath.value,
-                  //                   width: 120,
-                  //                   height: 120,
-                  //                   fit: BoxFit.contain,
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //             Positioned(
-                  //               bottom: 0,
-                  //               right: 0,
-                  //               child: TextButton(
-                  //                 style: TextButton.styleFrom(
-                  //                   shape: CircleBorder(),
-                  //                   padding: EdgeInsets.all(8),
-                  //                   backgroundColor: AppColor.secondary,
-                  //                 ),
-                  //                 onPressed: () async {
-                  //                   DeviceInfoPlugin deviceInfo =
-                  //                   DeviceInfoPlugin();
-                  //                   AndroidDeviceInfo androidInfo =
-                  //                   await deviceInfo.androidInfo;
-                  //                   if (androidInfo.version.sdkInt >=
-                  //                       33) {
-                  //                     var status =
-                  //                     await Permission.camera.status;
-                  //                     if (!status.isGranted) {
-                  //                       await Permission.camera.request();
-                  //                     }
-                  //                   } else {
-                  //                     var status =
-                  //                     await Permission.camera.status;
-                  //                     if (!status.isGranted) {
-                  //                       await Permission.camera.request();
-                  //                     }
-                  //                   }
-                  //
-                  //                   controller.pilihsourcefoto();
-                  //                 },
-                  //                 child: FaIcon(
-                  //                   FontAwesomeIcons.pencil,
-                  //                   color: Colors.white,
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   );
-                  // }),
-                  // Padding(
-                  //   padding: AppPading.customBottomPadding(),
-                  //   child: button_border_custom(
-                  //       onPressed: () async {
-                  //         if (await controller.checkContactPermission()) {
-                  //           controller.selectContact();
-                  //         } else {
-                  //           Get.snackbar(
-                  //             'Izin Diperlukan',
-                  //             'Silakan berikan izin akses kontak terlebih dahulu',
-                  //             snackPosition: SnackPosition.BOTTOM,
-                  //           );
-                  //         }
-                  //       },
-                  //       child: Text('Tambah dari kontak'),
-                  //       width: context.res_width),
-                  // ),
                   Obx(() {
                     return Padding(
                       padding: AppPading.customBottomPadding(),
@@ -307,7 +156,6 @@ class TambahPromo extends GetView<TambahPromoController> {
                       );
                     },
                   ),
-
                   Obx(() {
                     return Container(
                       //color: Colors.red,
@@ -383,7 +231,6 @@ class TambahPromo extends GetView<TambahPromoController> {
                       ),
                     );
                   }),
-
                   Obx(() {
                     return Padding(
                       padding: AppPading.customBottomPadding(),

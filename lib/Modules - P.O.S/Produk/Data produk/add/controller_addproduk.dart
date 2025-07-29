@@ -70,7 +70,7 @@ class TambahProdukController extends GetxController {
   var idKelompokProduk = TextEditingController().obs;
   var idSubKelompokProduk = TextEditingController().obs;
   var kodeProduk = TextEditingController().obs;
-  var namaProduk = TextEditingController().obs;
+  var namaProduk = TextEditingController();
   var serialKey = TextEditingController().obs;
   var imei = TextEditingController().obs;
   var hargaBeli = TextEditingController().obs;
@@ -918,11 +918,6 @@ class TambahProdukController extends GetxController {
 
     Get.dialog(showloading(), barrierDismissible: false);
     var uuid_produk = Uuid().v4();
-
-    var uuid_hargajual = Uuid().v4();
-    var uuid_satuanproduk = Uuid().v4();
-    var uuid_pajak = Uuid().v4();
-    var uuid_ukuran = Uuid().v4();
 
     if (image64List.isNotEmpty) {
       for (String image64 in image64List.value) {

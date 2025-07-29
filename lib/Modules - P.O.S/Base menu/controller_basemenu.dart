@@ -9,6 +9,7 @@ import 'package:meta/meta.dart';
 import 'package:qasir_pintar/Widget/popscreen.dart';
 
 import '../../Database/DB_helper.dart';
+import '../../Services/BoxStorage.dart';
 import '../Auth/login karyawan pin/view_loginpin.dart';
 import '../Home/view_home.dart';
 import '../Kasir/model_penjualan.dart';
@@ -19,18 +20,17 @@ import '../Produk/Produk/model_kategoriproduk.dart';
 import '../Users/model_user.dart';
 
 class BasemenuController extends GetxController {
+  final StorageService box = Get.find<StorageService>();
+
   @override
-  Future<void> onInit() async {
+  void onInit() {
     // TODO: implement onInit
     super.onInit();
     print('BASE MENU CON INIt--------------------------------->');
-    uuid.value = await GetStorage().read('uuid');
-    await checktour();
-    await fetchUserLocal(uuid);
-    await fetchKategoriProdukLocal(id_toko: id_toko);
-    await fetchSubKategoriProdukLocal(id_toko: id_toko);
-    await fetchProdukLocal(id_toko: id_toko);
-    await fetchRiwayatPenjualan(id_toko: id_toko);
+    uuid.value = box.read('uuid', fallback: 'null');
+    checktour();
+    fetchUserLocal(uuid.value);
+    namatoko.value = box.read('user_business_name', fallback: 'qwe');
     totalpenjualan.value = penjualan.length;
     totaluang.value =
         penjualan.fold(0.0, (sum, item) => sum + (item.totalBayar!));
@@ -41,7 +41,7 @@ class BasemenuController extends GetxController {
   var token = ''.obs;
   var logo = ''.obs;
   var toko = ''.obs;
-  var namatoko = GetStorage().read('user_business_name');
+  var namatoko = ''.obs;
 
   List<String> produklist = ['kopi', 'milo', 'indomie', 'supermie', 'arabica'];
 
@@ -155,7 +155,6 @@ class BasemenuController extends GetxController {
     if (query.isNotEmpty) {
       List<DataUser> data = query.map((e) => DataUser.fromJsondb(e)).toList();
       datauser.value = data;
-      print(datauser.value);
       return data;
     } else {
       print('empty');

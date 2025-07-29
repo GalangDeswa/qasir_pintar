@@ -570,7 +570,7 @@ class PenerimaanProdukController extends GetxController {
   List<DateTime?> datedata = [
     //DateTime.now(),
   ];
-  String? jenispenerimaanvalue;
+  final jenispenerimaanvalue = Rxn<String>();
   var jenispenerimaan = ['Lunas', 'Hutang'].obs;
 
   var kategoripelangganList = <DataKategoriPelanggan>[].obs;
@@ -957,6 +957,11 @@ class PenerimaanProdukController extends GetxController {
       sisabayar.value.text = '0';
       return;
     }
+    if (double.parse(jumlahbayar.value.text.replaceAll(',', '')) >
+        double.parse(totalbayar.value.text.replaceAll(',', ''))) {
+      sisabayar.value.text = '0';
+      return;
+    }
     var x = double.parse(totalbayar.value.text.replaceAll(',', ''));
     var y = double.parse(jumlahbayar.value.text.replaceAll(',', ''));
     var z = x - y;
@@ -982,12 +987,14 @@ class PenerimaanProdukController extends GetxController {
     var uuid_ukuran = Uuid().v4();
 
     var paket = await DBHelper().INSERT(
+      // TODO : Check avail ui kalok ada penambahan dari berbagai sumber(reversal, penerimaan dll) --> done?
+      // TODO : check minimum stock, sekarang check stock pakai minimum stock bukan = 0
       'penerimaan_produk',
       DataPenerimaanProduk(
               uuid: uuidpenerimaan,
               idToko: id_toko,
               idSupplier: suppliervalue.value,
-              jenisPenerimaan: jenispenerimaanvalue,
+              jenisPenerimaan: jenispenerimaanvalue.value,
               nomorFaktur: nomorfaktur.value.text,
               jumlahQty: int.parse(jumlahqty.value.text),
               totalHarga:
@@ -1030,6 +1037,7 @@ class PenerimaanProdukController extends GetxController {
           .fetchPenerimaanLocal(id_toko: id_toko);
       await Get.find<CentralProdukController>()
           .fetchProdukLocal(id_toko: id_toko);
+      Get.find<KasirController>().availStockMap.clear();
 
       Get.back(closeOverlays: true);
       Get.showSnackbar(toast().bottom_snackbar_success('Sukses', 'Berhasil'));

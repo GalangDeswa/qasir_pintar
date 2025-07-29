@@ -11,18 +11,17 @@ import '../pengaturan/controller_pengaturan.dart';
 class BasemenuBinding extends Bindings {
   @override
   void dependencies() {
-    Get.put(CentralProdukController());
-    Get.put(CentralPaketController());
-    Get.put(CentralSupplierController());
-    Get.put(CentralPelangganController());
-    Get.put(PembayaranController());
-    //Get.put(CentralPelangganController());
-    //Get.lazyPut<CentralPelangganController>(() => CentralPelangganController());
-    // Get.lazyPut<BasemenuController>(() => BasemenuController(), fenix: true);
-    // Get.lazyPut<KasirController>(() => KasirController(), fenix: true);
     Get.put(BasemenuController());
-    Get.put(KasirController());
-    Get.lazyPut<PengaturanController>(() => PengaturanController());
-    Get.lazyPut<UserController>(() => UserController());
+    // Get.lazyPut<CentralProdukController>(() => CentralProdukController(),
+    //     fenix: true);
+    //
+    // Get.put(CentralPaketController());
+    // Get.put(CentralSupplierController());
+    // Get.put(CentralPelangganController());
+    // Get.lazyPut<KasirController>(() => KasirController(), fenix: true);
+    // Get.put(BasemenuController());
+    //
+    // Get.lazyPut<PengaturanController>(() => PengaturanController());
+    // Get.lazyPut<UserController>(() => UserController());
   }
 }

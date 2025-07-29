@@ -210,6 +210,35 @@ class DataKeranjang {
   double get price => isPaket ? hargaPaket! : hargaEceran!;
 }
 
+class DataKeranjangSavev2 {
+  // final String uuid;
+  final DateTime savedAt;
+  final String idToko;
+  final double diskon;
+  final double promoValue;
+  final String namaPromo;
+  var promoUUID;
+  final String customerName;
+  final String customerUUID;
+  final int metodeDiskon;
+  final double displayDiskon;
+  final List<DataKeranjang> item;
+
+  DataKeranjangSavev2({
+    required this.idToko,
+    required this.savedAt,
+    required this.item,
+    required this.diskon,
+    required this.promoValue,
+    required this.namaPromo,
+    this.promoUUID,
+    required this.customerName,
+    required this.customerUUID,
+    required this.metodeDiskon,
+    required this.displayDiskon,
+  });
+}
+
 class DataProdukTemp {
   DataProdukTemp(
       {this.id,

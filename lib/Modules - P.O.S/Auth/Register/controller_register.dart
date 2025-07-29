@@ -49,10 +49,13 @@ class RegisterController extends GetxController {
   var provinceListLocal = <DataProvince>[].obs;
 
   var usertemp = <DataUser>[].obs;
-
+  var pin = TextEditingController().obs;
+  var konpin = TextEditingController().obs;
+  var showpin = true.obs;
+  var showkonpin = true.obs;
   addusertemp() {
     print('add user temp ---->');
-    usertemp.value.add(DataUser(
+    usertemp.add(DataUser(
       name: nama.value.text,
       email: email.value.text,
       phone: telepon.value.text,
@@ -65,7 +68,7 @@ class RegisterController extends GetxController {
     ));
 
     print(usertemp);
-    Get.toNamed('/setuptoko', arguments: usertemp.value.first);
+    Get.toNamed('/setuptoko', arguments: usertemp.first);
   }
 
   getProviceLocal() async {

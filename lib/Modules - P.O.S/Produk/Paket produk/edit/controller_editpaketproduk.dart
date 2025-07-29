@@ -1168,8 +1168,6 @@ class EditPaketProdukController extends GetxController {
 
   var customqty = TextEditingController().obs;
 
-  //TODO: buat reversal di penjualan
-
   popaddqty(DataProduk data) {
     var con = Get.find<CentralProdukController>();
     Get.dialog(AlertDialog(

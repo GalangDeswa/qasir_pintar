@@ -284,26 +284,26 @@ class TambahProdukv3 extends GetView<TambahProdukController> {
                     ),
                   );
                 }),
-                Obx(() {
-                  return Padding(
-                    padding: AppPading.customBottomPadding(),
-                    child: TextFormField(
-                      controller: controller.namaProduk.value,
-                      decoration: InputDecoration(
-                        labelText: 'Nama Produk',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
+
+                Padding(
+                  padding: AppPading.customBottomPadding(),
+                  child: TextFormField(
+                    controller: controller.namaProduk,
+                    decoration: InputDecoration(
+                      labelText: 'Nama Produk',
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(10),
                       ),
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Nama Produk harus diisi';
-                        }
-                        return null;
-                      },
                     ),
-                  );
-                }),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Nama Produk harus diisi';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+
                 Obx(() {
                   return Padding(
                     padding: AppPading.customBottomPadding(),
@@ -331,7 +331,6 @@ class TambahProdukv3 extends GetView<TambahProdukController> {
                       children: [
                         Expanded(
                           child: DropdownButtonFormField2(
-                            key: UniqueKey(),
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -388,7 +387,7 @@ class TambahProdukv3 extends GetView<TambahProdukController> {
                       children: [
                         Expanded(
                           child: DropdownButtonFormField2(
-                            key: UniqueKey(),
+                            // key: UniqueKey(),
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -447,7 +446,7 @@ class TambahProdukv3 extends GetView<TambahProdukController> {
                       children: [
                         Expanded(
                           child: DropdownButtonFormField2(
-                            key: UniqueKey(),
+                            //key: UniqueKey(),
                             decoration: InputDecoration(
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
@@ -483,142 +482,7 @@ class TambahProdukv3 extends GetView<TambahProdukController> {
                     ),
                   );
                 }),
-                // Obx(() {
-                //   return Padding(
-                //     padding: AppPading.customBottomPadding(),
-                //     child: Row(
-                //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //       children: [
-                //         Text(
-                //           'Serial Key',
-                //           style: AppFont.regular(),
-                //         ),
-                //         Switch(
-                //           value: controller.showserialkey.value,
-                //           onChanged: (value) {
-                //             controller.showserialkey.value = value;
-                //           },
-                //         ),
-                //       ],
-                //     ),
-                //   );
-                // }),
-                // Obx(() {
-                //   return controller.showserialkey.value == false
-                //       ? Container()
-                //       : Padding(
-                //           padding: AppPading.customBottomPadding(),
-                //           child: TextFormField(
-                //             controller: controller.serialKey.value,
-                //             decoration: InputDecoration(
-                //               labelText: 'Serial Key (opsional)',
-                //               border: OutlineInputBorder(
-                //                 borderRadius: BorderRadius.circular(10),
-                //               ),
-                //             ),
-                //             // validator: (value) {
-                //             //   if (value!.isEmpty) {
-                //             //     return 'Serial Key harus diisi';
-                //             //   }
-                //             //   return null;
-                //             // },
-                //           ),
-                //         );
-                // }),
-                // Obx(() {
-                //   return Padding(
-                //     padding: AppPading.customBottomPadding(),
-                //     child: Row(
-                //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //       children: [
-                //         Text(
-                //           'IMEI',
-                //           style: AppFont.regular(),
-                //         ),
-                //         Switch(
-                //           value: controller.showimei.value,
-                //           onChanged: (value) {
-                //             controller.showimei.value = value;
-                //           },
-                //         ),
-                //       ],
-                //     ),
-                //   );
-                // }),
-                // Obx(() {
-                //   return controller.showimei.value == false
-                //       ? Container()
-                //       : Padding(
-                //           padding: AppPading.customBottomPadding(),
-                //           child: TextFormField(
-                //             controller: controller.imei.value,
-                //             decoration: InputDecoration(
-                //               labelText: 'IMEI (opsional)',
-                //               border: OutlineInputBorder(
-                //                 borderRadius: BorderRadius.circular(10),
-                //               ),
-                //             ),
-                //             // validator: (value) {
-                //             //   if (value!.isEmpty) {
-                //             //     return 'IMEI harus diisi';
-                //             //   }
-                //             //   return null;
-                //             // },
-                //           ),
-                //         );
-                // }),
-                // Obx(() {
-                //   return Padding(
-                //     padding: AppPading.customBottomPadding(),
-                //     child: TextFormField(
-                //       controller: controller.hargaBeli.value,
-                //       onChanged: (val) {
-                //         print(controller.hargaBeli.value.text);
-                //       },
-                //       inputFormatters: [ThousandsFormatter()],
-                //       decoration: InputDecoration(
-                //         labelText: 'Harga Beli',
-                //         border: OutlineInputBorder(
-                //           borderRadius: BorderRadius.circular(10),
-                //         ),
-                //       ),
-                //       keyboardType: TextInputType.number,
-                //       validator: (value) {
-                //         if (value!.isEmpty) {
-                //           return 'Harga Beli harus diisi';
-                //         }
-                //         return null;
-                //       },
-                //     ),
-                //   );
-                // }),
-                // Obx(() {
-                //   return Padding(
-                //       padding: AppPading.customBottomPadding(),
-                //       child: TextFormField(
-                //         controller: controller.hpp.value,
-                //         inputFormatters: [ThousandsFormatter()],
-                //         decoration: InputDecoration(
-                //           labelText: 'HPP',
-                //           border: OutlineInputBorder(
-                //             borderRadius: BorderRadius.circular(10),
-                //           ),
-                //         ),
-                //         keyboardType: TextInputType.number,
-                //         validator: (value) {
-                //           if (value!.isEmpty) {
-                //             return 'HPP harus diisi';
-                //           }
-                //           if (double.parse(controller.hpp.value.text
-                //                   .replaceAll(',', '')) <
-                //               double.parse(controller.hargaBeli.value.text
-                //                   .replaceAll(',', ''))) {
-                //             return 'HPP harus >= dari Harga Beli';
-                //           }
-                //           return null;
-                //         },
-                //       ));
-                // }),
+
                 button_solid_custom(
                     onPressed: () {
                       if (controller.registerKey.value.currentState!
@@ -704,210 +568,6 @@ class TambahProdukv3next extends GetView<TambahProdukController> {
                   ),
                 ),
 
-                // Obx(() {
-                //   // Check if all lists are empty
-                //   final isEmpty = controller.pickedImageFiles.isEmpty &&
-                //       controller.selectedIconPaths.isEmpty;
-                //
-                //   return Padding(
-                //     padding: EdgeInsets.only(bottom: 100, top: 50),
-                //     child: isEmpty
-                //         ? Center(
-                //             // Show empty state UI
-                //             child: GestureDetector(
-                //               onTap: () async {
-                //                 // Handle permission and image picker
-                //                 DeviceInfoPlugin deviceInfo =
-                //                     DeviceInfoPlugin();
-                //                 AndroidDeviceInfo androidInfo =
-                //                     await deviceInfo.androidInfo;
-                //                 if (androidInfo.version.sdkInt >= 33) {
-                //                   var status = await Permission.photos.status;
-                //                   if (!status.isGranted)
-                //                     await Permission.photos.request();
-                //                 } else {
-                //                   var status = await Permission.storage.status;
-                //                   if (!status.isGranted)
-                //                     await Permission.storage.request();
-                //                 }
-                //                 controller.pilihsourcefoto();
-                //               },
-                //               child: Column(
-                //                 mainAxisSize: MainAxisSize.min,
-                //                 children: [
-                //                   Container(
-                //                     width: 110,
-                //                     height: 110,
-                //                     decoration: BoxDecoration(
-                //                       shape: BoxShape.circle,
-                //                       color: AppColor.primary,
-                //                     ),
-                //                     child: Icon(
-                //                       FontAwesomeIcons.image,
-                //                       color: Colors.white,
-                //                       size: 35,
-                //                     ),
-                //                   ),
-                //                   SizedBox(height: 16),
-                //                   Text(
-                //                     'Tambah Gambar',
-                //                     style: AppFont.regular(),
-                //                   ),
-                //                 ],
-                //               ),
-                //             ),
-                //           )
-                //         : SingleChildScrollView(
-                //             // Show normal horizontal list
-                //             scrollDirection: Axis.horizontal,
-                //             child: Row(
-                //               mainAxisAlignment: MainAxisAlignment.start,
-                //               crossAxisAlignment: CrossAxisAlignment.center,
-                //               children: [
-                //                 // Newly picked images
-                //                 ...controller.pickedImageFiles.map((file) =>
-                //                     Stack(
-                //                       alignment: Alignment.center,
-                //                       children: [
-                //                         Container(
-                //                           width: 110,
-                //                           height: 110,
-                //                           margin: EdgeInsets.only(right: 10),
-                //                           decoration: BoxDecoration(
-                //                             shape: BoxShape.circle,
-                //                             color: AppColor.primary,
-                //                           ),
-                //                           child: ClipOval(
-                //                             child: Image.file(
-                //                               File(file.path),
-                //                               width: 100,
-                //                               height: 100,
-                //                               fit: BoxFit.cover,
-                //                             ),
-                //                           ),
-                //                         ),
-                //                         Positioned(
-                //                           top: 0,
-                //                           right: 0,
-                //                           child: Container(
-                //                             padding: EdgeInsets.zero,
-                //                             decoration: BoxDecoration(
-                //                               shape: BoxShape.circle,
-                //                               color: AppColor.warning,
-                //                             ),
-                //                             child: IconButton(
-                //                                 icon: Icon(Icons.close,
-                //                                     color: Colors.white),
-                //                                 onPressed: () {
-                //                                   controller.removeImage(file);
-                //                                 }),
-                //                           ),
-                //                         ),
-                //                       ],
-                //                     )),
-                //
-                //                 // SVG icons
-                //
-                //                 ...controller.selectedIconPaths.map((file) =>
-                //                     Stack(
-                //                       alignment: Alignment.center,
-                //                       children: [
-                //                         Container(
-                //                           width: 110,
-                //                           height: 110,
-                //                           margin: EdgeInsets.only(right: 10),
-                //                           decoration: BoxDecoration(
-                //                             shape: BoxShape.circle,
-                //                             color: AppColor.primary,
-                //                           ),
-                //                           child: ClipOval(
-                //                             child: SvgPicture.asset(
-                //                               file,
-                //                               width: 120,
-                //                               height: 120,
-                //                               fit: BoxFit.contain,
-                //                             ),
-                //                           ),
-                //                         ),
-                //                         Positioned(
-                //                           top: 0,
-                //                           right: 0,
-                //                           child: Container(
-                //                             padding: EdgeInsets.zero,
-                //                             decoration: BoxDecoration(
-                //                               shape: BoxShape.circle,
-                //                               color: AppColor.warning,
-                //                             ),
-                //                             child: IconButton(
-                //                                 icon: Icon(Icons.close,
-                //                                     color: Colors.white),
-                //                                 onPressed: () {
-                //                                   controller.removeIcon(file);
-                //                                 }),
-                //                           ),
-                //                         ),
-                //                       ],
-                //                     )),
-                //                 // Always show add button
-                //                 Stack(
-                //                   alignment: Alignment.center,
-                //                   children: [
-                //                     Container(
-                //                       width: 110,
-                //                       height: 110,
-                //                       decoration: BoxDecoration(
-                //                         shape: BoxShape.circle,
-                //                         color: AppColor.primary,
-                //                       ),
-                //                       child: Icon(
-                //                         FontAwesomeIcons.image,
-                //                         color: Colors.white,
-                //                         size: 35,
-                //                       ),
-                //                     ),
-                //                     Positioned(
-                //                       bottom: 0,
-                //                       right: 0,
-                //                       child: TextButton(
-                //                         style: TextButton.styleFrom(
-                //                           shape: CircleBorder(),
-                //                           padding: EdgeInsets.all(8),
-                //                           backgroundColor: AppColor.secondary,
-                //                         ),
-                //                         onPressed: () async {
-                //                           DeviceInfoPlugin deviceInfo =
-                //                               DeviceInfoPlugin();
-                //                           AndroidDeviceInfo androidInfo =
-                //                               await deviceInfo.androidInfo;
-                //                           if (androidInfo.version.sdkInt >=
-                //                               33) {
-                //                             var status =
-                //                                 await Permission.photos.status;
-                //                             if (!status.isGranted)
-                //                               await Permission.photos.request();
-                //                           } else {
-                //                             var status =
-                //                                 await Permission.storage.status;
-                //                             if (!status.isGranted)
-                //                               await Permission.storage
-                //                                   .request();
-                //                           }
-                //                           controller.pilihsourcefoto();
-                //                         },
-                //                         child: Icon(
-                //                           Icons.add,
-                //                           color: Colors.white,
-                //                         ),
-                //                       ),
-                //                     ),
-                //                   ],
-                //                 ),
-                //               ],
-                //             ),
-                //           ),
-                //   );
-                // }),
-
                 Obx(() {
                   return Padding(
                     padding: AppPading.customBottomPadding(),
@@ -960,50 +620,6 @@ class TambahProdukv3next extends GetView<TambahProdukController> {
                         },
                       ));
                 }),
-
-                // Obx(() {
-                //   return Padding(
-                //     padding: AppPading.customBottomPadding(),
-                //     child: Row(
-                //       children: [
-                //         Expanded(
-                //           child: DropdownButtonFormField2(
-                //             key: UniqueKey(),
-                //             decoration: InputDecoration(
-                //               border: OutlineInputBorder(
-                //                 borderRadius: BorderRadius.circular(10),
-                //               ),
-                //             ),
-                //             validator: (value) {
-                //               if (value == null) {
-                //                 return 'jenis produk dipilih';
-                //               }
-                //               return null;
-                //             },
-                //             isExpanded: true,
-                //             dropdownStyleData: DropdownStyleData(
-                //                 decoration: BoxDecoration(
-                //                     borderRadius: BorderRadius.circular(10),
-                //                     color: Colors.white)),
-                //             hint:
-                //                 Text('Jenis produk', style: AppFont.regular()),
-                //             value: controller.jenisvalue,
-                //             items: controller.jenisproduklist.map((x) {
-                //               return DropdownMenuItem(
-                //                 child: Text(x),
-                //                 value: x,
-                //               );
-                //             }).toList(),
-                //             onChanged: (val) {
-                //               controller.jenisvalue = val;
-                //               print(controller.jenisvalue);
-                //             },
-                //           ),
-                //         ),
-                //       ],
-                //     ),
-                //   );
-                // }),
 
                 Obx(() {
                   return Padding(
@@ -1083,17 +699,6 @@ class TambahProdukv3next extends GetView<TambahProdukController> {
                               },
                             ),
                           ),
-                          // Container(
-                          //     margin: EdgeInsets.only(left: 15),
-                          //     decoration: BoxDecoration(
-                          //         shape: BoxShape.circle,
-                          //         color: AppColor.primary),
-                          //     child: IconButton(
-                          //         onPressed: () {},
-                          //         icon: Icon(
-                          //           Icons.add,
-                          //           color: Colors.white,
-                          //         )))
                         ],
                       ));
                 }),
@@ -1281,7 +886,7 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
                           child: TextFormField(
                             controller: controller.infostock.value,
                             decoration: InputDecoration(
-                              labelText: 'Info stock habis',
+                              labelText: 'Minimum Stock',
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(10),
                               ),
@@ -1290,10 +895,15 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
                             validator: (value) {
                               if (controller.hitungStok.value == true &&
                                   value!.isEmpty) {
-                                return 'Stock habis harus diisi';
+                                return 'Minimum stock harus diisi';
                               }
                               if (value!.isNotEmpty && int.parse(value) < 0)
-                                return 'Stock habis tidak boleh lebih kecil dari 0';
+                                return 'Minimum stock tidak boleh lebih kecil dari 0';
+                              if (value!.isNotEmpty &&
+                                  int.parse(value) >
+                                      int.parse(
+                                          controller.stockawal.value.text))
+                                return 'Minimum stock tidak boleh lebih kecil besar dari stock awal';
                             },
                           ))
                       : Container();
@@ -1447,7 +1057,7 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
                             children: [
                               Expanded(
                                 child: DropdownButtonFormField2(
-                                  key: UniqueKey(),
+                                  //key: UniqueKey(),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),
@@ -1479,7 +1089,6 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
                                     );
                                   }).toList(),
                                   onChanged: (val) {
-                                    print('asdasdasdasd');
                                     controller.pajakValue = val;
                                     var matchingPajak =
                                         controller.pajakList.firstWhere(
@@ -1549,7 +1158,7 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
                             children: [
                               Expanded(
                                 child: DropdownButtonFormField2(
-                                  key: UniqueKey(),
+                                  //key: UniqueKey(),
                                   decoration: InputDecoration(
                                     border: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(10),

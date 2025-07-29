@@ -5,6 +5,7 @@ import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Kasir%20-%20Pembayaran/controller_pembayaran.dart';
 import 'package:qasir_pintar/Modules%20-%20P.O.S/Kasir/controller_kasir.dart';
 import 'package:qasir_pintar/Widget/widget.dart';
+import 'package:smooth_sheets/smooth_sheets.dart';
 
 import '../../Widget/popscreen.dart';
 
@@ -221,7 +222,16 @@ class BottomMenuPembayaran extends GetView<KasirController> {
                     button_border_custom(
                         //TODO ; buat simpan order / prebill
                         margin: EdgeInsets.all(20),
-                        onPressed: () {},
+                        onPressed: () {
+                          if (controller.keranjangv2.isEmpty) {
+                            Get.showSnackbar(toast().bottom_snackbar_error(
+                                "Error", 'Keranjang kosong'));
+                          } else {
+                            controller.saveCartv2();
+                            controller.kasirsheet.value
+                                .animateTo(const SheetOffset(0.1));
+                          }
+                        },
                         child: Text('Simpan'),
                         width: context.width * 0.3),
                     Expanded(

@@ -59,7 +59,7 @@ class DrawerBase extends GetView<BasemenuController> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        controller.datauser.first.businessName,
+                        controller.namatoko.value,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -83,41 +83,41 @@ class DrawerBase extends GetView<BasemenuController> {
           Expanded(
             child: ListView(
               children: [
-                ExpansionTile(
-                  title: ListTile(
-                    leading: Icon(
-                      FontAwesomeIcons.starOfLife,
-                      color: AppColor.primary,
-                    ),
-                    title: Text(
-                      'Aplikasi',
-                      style: AppFont.regular(),
-                    ),
-                  ),
-                  children: [
-                    _buildDrawerItem(
-                      icon: FontAwesomeIcons.truckPickup,
-                      title: 'Distributor',
-                      onTap: () {
-                        Get.offAllNamed('/base_menu_distributor');
-                      },
-                    ),
-                    _buildDrawerItem(
-                      icon: FontAwesomeIcons.cashRegister,
-                      title: 'P.O.S',
-                      onTap: () {
-                        Get.offAllNamed('/basemenu');
-                      },
-                    ),
-                  ],
-                ),
-                Divider(
-                  color: Colors.black.withOpacity(0.1),
-                  thickness: 1,
-                  height: 20,
-                  indent: 16,
-                  endIndent: 16,
-                ),
+                // ExpansionTile(
+                //   title: ListTile(
+                //     leading: Icon(
+                //       FontAwesomeIcons.starOfLife,
+                //       color: AppColor.primary,
+                //     ),
+                //     title: Text(
+                //       'Aplikasi',
+                //       style: AppFont.regular(),
+                //     ),
+                //   ),
+                //   children: [
+                //     _buildDrawerItem(
+                //       icon: FontAwesomeIcons.truckPickup,
+                //       title: 'Distributor',
+                //       onTap: () {
+                //         Get.offAllNamed('/base_menu_distributor');
+                //       },
+                //     ),
+                //     _buildDrawerItem(
+                //       icon: FontAwesomeIcons.cashRegister,
+                //       title: 'P.O.S',
+                //       onTap: () {
+                //         Get.offAllNamed('/basemenu');
+                //       },
+                //     ),
+                //   ],
+                // ),
+                // Divider(
+                //   color: Colors.black.withOpacity(0.1),
+                //   thickness: 1,
+                //   height: 20,
+                //   indent: 16,
+                //   endIndent: 16,
+                // ),
                 ExpansionTile(
                   title: ListTile(
                     leading: Icon(
@@ -138,6 +138,13 @@ class DrawerBase extends GetView<BasemenuController> {
                       },
                     ),
                     // _buildDrawerItem(
+                    //   icon: FontAwesomeIcons.chartSimple,
+                    //   title: 'Laporan',
+                    //   onTap: () {
+                    //     Get.toNamed('/laporanmenu');
+                    //   },
+                    // ),
+                    // _buildDrawerItem(
                     //   icon: FontAwesomeIcons.book,
                     //   title: 'Laporan',
                     //   onTap: () {
@@ -145,6 +152,71 @@ class DrawerBase extends GetView<BasemenuController> {
                     //   },
                     // ),
                   ],
+                ),
+                ExpansionTile(
+                  title: ListTile(
+                    leading: Icon(
+                      FontAwesomeIcons.chartSimple,
+                      color: AppColor.primary,
+                    ),
+                    title: Text(
+                      'Laporan',
+                      style: AppFont.regular(),
+                    ),
+                  ),
+                  children: [
+                    _buildDrawerItem(
+                      icon: FontAwesomeIcons.receipt,
+                      title: 'Umum',
+                      onTap: () {
+                        Get.toNamed('/ringkasanpenjualan');
+                      },
+                    ),
+                    _buildDrawerItem(
+                      icon: FontAwesomeIcons.chartSimple,
+                      title: 'Penjualan',
+                      onTap: () {
+                        Get.toNamed('/laporankasir');
+                      },
+                    ),
+                    _buildDrawerItem(
+                      icon: FontAwesomeIcons.chartSimple,
+                      title: 'Beban',
+                      onTap: () {
+                        Get.toNamed('/kaskasir');
+                      },
+                    ),
+                    _buildDrawerItem(
+                      icon: FontAwesomeIcons.chartSimple,
+                      title: 'Reversal',
+                      onTap: () {
+                        Get.toNamed('/laporanmenu');
+                      },
+                    ),
+                    // _buildDrawerItem(
+                    //   icon: FontAwesomeIcons.book,
+                    //   title: 'Laporan',
+                    //   onTap: () {
+                    //     Get.toNamed('/laporanmenu');
+                    //   },
+                    // ),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child: ListTile(
+                    leading: Icon(
+                      FontAwesomeIcons.moneyBillWave,
+                      color: AppColor.primary,
+                    ),
+                    title: Text(
+                      'Beban',
+                      style: AppFont.regular(),
+                    ),
+                    onTap: () {
+                      Get.toNamed('/basemenu_beban');
+                    },
+                  ),
                 ),
                 ExpansionTile(
                   title: ListTile(
@@ -276,25 +348,26 @@ class DrawerBase extends GetView<BasemenuController> {
                                               fontWeight: FontWeight.bold),
                                         ),
                                         const SizedBox(height: 8),
-                                        DropdownButton<BluetoothDevice>(
-                                            isExpanded: true,
-                                            hint: const Text('Choose a device'),
-                                            value: _ctrl.selectedDevice.value,
-                                            items: _ctrl.devices.map((device) {
-                                              final name =
-                                                  device.name ?? 'Unknown';
-                                              final addr =
-                                                  device.address ?? '—';
-                                              return DropdownMenuItem<
-                                                  BluetoothDevice>(
-                                                value: device,
-                                                child: Text('$name ($addr)'),
-                                              );
-                                            }).toList(),
-                                            onChanged: (device) {
-                                              print(device!.name);
-                                              _ctrl.selectDevice(device);
-                                            }),
+                                        DropdownButton<String>(
+                                          isExpanded: true,
+                                          hint: const Text('Choose a device'),
+                                          value: _ctrl.selectedAddress.value,
+                                          items: _ctrl.devices.map((device) {
+                                            final name =
+                                                device.name ?? 'Unknown';
+                                            final addr = device.address ?? '—';
+                                            return DropdownMenuItem<String>(
+                                              value: addr,
+                                              child: Text('$name ($addr)'),
+                                            );
+                                          }).toList(),
+                                          onChanged: (addr) {
+                                            final device = _ctrl.devices
+                                                .firstWhere(
+                                                    (d) => d.address == addr);
+                                            _ctrl.selectDevice(device);
+                                          },
+                                        ),
                                         const SizedBox(height: 20),
 
                                         // 3) Connect / Disconnect Button

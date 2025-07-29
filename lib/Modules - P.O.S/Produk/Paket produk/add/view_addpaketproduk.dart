@@ -168,7 +168,6 @@ class TambahPaketProduk extends GetView<TambahPaketProdukController> {
                   );
                 }),
                 SizedBox(height: 20),
-
                 Padding(
                   padding: AppPading.customBottomPadding(),
                   child: button_solid_custom(
@@ -181,648 +180,672 @@ class TambahPaketProduk extends GetView<TambahPaketProdukController> {
                 Obx(() {
                   return controller.produktemp.isEmpty
                       ? Container()
-                      : Obx(() {
-                          return Container(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(
-                                    color: Colors.black, width: 0.5)),
-                            height: 200,
-                            margin: AppPading.customBottomPadding(),
-                            child: controller.produktemp.isNotEmpty
-                                ? ListView.builder(
-                                    itemCount: controller.produktemp.length,
-                                    itemBuilder: (context, index) {
-                                      final customer = controller.produktemp;
+                      : Column(
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  border: Border.all(
+                                      color: Colors.black, width: 0.5)),
+                              height: 200,
+                              margin: AppPading.customBottomPadding(),
+                              child: controller.produktemp.isNotEmpty
+                                  ? ListView.builder(
+                                      itemCount: controller.produktemp.length,
+                                      itemBuilder: (context, index) {
+                                        final customer = controller.produktemp;
 
-                                      return Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Expanded(
-                                                child: ListTile(
-                                                  leading: customer[index]
-                                                                  .gambar_produk_utama !=
-                                                              '' &&
-                                                          customer[index]
-                                                                  .gambar_produk_utama !=
-                                                              null
-                                                      ? controller.isBase64Svg(
-                                                              customer[index]
-                                                                  .gambar_produk_utama!)
-                                                          ? SvgPicture.memory(
-                                                              base64Decode(customer[
-                                                                      index]
-                                                                  .gambar_produk_utama!),
-                                                              width: 30,
-                                                              height: 30,
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                            )
-                                                          : Image.memory(
-                                                              base64Decode(customer[
-                                                                      index]
-                                                                  .gambar_produk_utama!),
-                                                              width: 30,
-                                                              height: 30,
-                                                              fit: BoxFit
-                                                                  .contain,
-                                                            )
-                                                      : Image.asset(
-                                                          AppString.defaultImg,
-                                                          width: 30,
-                                                          height: 30,
-                                                          fit: BoxFit.contain,
-                                                        ),
-                                                  title: Text(
-                                                    customer[index]
-                                                        .nama_produk!,
-                                                    style: TextStyle(
-                                                      fontSize: 13,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                  trailing: Text(
-                                                    'Qty : ' +
-                                                        customer[index]
-                                                            .qty
-                                                            .toString(),
-                                                    style: AppFont.small(),
-                                                  ),
-                                                  subtitle: Column(
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
-                                                    children: [
-                                                      Text(
-                                                        'Modal : ' +
-                                                            AppFormat().numFormat(
+                                        return Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                Expanded(
+                                                  child: ListTile(
+                                                    leading: customer[index]
+                                                                    .gambar_produk_utama !=
+                                                                '' &&
+                                                            customer[index]
+                                                                    .gambar_produk_utama !=
+                                                                null
+                                                        ? controller.isBase64Svg(
                                                                 customer[index]
-                                                                    .harga_beli),
-                                                        style: AppFont.small(),
+                                                                    .gambar_produk_utama!)
+                                                            ? SvgPicture.memory(
+                                                                base64Decode(customer[
+                                                                        index]
+                                                                    .gambar_produk_utama!),
+                                                                width: 30,
+                                                                height: 30,
+                                                                fit: BoxFit
+                                                                    .contain,
+                                                              )
+                                                            : Image.memory(
+                                                                base64Decode(customer[
+                                                                        index]
+                                                                    .gambar_produk_utama!),
+                                                                width: 30,
+                                                                height: 30,
+                                                                fit: BoxFit
+                                                                    .contain,
+                                                              )
+                                                        : Image.asset(
+                                                            AppString
+                                                                .defaultImg,
+                                                            width: 30,
+                                                            height: 30,
+                                                            fit: BoxFit.contain,
+                                                          ),
+                                                    title: Text(
+                                                      customer[index]
+                                                          .nama_produk!,
+                                                      style: TextStyle(
+                                                        fontSize: 13,
+                                                        fontWeight:
+                                                            FontWeight.bold,
                                                       ),
-                                                      Text(
-                                                          'HPP : ' +
+                                                    ),
+                                                    trailing: Text(
+                                                      'Qty : ' +
+                                                          customer[index]
+                                                              .qty
+                                                              .toString(),
+                                                      style: AppFont.small(),
+                                                    ),
+                                                    subtitle: Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          'Modal : ' +
                                                               AppFormat().numFormat(
                                                                   customer[
                                                                           index]
-                                                                      .hpp),
+                                                                      .harga_beli),
                                                           style:
-                                                              AppFont.small())
-                                                    ],
+                                                              AppFont.small(),
+                                                        ),
+                                                        Text(
+                                                            'HPP : ' +
+                                                                AppFormat().numFormat(
+                                                                    customer[
+                                                                            index]
+                                                                        .hpp),
+                                                            style:
+                                                                AppFont.small())
+                                                      ],
+                                                    ),
                                                   ),
                                                 ),
-                                              ),
-                                              IconButton(
-                                                  iconSize: 20.0,
-                                                  padding: EdgeInsets.zero,
-                                                  constraints:
-                                                      const BoxConstraints(),
-                                                  onPressed: () {
-                                                    print('min-------------->');
-                                                    customer[index].qty--;
+                                                IconButton(
+                                                    iconSize: 20.0,
+                                                    padding: EdgeInsets.zero,
+                                                    constraints:
+                                                        const BoxConstraints(),
+                                                    onPressed: () {
+                                                      print(
+                                                          'min-------------->');
+                                                      customer[index].qty--;
 
-                                                    // Get the individual product values to subtract
-                                                    final hargaBeliPerItem =
-                                                        customer[index]
-                                                            .harga_beli!;
-                                                    final hppPerItem =
-                                                        customer[index].hpp!;
+                                                      // Get the individual product values to subtract
+                                                      final hargaBeliPerItem =
+                                                          customer[index]
+                                                              .harga_beli!;
+                                                      final hppPerItem =
+                                                          customer[index].hpp!;
 
-                                                    // Subtract from totals
-                                                    controller.harga_modal
-                                                            .value -=
-                                                        hargaBeliPerItem;
-                                                    controller.harga_hpp
-                                                        .value -= hppPerItem;
+                                                      // Subtract from totals
+                                                      controller.harga_modal
+                                                              .value -=
+                                                          hargaBeliPerItem;
+                                                      controller.harga_hpp
+                                                          .value -= hppPerItem;
 
-                                                    controller.hargaModal.value
-                                                            .text =
-                                                        AppFormat().numFormat(
-                                                            controller
-                                                                .harga_modal
-                                                                .value);
-                                                    controller.hpp.value.text =
-                                                        AppFormat().numFormat(
-                                                            controller.harga_hpp
-                                                                .value);
-
-                                                    if (customer[index].qty <=
-                                                        0) {
-                                                      var x = customer
-                                                          .removeAt(index);
+                                                      controller.hargaModal
+                                                              .value.text =
+                                                          AppFormat().numFormat(
+                                                              controller
+                                                                  .harga_modal
+                                                                  .value);
                                                       controller
-                                                          .deletedDetailIds
-                                                          .add(x.uuid!);
+                                                              .hpp.value.text =
+                                                          AppFormat().numFormat(
+                                                              controller
+                                                                  .harga_hpp
+                                                                  .value);
+
+                                                      if (customer[index].qty <=
+                                                          0) {
+                                                        var x = customer
+                                                            .removeAt(index);
+                                                        controller
+                                                            .deletedDetailIds
+                                                            .add(x.uuid!);
+                                                        controller.produktemp
+                                                            .refresh();
+                                                      }
+
                                                       controller.produktemp
                                                           .refresh();
-                                                    }
+                                                    },
+                                                    icon: Icon(Icons.remove)),
+                                                IconButton(
+                                                    iconSize: 20.0,
+                                                    padding: EdgeInsets.zero,
+                                                    constraints:
+                                                        const BoxConstraints(),
+                                                    onPressed: () {
+                                                      var check = con.produk
+                                                          .where((element) =>
+                                                              element.uuid ==
+                                                              customer[index]
+                                                                  .uuid)
+                                                          .first;
+                                                      final existingIndex =
+                                                          controller.produktemp
+                                                              .indexWhere((item) =>
+                                                                  item.uuid ==
+                                                                  customer[
+                                                                          index]
+                                                                      .uuid);
+                                                      if (check.qty == 0 &&
+                                                          check.hitung_stok ==
+                                                              1 &&
+                                                          check.tampilkan_di_produk ==
+                                                              1) {
+                                                        Get.showSnackbar(toast()
+                                                            .bottom_snackbar_error(
+                                                                "Error",
+                                                                'Stock sudah habis! harap isi stock terlebih dahulu'));
+                                                        return;
+                                                      }
+                                                      if (controller
+                                                                  .produktemp[
+                                                                      existingIndex]
+                                                                  .qty >=
+                                                              check.qty! &&
+                                                          check.tampilkan_di_produk ==
+                                                              1 &&
+                                                          check.hitung_stok ==
+                                                              1) {
+                                                        Get.showSnackbar(toast()
+                                                            .bottom_snackbar_error(
+                                                                "Error",
+                                                                'Stock tidak mencukupi'));
 
-                                                    controller.produktemp
-                                                        .refresh();
-                                                  },
-                                                  icon: Icon(Icons.remove)),
-                                              IconButton(
-                                                  iconSize: 20.0,
-                                                  padding: EdgeInsets.zero,
-                                                  constraints:
-                                                      const BoxConstraints(),
-                                                  onPressed: () {
-                                                    var check = con.produk
-                                                        .where((element) =>
-                                                            element.uuid ==
-                                                            customer[index]
-                                                                .uuid)
-                                                        .first;
-                                                    final existingIndex =
-                                                        controller
-                                                            .produktemp
-                                                            .indexWhere((item) =>
-                                                                item.uuid ==
-                                                                customer[index]
-                                                                    .uuid);
-                                                    if (check.qty == 0 &&
-                                                        check.hitung_stok ==
-                                                            1 &&
-                                                        check.tampilkan_di_produk ==
-                                                            1) {
-                                                      Get.showSnackbar(toast()
-                                                          .bottom_snackbar_error(
-                                                              "Error",
-                                                              'Stock sudah habis! harap isi stock terlebih dahulu'));
-                                                      return;
-                                                    }
-                                                    if (controller
-                                                                .produktemp[
-                                                                    existingIndex]
-                                                                .qty >=
-                                                            check.qty! &&
-                                                        check.tampilkan_di_produk ==
-                                                            1 &&
-                                                        check.hitung_stok ==
-                                                            1) {
-                                                      Get.showSnackbar(toast()
-                                                          .bottom_snackbar_error(
-                                                              "Error",
-                                                              'Stock tidak mencukupi'));
-
-                                                      return;
-                                                    }
-                                                    customer[index].qty++;
-                                                    controller.harga_modal
-                                                            .value +=
-                                                        customer[index]
-                                                            .harga_beli!;
-                                                    controller
-                                                            .harga_hpp.value +=
-                                                        customer[index].hpp!;
-                                                    controller.hargaModal.value
-                                                            .text =
-                                                        AppFormat().numFormat(
-                                                            controller
-                                                                .harga_modal
-                                                                .value);
-                                                    controller.hpp.value.text =
-                                                        AppFormat().numFormat(
-                                                            controller.harga_hpp
-                                                                .value);
-                                                    print(
-                                                        'sum harga modal --->' +
-                                                            controller
-                                                                .harga_modal
-                                                                .value
-                                                                .toString());
-                                                    print('sum harga hpp --->' +
-                                                        controller
-                                                            .harga_hpp.value
-                                                            .toString());
-                                                    controller.produktemp
-                                                        .refresh();
-                                                  },
-                                                  icon: Icon(Icons.add))
-                                            ],
+                                                        return;
+                                                      }
+                                                      customer[index].qty++;
+                                                      controller.harga_modal
+                                                              .value +=
+                                                          customer[index]
+                                                              .harga_beli!;
+                                                      controller.harga_hpp
+                                                              .value +=
+                                                          customer[index].hpp!;
+                                                      controller.hargaModal
+                                                              .value.text =
+                                                          AppFormat().numFormat(
+                                                              controller
+                                                                  .harga_modal
+                                                                  .value);
+                                                      controller
+                                                              .hpp.value.text =
+                                                          AppFormat().numFormat(
+                                                              controller
+                                                                  .harga_hpp
+                                                                  .value);
+                                                      print(
+                                                          'sum harga modal --->' +
+                                                              controller
+                                                                  .harga_modal
+                                                                  .value
+                                                                  .toString());
+                                                      print(
+                                                          'sum harga hpp --->' +
+                                                              controller
+                                                                  .harga_hpp
+                                                                  .value
+                                                                  .toString());
+                                                      controller.produktemp
+                                                          .refresh();
+                                                    },
+                                                    icon: Icon(Icons.add))
+                                              ],
+                                            ),
+                                            Container(
+                                              height: 0.5,
+                                              color: Colors.black,
+                                            )
+                                          ],
+                                        );
+                                      },
+                                    )
+                                  : Center(child: Text('Paket kosong')),
+                            ),
+                            Padding(
+                                padding: AppPading.customBottomPadding(),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller: controller.namaPaket.value,
+                                        decoration: InputDecoration(
+                                          labelText: 'Nama Paket',
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
                                           ),
-                                          Container(
-                                            height: 0.5,
-                                            color: Colors.black,
-                                          )
-                                        ],
-                                      );
-                                    },
-                                  )
-                                : Center(child: Text('Paket kosong')),
-                          );
-                        });
-                }),
+                                        ),
+                                        keyboardType: TextInputType.text,
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'nama paket harus diisi';
+                                          }
 
-                Obx(() {
-                  return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: controller.namaPaket.value,
-                              decoration: InputDecoration(
-                                labelText: 'Nama Paket',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              keyboardType: TextInputType.text,
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'nama paket harus diisi';
-                                }
-
-                                return null;
-                              },
-                            ),
-                          ),
-                        ],
-                      ));
-                }),
-
-                Obx(() {
-                  return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              readOnly: true,
-                              controller: controller.hargaModal.value,
-                              inputFormatters: [ThousandsFormatter()],
-                              decoration: InputDecoration(
-                                labelText: 'Harga modal',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              keyboardType: TextInputType.number,
-                              // validator: (value) {
-                              //   if (value!.isEmpty) {
-                              //     return 'Harga modal harus diisi';
-                              //   }
-                              //   if (double.parse(controller
-                              //           .hargaModal.value.text
-                              //           .replaceAll(',', '')) <
-                              //       double.parse(controller.hpp.value.text
-                              //           .replaceAll(',', ''))) {
-                              //     return 'harga modal harus >= dengan HPP';
-                              //   }
-                              //   return null;
-                              // },
-                            ),
-                          ),
-                        ],
-                      ));
-                }),
-                Obx(() {
-                  return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              readOnly: true,
-                              controller: controller.hpp.value,
-                              inputFormatters: [ThousandsFormatter()],
-                              decoration: InputDecoration(
-                                labelText: 'HPP',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'HPP harus diisi';
-                                }
-                                // if (double.parse(controller
-                                //         .hargaJualEceran.value.text
-                                //         .replaceAll(',', '')) <
-                                //     double.parse(controller.hpp.value.text
-                                //         .replaceAll(',', ''))) {
-                                //   return 'harga eceran harus >= HPP';
-                                // }
-                                return null;
-                              },
-                            ),
-                          ),
-                          // Container(
-                          //     margin: EdgeInsets.only(left: 15),
-                          //     decoration: BoxDecoration(
-                          //         shape: BoxShape.circle,
-                          //         color: AppColor.primary),
-                          //     child: IconButton(
-                          //         onPressed: () {},
-                          //         icon: Icon(
-                          //           Icons.add,
-                          //           color: Colors.white,
-                          //         )))
-                        ],
-                      ));
-                }),
-
-                Obx(() {
-                  return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: controller.hargaJualPaket.value,
-                              inputFormatters: [ThousandsFormatter()],
-                              decoration: InputDecoration(
-                                labelText: 'Harga Jual Paket',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Harga Jual paket harus diisi';
-                                }
-                                if (double.parse(controller
-                                        .hargaJualPaket.value.text
-                                        .replaceAll(',', '')) <
-                                    double.parse(controller.hpp.value.text
-                                        .replaceAll(',', ''))) {
-                                  return 'harga jual paket harus >= HPP';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                        ],
-                      ));
-                }),
-
-                Obx(() {
-                  return Padding(
-                    padding: AppPading.customBottomPadding(),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Diskon',
-                          style: AppFont.regular(),
-                        ),
-                        Switch(
-                          value: controller.showdiskon.value,
-                          onChanged: (value) {
-                            controller.showdiskon.value = value;
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-                Obx(
-                  () {
-                    // Update text field when radio changes
-                    final isNominal = controller.selecteddiskon.value ==
-                        controller.opsidiskon[0];
-                    final currentValue = isNominal
-                        ? controller.diskonvalue.value.toStringAsFixed(0)
-                        : controller.diskonvalue.value.toStringAsFixed(0);
-
-                    // Update controller text when value changes
-                    if (controller.diskon.value.text != currentValue) {
-                      controller.diskon.value.text = currentValue;
-                    }
-
-                    return controller.showdiskon.value == false
-                        ? Container()
-                        : Padding(
-                            padding: AppPading.customBottomPadding(),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Expanded(
-                                  child: TextFormField(
-                                    controller: controller.diskon.value,
-                                    decoration: InputDecoration(
-                                      prefixIcon: isNominal
-                                          ? const Icon(Icons.money)
-                                          : const Icon(Icons.percent),
-                                      labelText: 'Nilai Diskon',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                                          return null;
+                                        },
                                       ),
                                     ),
-                                    keyboardType: TextInputType.number,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty)
-                                        return 'Diskon harus diisi';
-                                      final parsed = double.tryParse(value);
-                                      if (parsed == null)
-                                        return 'Masukkan angka valid';
-                                      if (isNominal && parsed <= 0)
-                                        return 'Nominal harus > 0';
-                                      if (!isNominal &&
-                                          (parsed <= 0 || parsed > 100)) {
-                                        return 'Persen harus 1-100';
-                                      }
-                                      return null;
-                                    },
-                                    onChanged: (value) {
-                                      final parsed = double.tryParse(value);
-                                      if (parsed == null) return;
+                                  ],
+                                )),
 
-                                      if (isNominal) {
-                                        controller.diskonvalue.value = parsed;
-                                      } else {
-                                        controller.diskonvalue.value = parsed;
-                                      }
+                            Padding(
+                                padding: AppPading.customBottomPadding(),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        readOnly: true,
+                                        controller: controller.hargaModal.value,
+                                        inputFormatters: [ThousandsFormatter()],
+                                        decoration: InputDecoration(
+                                          labelText: 'Harga modal',
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        // validator: (value) {
+                                        //   if (value!.isEmpty) {
+                                        //     return 'Harga modal harus diisi';
+                                        //   }
+                                        //   if (double.parse(controller
+                                        //           .hargaModal.value.text
+                                        //           .replaceAll(',', '')) <
+                                        //       double.parse(controller.hpp.value.text
+                                        //           .replaceAll(',', ''))) {
+                                        //     return 'harga modal harus >= dengan HPP';
+                                        //   }
+                                        //   return null;
+                                        // },
+                                      ),
+                                    ),
+                                  ],
+                                )),
+
+                            Padding(
+                                padding: AppPading.customBottomPadding(),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        readOnly: true,
+                                        controller: controller.hpp.value,
+                                        inputFormatters: [ThousandsFormatter()],
+                                        decoration: InputDecoration(
+                                          labelText: 'HPP',
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'HPP harus diisi';
+                                          }
+                                          // if (double.parse(controller
+                                          //         .hargaJualEceran.value.text
+                                          //         .replaceAll(',', '')) <
+                                          //     double.parse(controller.hpp.value.text
+                                          //         .replaceAll(',', ''))) {
+                                          //   return 'harga eceran harus >= HPP';
+                                          // }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                    // Container(
+                                    //     margin: EdgeInsets.only(left: 15),
+                                    //     decoration: BoxDecoration(
+                                    //         shape: BoxShape.circle,
+                                    //         color: AppColor.primary),
+                                    //     child: IconButton(
+                                    //         onPressed: () {},
+                                    //         icon: Icon(
+                                    //           Icons.add,
+                                    //           color: Colors.white,
+                                    //         )))
+                                  ],
+                                )),
+
+                            Padding(
+                                padding: AppPading.customBottomPadding(),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextFormField(
+                                        controller:
+                                            controller.hargaJualPaket.value,
+                                        inputFormatters: [ThousandsFormatter()],
+                                        decoration: InputDecoration(
+                                          labelText: 'Harga Jual Paket',
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        keyboardType: TextInputType.number,
+                                        validator: (value) {
+                                          if (value!.isEmpty) {
+                                            return 'Harga Jual paket harus diisi';
+                                          }
+                                          if (double.parse(controller
+                                                  .hargaJualPaket.value.text
+                                                  .replaceAll(',', '')) <
+                                              double.parse(controller
+                                                  .hpp.value.text
+                                                  .replaceAll(',', ''))) {
+                                            return 'harga jual paket harus >= HPP';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                    ),
+                                  ],
+                                )),
+
+                            Padding(
+                              padding: AppPading.customBottomPadding(),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Diskon',
+                                    style: AppFont.regular(),
+                                  ),
+                                  Switch(
+                                    value: controller.showdiskon.value,
+                                    onChanged: (value) {
+                                      controller.showdiskon.value = value;
                                     },
                                   ),
-                                ),
-                                Expanded(
-                                  child: Obx(
-                                    () => Row(
+                                ],
+                              ),
+                            ),
+
+                            Obx(
+                              () {
+                                // Update text field when radio changes
+                                final isNominal =
+                                    controller.selecteddiskon.value ==
+                                        controller.opsidiskon[0];
+                                final currentValue = isNominal
+                                    ? controller.diskonvalue.value
+                                        .toStringAsFixed(0)
+                                    : controller.diskonvalue.value
+                                        .toStringAsFixed(0);
+
+                                // Update controller text when value changes
+                                if (controller.diskon.value.text !=
+                                    currentValue) {
+                                  controller.diskon.value.text = currentValue;
+                                }
+
+                                return controller.showdiskon.value == false
+                                    ? Container()
+                                    : Padding(
+                                        padding:
+                                            AppPading.customBottomPadding(),
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: TextFormField(
+                                                controller:
+                                                    controller.diskon.value,
+                                                decoration: InputDecoration(
+                                                  prefixIcon: isNominal
+                                                      ? const Icon(Icons.money)
+                                                      : const Icon(
+                                                          Icons.percent),
+                                                  labelText: 'Nilai Diskon',
+                                                  border: OutlineInputBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            10),
+                                                  ),
+                                                ),
+                                                keyboardType:
+                                                    TextInputType.number,
+                                                validator: (value) {
+                                                  if (value == null ||
+                                                      value.isEmpty)
+                                                    return 'Diskon harus diisi';
+                                                  final parsed =
+                                                      double.tryParse(value);
+                                                  if (parsed == null)
+                                                    return 'Masukkan angka valid';
+                                                  if (isNominal && parsed <= 0)
+                                                    return 'Nominal harus > 0';
+                                                  if (!isNominal &&
+                                                      (parsed <= 0 ||
+                                                          parsed > 100)) {
+                                                    return 'Persen harus 1-100';
+                                                  }
+                                                  return null;
+                                                },
+                                                onChanged: (value) {
+                                                  final parsed =
+                                                      double.tryParse(value);
+                                                  if (parsed == null) return;
+
+                                                  if (isNominal) {
+                                                    controller.diskonvalue
+                                                        .value = parsed;
+                                                  } else {
+                                                    controller.diskonvalue
+                                                        .value = parsed;
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Obx(
+                                                () => Row(
+                                                  children: [
+                                                    Expanded(
+                                                      child: RadioMenuButton(
+                                                        value: controller
+                                                            .opsidiskon[0],
+                                                        groupValue: controller
+                                                            .selecteddiskon
+                                                            .value,
+                                                        onChanged: (x) {
+                                                          controller
+                                                              .selecteddiskon
+                                                              .value = x!;
+                                                        },
+                                                        child:
+                                                            const Text('Rp.'),
+                                                      ),
+                                                    ),
+                                                    Expanded(
+                                                      child: RadioMenuButton(
+                                                        value: controller
+                                                            .opsidiskon[1],
+                                                        groupValue: controller
+                                                            .selecteddiskon
+                                                            .value,
+                                                        onChanged: (x) {
+                                                          controller
+                                                              .selecteddiskon
+                                                              .value = x!;
+                                                        },
+                                                        child: const Text('%'),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      );
+                              },
+                            ),
+
+                            Padding(
+                              padding: AppPading.customBottomPadding(),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Pajak',
+                                    style: AppFont.regular(),
+                                  ),
+                                  Switch(
+                                    value: controller.pajakdisplay.value,
+                                    onChanged: (value) {
+                                      controller.pajakdisplay.value = value;
+                                    },
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            controller.pajakdisplay.value == true
+                                ? Padding(
+                                    padding: AppPading.customBottomPadding(),
+                                    child: Row(
                                       children: [
                                         Expanded(
-                                          child: RadioMenuButton(
-                                            value: controller.opsidiskon[0],
-                                            groupValue:
-                                                controller.selecteddiskon.value,
-                                            onChanged: (x) {
-                                              controller.selecteddiskon.value =
-                                                  x!;
+                                          child: DropdownButtonFormField2(
+                                            // key: UniqueKey(),
+                                            decoration: InputDecoration(
+                                              border: OutlineInputBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                              ),
+                                            ),
+                                            // validator: (value) {
+                                            //   if (value == null) {
+                                            //     return 'Sub Kategori dipilih';
+                                            //   }
+                                            //   return null;
+                                            // },
+                                            isExpanded: true,
+                                            dropdownStyleData:
+                                                DropdownStyleData(
+                                                    decoration: BoxDecoration(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                        color: Colors.white)),
+                                            hint: Text('Pajak (opsional)',
+                                                style: AppFont.regular()),
+                                            value: controller.pajakValue,
+                                            items:
+                                                controller.pajakList.map((x) {
+                                              return DropdownMenuItem(
+                                                child: Text(x.nama_pajak! +
+                                                    ' - ' +
+                                                    ' ${NumberFormat('#,###').format(x.nominal_pajak)} %'),
+                                                value: x.uuid,
+                                              );
+                                            }).toList(),
+                                            onChanged: (val) {
+                                              controller.pajakValue = val;
+                                              var matchingPajak = controller
+                                                  .pajakList
+                                                  .firstWhere(
+                                                (e) => e.uuid == val,
+                                              );
+
+                                              // If a matching pajak is found, update nominalPajak
+                                              if (matchingPajak != null) {
+                                                controller.nominalPajak.value
+                                                        .text =
+                                                    matchingPajak.nominal_pajak
+                                                        .toString();
+                                              } else {
+                                                // Handle the case where no matching pajak is found
+                                                controller.nominalPajak.value
+                                                        .text =
+                                                    '0'; // or any default value
+                                              }
+                                              print(controller.pajakValue);
                                             },
-                                            child: const Text('Rp.'),
                                           ),
                                         ),
-                                        Expanded(
-                                          child: RadioMenuButton(
-                                            value: controller.opsidiskon[1],
-                                            groupValue:
-                                                controller.selecteddiskon.value,
-                                            onChanged: (x) {
-                                              controller.selecteddiskon.value =
-                                                  x!;
-                                            },
-                                            child: const Text('%'),
-                                          ),
-                                        ),
+                                        // Container(
+                                        //     margin: EdgeInsets.only(left: 15),
+                                        //     decoration: BoxDecoration(
+                                        //         shape: BoxShape.circle,
+                                        //         color: AppColor.primary),
+                                        //     child: IconButton(
+                                        //         onPressed: () {
+                                        //           Get.toNamed(
+                                        //             '/tambahpajak',
+                                        //           );
+                                        //         },
+                                        //         icon: Icon(
+                                        //           Icons.add,
+                                        //           color: Colors.white,
+                                        //         ))),
                                       ],
                                     ),
+                                  )
+                                : Container(),
+
+                            // Switch for tampilkan_di_produk
+                            Padding(
+                              padding: AppPading.customBottomPadding(),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text('Tampilkan di paket'),
+                                  Switch(
+                                    value: controller.tampilkanDiProduk.value,
+                                    onChanged: (value) {
+                                      controller.tampilkanDiProduk.value =
+                                          value;
+                                    },
                                   ),
-                                ),
-                              ],
-                            ),
-                          );
-                  },
-                ),
-
-                Obx(() {
-                  return Padding(
-                    padding: AppPading.customBottomPadding(),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Pajak',
-                          style: AppFont.regular(),
-                        ),
-                        Switch(
-                          value: controller.pajakdisplay.value,
-                          onChanged: (value) {
-                            controller.pajakdisplay.value = value;
-                          },
-                        ),
-                      ],
-                    ),
-                  );
-                }),
-
-                Obx(() {
-                  return controller.pajakdisplay.value == true
-                      ? Padding(
-                          padding: AppPading.customBottomPadding(),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: DropdownButtonFormField2(
-                                  key: UniqueKey(),
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  // validator: (value) {
-                                  //   if (value == null) {
-                                  //     return 'Sub Kategori dipilih';
-                                  //   }
-                                  //   return null;
-                                  // },
-                                  isExpanded: true,
-                                  dropdownStyleData: DropdownStyleData(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Colors.white)),
-                                  hint: Text('Pajak (opsional)',
-                                      style: AppFont.regular()),
-                                  value: controller.pajakValue,
-                                  items: controller.pajakList.map((x) {
-                                    return DropdownMenuItem(
-                                      child: Text(x.nama_pajak! +
-                                          ' - ' +
-                                          ' ${NumberFormat('#,###').format(x.nominal_pajak)} %'),
-                                      value: x.uuid,
-                                    );
-                                  }).toList(),
-                                  onChanged: (val) {
-                                    controller.pajakValue = val;
-                                    var matchingPajak =
-                                        controller.pajakList.firstWhere(
-                                      (e) => e.uuid == val,
-                                    );
-
-                                    // If a matching pajak is found, update nominalPajak
-                                    if (matchingPajak != null) {
-                                      controller.nominalPajak.value.text =
-                                          matchingPajak.nominal_pajak
-                                              .toString();
-                                    } else {
-                                      // Handle the case where no matching pajak is found
-                                      controller.nominalPajak.value.text =
-                                          '0'; // or any default value
-                                    }
-                                    print(controller.pajakValue);
-                                  },
-                                ),
+                                ],
                               ),
-                              // Container(
-                              //     margin: EdgeInsets.only(left: 15),
-                              //     decoration: BoxDecoration(
-                              //         shape: BoxShape.circle,
-                              //         color: AppColor.primary),
-                              //     child: IconButton(
-                              //         onPressed: () {
-                              //           Get.toNamed(
-                              //             '/tambahpajak',
-                              //           );
-                              //         },
-                              //         icon: Icon(
-                              //           Icons.add,
-                              //           color: Colors.white,
-                              //         ))),
-                            ],
-                          ),
-                        )
-                      : Container();
-                }),
+                            ),
 
-                // Switch for tampilkan_di_produk
-                Obx(() {
-                  return Padding(
-                    padding: AppPading.customBottomPadding(),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Tampilkan di paket'),
-                        Switch(
-                          value: controller.tampilkanDiProduk.value,
-                          onChanged: (value) {
-                            controller.tampilkanDiProduk.value = value;
-                          },
-                        ),
-                      ],
-                    ),
-                  );
+                            button_solid_custom(
+                                onPressed: () {
+                                  if (controller
+                                      .registerKey2.value.currentState!
+                                      .validate()) {
+                                    controller.tambahPaketProduk();
+                                  }
+                                },
+                                child: Text('Tambah',
+                                    style: AppFont.regular_white()),
+                                width: context.res_width)
+                          ],
+                        );
                 }),
-                // Obx(() {
-                //   return Padding(
-                //     padding: AppPading.customBottomPadding(),
-                //     child: Row(
-                //       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                //       children: [
-                //         Text('Hitung Stock'),
-                //         Switch(
-                //           value: controller.hitung_stock.value,
-                //           onChanged: (value) {
-                //             controller.hitung_stock.value = value;
-                //           },
-                //         ),
-                //       ],
-                //     ),
-                //   );
-                // }),
-                button_solid_custom(
-                    onPressed: () {
-                      if (controller.registerKey2.value.currentState!
-                          .validate()) {
-                        controller.tambahPaketProduk();
-                      }
-                    },
-                    child: Text('Tambah', style: AppFont.regular_white()),
-                    width: context.res_width)
               ],
             ),
           ),

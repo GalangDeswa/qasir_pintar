@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Karyawan/controller_karyawan.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Karyawan/model_karyawan.dart';
 
@@ -25,12 +26,15 @@ class EditKaryawanController extends GetxController {
     nama.value.text = data.nama_karyawan!;
     email.value.text = data.email;
     telepon.value.text = data.nohp;
+    rolevalue = data.role;
     isAktif.value = data.aktif == 1 ? true : false;
     // pinlama.value.text = data.pin;
   }
 
   var ubahpin = false.obs;
   var isAktif = false.obs;
+  String? rolevalue;
+  var rolelist = ['ADMIN', 'MANAGER', "KASIR"].obs;
 
   var nama = TextEditingController().obs;
   var email = TextEditingController().obs;
@@ -258,7 +262,7 @@ class EditKaryawanController extends GetxController {
 
   DataKaryawan data = Get.arguments;
 
-  Map<String, dynamic> dataedit({nama, hp, email, pin, aktif}) {
+  Map<String, dynamic> dataedit({nama, hp, email, pin, aktif, role}) {
     var map = <String, dynamic>{};
 
     map['Nama_Karyawan'] = nama;
@@ -266,6 +270,7 @@ class EditKaryawanController extends GetxController {
     map['Email'] = email;
     map['Pin'] = pin;
     map['aktif'] = aktif;
+    map['role'] = role;
     return map;
   }
 
@@ -281,13 +286,15 @@ class EditKaryawanController extends GetxController {
             email: email.value.text,
             hp: telepon.value.text,
             aktif: isAktif.value == true ? 1 : 0,
-            nama: nama.value.text),
+            nama: nama.value.text,
+            role: rolevalue),
         id: data.uuid);
 
     print(query);
     if (query == 1) {
       //print('edit user local berhasil------------------------------------->');
-      await Get.find<KaryawanController>().fetchKaryawanLocal(id_toko: id_toko);
+      await Get.find<CentralKaryawanController>()
+          .fetchKaryawanLocal(id_toko: id_toko);
       Get.back(closeOverlays: true);
       Get.showSnackbar(toast()
           .bottom_snackbar_success('sukses', 'karyawan berhasil diedit'));

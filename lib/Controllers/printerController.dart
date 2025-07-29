@@ -9,8 +9,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:bluetooth_print_plus/bluetooth_print_plus.dart';
+import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qasir_pintar/Modules%20-%20P.O.S/Kasir%20-%20Pembayaran/controller_pembayaran.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Kasir/controller_kasir.dart';
 
 import '../Config/config.dart';
 import '../Modules - P.O.S/History/detail/controller_detailriwayatpenjualan.dart';
@@ -27,6 +29,8 @@ class PrintController extends GetxController {
 
   /// Currently selected device
   final Rx<BluetoothDevice?> selectedDevice = Rx<BluetoothDevice?>(null);
+
+  RxnString selectedAddress = RxnString();
 
   /// Connection status
   final RxBool isConnected = false.obs;
@@ -81,9 +85,9 @@ class PrintController extends GetxController {
 
   /// Trigger a ~4-second BLE scan
   Future<void> startScan() async {
-    isScanning.value = true;
     devices.clear();
     selectedDevice.value = null;
+    isScanning.value = true;
     await checkPermissions();
     // 1. Check if Bluetooth is enabled
 
@@ -119,7 +123,10 @@ class PrintController extends GetxController {
 
   /// Set the selected device from dropdown
   void selectDevice(BluetoothDevice? device) {
+    selectedAddress.value = null;
+    selectedDevice.value = null;
     selectedDevice.value = device;
+    selectedAddress.value = device?.address;
   }
 
   void _showBluetoothEnableDialog() {
@@ -280,7 +287,7 @@ class PrintController extends GetxController {
   /// [items]     = list of DataProdukTemp (each product in the cart)
   Future<void> printPenjualanReceipt({
     required DataPenjualan penjualan,
-    required List<DataProdukTemp> items,
+    required List<DataKeranjang> items,
     required String NamaToko,
     namaPelanggan,
   }) async {
@@ -341,8 +348,14 @@ class PrintController extends GetxController {
       styles: PosStyles(align: PosAlign.center, height: PosTextSize.size2),
       linesAfter: 1,
     );
+    final currentTime = DateFormat('HH:mm').format(DateTime.now());
     bytes += generator.text(
-      'Tanggal: ${penjualan.tanggal ?? ''}',
+      'Tanggal: $currentTime - ${AppFormat().dateFormat(penjualan.tanggal) ?? ''}',
+      styles: const PosStyles(align: PosAlign.left),
+      linesAfter: 1,
+    );
+    bytes += generator.text(
+      'Kasir: ${penjualan.namaKaryawan}',
       styles: const PosStyles(align: PosAlign.left),
       linesAfter: 1,
     );
@@ -380,13 +393,14 @@ class PrintController extends GetxController {
     // 4c) List each item
     for (var prod in items) {
       // Assuming DataProdukTemp has: nama_produk, qty, harga_jual_eceran
-      final nama = prod.nama_produk ?? '-';
+      final nama = prod.isPaket == false ? prod.namaProduk : prod.namaPaket;
       final qty = prod.qty.toString();
-      final hargaTotal =
-          (prod.harga_jual_eceran! * prod.qty).toStringAsFixed(0);
+      final hargaTotal = prod.isPaket == false
+          ? (prod.hargaEceran! * prod.qty).toStringAsFixed(0)
+          : (prod.hargaPaket! * prod.qty).toStringAsFixed(0);
 
       bytes += generator.row([
-        PosColumn(text: nama, width: 6),
+        PosColumn(text: nama!, width: 6),
         PosColumn(
             text: qty,
             width: 2,
@@ -441,10 +455,22 @@ class PrintController extends GetxController {
     // If there is a promo code / promo value
     if ((penjualan.nilaiPromo ?? 0) > 0) {
       bytes += generator.row([
-        PosColumn(text: 'Promo (${penjualan.kodePromo})', width: 6),
+        PosColumn(text: 'Promo (${penjualan.namaPromo})', width: 6),
         PosColumn(text: '', width: 2),
         PosColumn(
           text: penjualan.nilaiPromo!.toStringAsFixed(0),
+          width: 4,
+          styles: const PosStyles(align: PosAlign.right),
+        ),
+      ]);
+    }
+
+    if ((penjualan.totalPajak ?? 0) > 0) {
+      bytes += generator.row([
+        PosColumn(text: 'Total pajak', width: 6),
+        PosColumn(text: '', width: 2),
+        PosColumn(
+          text: penjualan.totalPajak!.toStringAsFixed(0),
           width: 4,
           styles: const PosStyles(align: PosAlign.right),
         ),
@@ -490,11 +516,11 @@ class PrintController extends GetxController {
     bytes += generator.text(
       'Terima kasih atas kunjungan Anda!',
       styles: const PosStyles(align: PosAlign.center),
-      linesAfter: 2,
+      linesAfter: 0,
     );
 
     // 4g) Cut
-    bytes += generator.cut();
+    bytes += generator.cut(mode: PosCutMode.partial);
 
     // 5) Finally, send all bytes to the printer
     final Uint8List dataToSend = Uint8List.fromList(bytes);
@@ -567,8 +593,16 @@ class PrintController extends GetxController {
       styles: PosStyles(align: PosAlign.center, height: PosTextSize.size2),
       linesAfter: 1,
     );
+    final currentTime = DateFormat('HH:mm').format(DateTime.now());
     bytes += generator.text(
-      'Tanggal: ${penjualan.tanggal ?? ''}',
+      'Tanggal: $currentTime - ${AppFormat().dateFormat(penjualan.tanggal) ?? ''}',
+      styles: const PosStyles(align: PosAlign.left),
+      linesAfter: 1,
+    );
+    // TODO : check id karyawan/nama karyawan dari penjualan db
+    // TODO : karyawan harus login dulu sebelum  buka kasir
+    bytes += generator.text(
+      'Kasir: ${penjualan.id_karyawan}',
       styles: const PosStyles(align: PosAlign.left),
       linesAfter: 1,
     );
@@ -606,13 +640,12 @@ class PrintController extends GetxController {
     // 4c) List each item
     for (var prod in items) {
       // Assuming DataProdukTemp has: nama_produk, qty, harga_jual_eceran
-      final nama = prod.nama_produk ?? '-';
+      final nama = prod.nama_produk ?? prod.namaPaket;
       final qty = prod.qty.toString();
-      final hargaTotal =
-          (prod.harga_jual_eceran! * prod.qty!).toStringAsFixed(0);
+      final hargaTotal = 'Rp.' + AppFormat().numFormat(prod.subtotal!);
 
       bytes += generator.row([
-        PosColumn(text: nama, width: 6),
+        PosColumn(text: nama!, width: 6),
         PosColumn(
             text: qty,
             width: 2,
@@ -667,7 +700,7 @@ class PrintController extends GetxController {
     // If there is a promo code / promo value
     if ((penjualan.nilaiPromo ?? 0) > 0) {
       bytes += generator.row([
-        PosColumn(text: 'Promo (${penjualan.kodePromo})', width: 6),
+        PosColumn(text: 'Promo (${penjualan.namaPromo})', width: 6),
         PosColumn(text: '', width: 2),
         PosColumn(
           text: penjualan.nilaiPromo!.toStringAsFixed(0),
@@ -676,6 +709,20 @@ class PrintController extends GetxController {
         ),
       ]);
     }
+
+    // If there is a promo code / promo value
+
+    bytes += generator.row([
+      PosColumn(text: 'Total pajak ', width: 6),
+      PosColumn(text: '', width: 2),
+      PosColumn(
+        text: penjualan.totalPajak == null
+            ? 0.0.toString()
+            : penjualan.totalPajak!.toStringAsFixed(0),
+        width: 4,
+        styles: const PosStyles(align: PosAlign.right),
+      ),
+    ]);
 
     // Grand total
     bytes += generator.row([
@@ -716,11 +763,11 @@ class PrintController extends GetxController {
     bytes += generator.text(
       'Terima kasih atas kunjungan Anda!',
       styles: const PosStyles(align: PosAlign.center),
-      linesAfter: 2,
+      linesAfter: 0,
     );
 
     // 4g) Cut
-    bytes += generator.cut();
+    bytes += generator.cut(mode: PosCutMode.partial);
 
     // 5) Finally, send all bytes to the printer
     final Uint8List dataToSend = Uint8List.fromList(bytes);
@@ -1010,9 +1057,9 @@ class PrintController extends GetxController {
                                 label: const Text('Cetak struk'),
                                 onPressed: (isConnected.value)
                                     ? () {
-                                        var x =
-                                            Get.find<PembayaranController>();
+                                        var x = Get.find<KasirController>();
                                         x.printstruk();
+                                        Get.back();
                                       }
                                     : null,
                                 style: ElevatedButton.styleFrom(

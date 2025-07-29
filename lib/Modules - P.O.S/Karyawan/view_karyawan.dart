@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Karyawan/controller_karyawan.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Karyawan/model_karyawan.dart';
 
@@ -14,6 +15,7 @@ class Karyawan extends GetView<KaryawanController> {
 
   @override
   Widget build(BuildContext context) {
+    var con = Get.find<CentralKaryawanController>();
     return Scaffold(
       floatingActionButton: customFloat(
         onPressed: () {
@@ -37,9 +39,9 @@ class Karyawan extends GetView<KaryawanController> {
                   ),
                   Expanded(
                     child: TextField(
-                      controller: controller.search.value,
+                      controller: con.search.value,
                       onChanged: (val) async {
-                        await controller.searchKaryawanLocal();
+                        await con.searchKaryawanLocal();
                       },
                       decoration: InputDecoration(hintText: 'Pencarian'),
                     ),
@@ -87,11 +89,11 @@ class Karyawan extends GetView<KaryawanController> {
             ),
             Obx(() {
               return Expanded(
-                child: controller.karyawanList.isNotEmpty
+                child: con.karyawanList.isNotEmpty
                     ? ListView.builder(
-                        itemCount: controller.karyawanList.length,
+                        itemCount: con.karyawanList.length,
                         itemBuilder: (context, index) {
-                          final karyawan = controller.karyawanList;
+                          final karyawan = con.karyawanList;
 
                           return custom_list(
                             gestureroute: '/detailkaryawan',
@@ -103,9 +105,20 @@ class Karyawan extends GetView<KaryawanController> {
                             subtitle: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  Text(karyawan[index].email),
-                                  Text(karyawan[index].nohp)
+                                  Text(
+                                    karyawan[index].email,
+                                    style: AppFont.regular(),
+                                  ),
+                                  Text(
+                                    karyawan[index].nohp,
+                                    style: AppFont.regular(),
+                                  ),
+                                  Text(
+                                    karyawan[index].role!,
+                                    style: AppFont.regular_bold(),
+                                  )
                                 ]),
+                            //TODO : edit karyawan role, sistem login karyawan kasir
                             trailing: customDropdown(
                                 dropdownColor: Colors.white,
                                 onSelected: (value) {

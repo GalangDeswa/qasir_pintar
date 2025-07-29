@@ -281,7 +281,7 @@ class PenerimaanProduk extends GetView<PenerimaanProdukController> {
                                       color: Colors.white)),
                               hint: Text('Jenis Penerimaan',
                                   style: AppFont.regular()),
-                              value: controller.jenispenerimaanvalue,
+                              value: controller.jenispenerimaanvalue.value,
                               items: controller.jenispenerimaan.map((x) {
                                 return DropdownMenuItem(
                                   child: Text(x),
@@ -289,8 +289,9 @@ class PenerimaanProduk extends GetView<PenerimaanProdukController> {
                                 );
                               }).toList(),
                               onChanged: (val) {
-                                controller.jenispenerimaanvalue = val;
-                                controller.jenispenerimaanvalue == 'Lunas'
+                                controller.jenispenerimaanvalue.value =
+                                    val.toString();
+                                controller.jenispenerimaanvalue.value == 'Lunas'
                                     ? controller.sisabayar.value.text =
                                         0.0.toString()
                                     : controller.sisabayar.value.text =
@@ -454,27 +455,29 @@ class PenerimaanProduk extends GetView<PenerimaanProdukController> {
                     );
                   }),
                   Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        readOnly: true,
-                        inputFormatters: [ThousandsFormatter()],
-                        controller: controller.sisabayar.value,
-                        decoration: InputDecoration(
-                          labelText: 'Sisa bayar',
-                          labelStyle: AppFont.regular(),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.number,
-                        // validator: (value) {
-                        //   if (value!.isEmpty) {
-                        //     return 'sisa bayar harus diisi';
-                        //   }
-                        //   return null;
-                        // },
-                      ),
-                    );
+                    return controller.jenispenerimaanvalue.value == 'Lunas'
+                        ? Container()
+                        : Padding(
+                            padding: AppPading.customBottomPadding(),
+                            child: TextFormField(
+                              readOnly: true,
+                              inputFormatters: [ThousandsFormatter()],
+                              controller: controller.sisabayar.value,
+                              decoration: InputDecoration(
+                                labelText: 'Sisa bayar',
+                                labelStyle: AppFont.regular(),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10)),
+                              ),
+                              keyboardType: TextInputType.number,
+                              // validator: (value) {
+                              //   if (value!.isEmpty) {
+                              //     return 'sisa bayar harus diisi';
+                              //   }
+                              //   return null;
+                              // },
+                            ),
+                          );
                   }),
                   button_solid_custom(
                       onPressed: () {

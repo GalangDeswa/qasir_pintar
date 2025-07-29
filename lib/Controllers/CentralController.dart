@@ -16,6 +16,7 @@ import 'package:qasir_pintar/Config/config.dart';
 import 'package:uuid/uuid.dart';
 
 import '../Database/DB_helper.dart';
+import '../Modules - P.O.S/Beban/model_beban.dart';
 import '../Modules - P.O.S/Karyawan/model_karyawan.dart';
 import '../Modules - P.O.S/Kasir/model_penjualan.dart';
 import '../Modules - P.O.S/Pelanggan/List Pelanggan/model_pelanggan.dart';
@@ -27,7 +28,10 @@ import '../Modules - P.O.S/Produk/stock/model_penerimaan.dart';
 import '../Modules - P.O.S/Produk/stock/penerimaan produk/controller_penerimaan_produk.dart';
 import '../Modules - P.O.S/Promo/model_promo.dart';
 import '../Modules - P.O.S/Supplier/model_supplier.dart';
+import '../Services/BoxStorage.dart';
 import '../Widget/widget.dart';
+
+final StorageService box = Get.find<StorageService>();
 
 class CentralProdukController extends GetxController {
   @override
@@ -245,7 +249,7 @@ class CentralProdukController extends GetxController {
     }
   }
 
-  var id_toko = GetStorage().read('uuid');
+  var id_toko = box.read('uuid', fallback: 'null');
   var kategoriProduk = <DataKategoriProduk>[].obs;
   var produk = <DataProduk>[].obs;
   var subKategoriProduk = <DataSubKategoriProduk>[].obs;
@@ -1180,7 +1184,36 @@ class CentralKaryawanController extends GetxController {
   var id_toko = GetStorage().read('uuid');
 
   var karyawanList = <DataKaryawan>[].obs;
+  var karyawanvalue;
+  var role;
+  var namaKaryawan = ''.obs;
   var search = TextEditingController().obs;
+  var verifikasi_kode = TextEditingController().obs;
+
+  loginKaryawan(uuid, kode, roleval) async {
+    Get.dialog(showloading(), barrierDismissible: false);
+    print('-------------------login karyawan---------------------');
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH(
+        'SELECT * FROM Karyawan WHERE id_toko = "$id_toko" AND uuid = "$uuid" AND Pin = "$kode" AND role IN ("KASIR", "ADMIN")');
+    if (query.isNotEmpty) {
+      await box.write('karyawan_login', true);
+      await box.write('karyawan_id', karyawanvalue);
+      await box.write('karyawan_nama', namaKaryawan.value);
+      await box.write('karyawan_role', role);
+
+      print(box.read('karyawan_role', fallback: ''));
+      print(box.read('karyawan_id', fallback: ''));
+      print(box.read('karyawan_nama', fallback: ''));
+      Get.back(closeOverlays: true);
+
+      Get.showSnackbar(toast().bottom_snackbar_success('Sukses', 'Berhasil'));
+    } else {
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('Gagal', 'periksa pin / jabatan'));
+    }
+  }
 
   searchKaryawanLocal() async {
     List<Map<String, Object?>> query = await DBHelper().FETCH(
@@ -1194,7 +1227,7 @@ class CentralKaryawanController extends GetxController {
   }
 
   fetchKaryawanLocal({id_toko}) async {
-    print('-------------------fetch supplier local---------------------');
+    print('-------------------fetch karyawan local---------------------');
 
     List<Map<String, Object?>> query = await DBHelper()
         .FETCH('SELECT * FROM Karyawan WHERE id_toko = "$id_toko"');
@@ -1202,7 +1235,7 @@ class CentralKaryawanController extends GetxController {
       List<DataKaryawan> data =
           query.map((e) => DataKaryawan.fromJsondb(e)).toList();
       karyawanList.value = data;
-      //logo.value = userList.value.first.logo!;
+
       return data;
     } else {
       print('empty');
@@ -3043,42 +3076,6 @@ class CentralStockController extends GetxController {
       Get.showSnackbar(toast()
           .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
     }
-
-    // var select = kategoripelangganList.where((x) => x.uuid == uuid).first;
-    // var delete = await DBHelper().UPDATE(
-    //   id: select.idLocal,
-    //   table: 'beban_local',
-    //   data: DataBeban(
-    //       aktif: 'N',
-    //       sync: 'N',
-    //       id: select.id,
-    //       idLocal: select.idLocal,
-    //       idToko: select.idToko,
-    //       jumlah: select.jumlah,
-    //       tgl: select.tgl,
-    //       keterangan: select.keterangan,
-    //       nama: select.nama,
-    //       idKtrBeban: select.idKtrBeban,
-    //       idUser: select.idUser,
-    //       namaKtrBeban: select.namaKtrBeban)
-    //       .toMapForDb(),
-    // );
-
-    // var query = await DBHelper().DELETE('produk_local', id);
-    // if (delete == 1) {
-    //   await fetchBebanlocal(id_toko);
-    //   await Get.find<dashboardController>().loadbebanhariini();
-    //   await Get.find<dashboardController>().loadpendapatanhariini();
-    //   await Get.find<dashboardController>().loadpendapatantotal();
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(
-    //       toast().bottom_snackbar_success('Sukses', 'Beban berhasil dihapus'));
-    //   print('deleted ' + id_local.toString());
-    // } else {
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(toast()
-    //       .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
-    // }
   }
 
   deleteProduk({uuid}) async {
@@ -3391,6 +3388,123 @@ WHERE
       return data;
     } else {
       print('empty');
+      return null;
+    }
+  }
+}
+
+class CentralBebanController extends GetxController {
+  @override
+  void onInit() {
+    // TODO: implement onInit
+    super.onInit();
+    print('id_toko on init--->');
+    id_toko = box.read('uuid', fallback: 'null');
+    print('id toko --->');
+    print(id_toko);
+    fetchBeban();
+    fetchKategoriBeban();
+  }
+
+  var id_toko;
+
+  var listBeban = <DataBeban>[].obs;
+  var listBebanRutin = <DataBeban>[].obs;
+  var listKategoriBeban = <DataKategoriBeban>[].obs;
+  var search = TextEditingController().obs;
+  var searchproduk = TextEditingController().obs;
+  var subsearch = TextEditingController().obs;
+
+  fetchBeban() async {
+    print('-------------------fetch pelanggan CENTRAL---------------------');
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH('''
+    SELECT 
+        beban.*, 
+        kategori_beban.nama_kategori_beban AS kategori_beban,
+        karyawan.nama_karyawan as nama_karyawan
+    FROM 
+        beban 
+    LEFT JOIN 
+       kategori_beban ON beban.id_kategori_beban = kategori_beban.uuid 
+    LEFT JOIN 
+       karyawan ON beban.id_karyawan = karyawan.uuid 
+    WHERE 
+         beban.id_toko = "$id_toko"
+    ORDER BY 
+        beban.id DESC
+  ''');
+    if (query.isNotEmpty) {
+      List<DataBeban> data = query.map((e) => DataBeban.fromJsondb(e)).toList();
+      listBeban.value = data;
+      print('id_toko con');
+      print(id_toko);
+      //logo.value = userList.value.first.logo!;
+      return data;
+    } else {
+      print('empty');
+      print('id_toko con');
+      print(id_toko);
+      return null;
+    }
+  }
+
+  fetchBebanRutin() async {
+    print('-------------------fetch BEBAN RUITn CENTRAL---------------------');
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH('''
+    SELECT 
+        beban.*, 
+        kategori_beban.nama_kategori_beban AS kategori_beban
+    FROM 
+        beban 
+    LEFT JOIN 
+       kategori_beban ON beban.id_kategori_beban = kategori_beban.uuid 
+    WHERE 
+         beban.id_toko = "$id_toko"
+    ORDER BY 
+        beban.id DESC
+  ''');
+
+    if (query.isNotEmpty) {
+      List<DataBeban> data = query.map((e) => DataBeban.fromJsondb(e)).toList();
+
+      // ✅ Remove duplicates by `nama_beban`
+      final seen = <String, DataBeban>{};
+      for (var item in data) {
+        if (!seen.containsKey(item.namaBeban)) {
+          seen[item.namaBeban!] = item;
+        }
+      }
+
+      listBebanRutin.value = seen.values.toList();
+
+      print('Filtered beban by name: ${listBebanRutin.length}');
+      return listBebanRutin;
+    } else {
+      print('empty');
+      return null;
+    }
+  }
+
+  fetchKategoriBeban() async {
+    print(
+        '-------------------fetch kategori beban CENTRAL---------------------');
+
+    List<Map<String, Object?>> query = await DBHelper()
+        .FETCH('SELECT * FROM kategori_beban WHERE id_toko = "$id_toko"');
+    if (query.isNotEmpty) {
+      List<DataKategoriBeban> data =
+          query.map((e) => DataKategoriBeban.fromJsondb(e)).toList();
+      listKategoriBeban.value = data;
+      print('id_toko con');
+      print(id_toko);
+      //logo.value = userList.value.first.logo!;
+      return data;
+    } else {
+      print('empty');
+      print('id_toko con');
+      print(id_toko);
       return null;
     }
   }

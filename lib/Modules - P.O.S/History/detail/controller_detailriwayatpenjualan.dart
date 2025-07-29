@@ -18,9 +18,11 @@ import 'package:qasir_pintar/Modules - P.O.S/Kasir/model_penjualan.dart';
 import 'package:smooth_sheets/smooth_sheets.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../Controllers/CentralController.dart';
 import '../../../Controllers/printerController.dart';
 import '../../../Database/DB_helper.dart';
 import '../../../Widget/widget.dart';
+import '../../Kasir/controller_kasir.dart';
 import '../../Pelanggan/List Pelanggan/controller_pelanggan.dart';
 import '../../Pelanggan/List Pelanggan/model_pelanggan.dart';
 import '../../Pelanggan/List kategori pelanggan/model_kategoriPelanggan.dart';
@@ -28,6 +30,7 @@ import '../../Produk/Data produk/model_produk.dart';
 import '../../Produk/stock/controller_basemenustock.dart';
 import '../../Produk/stock/model_penerimaan.dart';
 import '../../Supplier/model_supplier.dart';
+import '../controller_riwayatpenjualan.dart';
 
 class DetailHistoryPenjualanController extends GetxController {
   @override
@@ -46,7 +49,7 @@ class DetailHistoryPenjualanController extends GetxController {
     //pelanggan.value.text = data.idPelanggan!;
     jumlahbayar.value.text = data.nilaiBayar.toString();
     sisabayar.value.text = data.kembalian.toString();
-    kodepromo.value.text = data.kodePromo!;
+    kodepromo.value.text = data.kodePromo ?? '-';
     nilaipromo.value.text = data.nilaiPromo.toString();
 
     dataprint = DataPenjualan(
@@ -90,6 +93,115 @@ class DetailHistoryPenjualanController extends GetxController {
   var hpp = TextEditingController().obs;
   var dataprint;
   var itemprint;
+
+  Map<String, dynamic> dataReversal({reversal}) {
+    var map = <String, dynamic>{};
+    map['reversal'] = reversal;
+    return map;
+  }
+  // Map<String, dynamic> dataReversal({
+  //
+  //   idPelanggan,
+  //   idToko,
+  //   idLogin,
+  //   tanggal,
+  //   noFaktur,
+  //   subtotal,
+  //   diskonNominal,
+  //   diskonPersen,
+  //   kembalian,
+  //   kodePromo,
+  //   nilaiBayar,
+  //   nilaiPromo,
+  //   totalBayar,
+  //   totalQty,
+  //   totalDiskon,
+  //   namaPelanggan,
+  //   namaPromo,
+  //   totalPajak,
+  //
+  // }) {
+  //   var map = <String, dynamic>{};
+  //
+  //   // Add all fields directly (no null checks)
+  //
+  //   map['id_kelompok_produk'] = id_kelompok_produk;
+  //   map['id_sub_kelompok_produk'] = id_sub_kelompok_produk;
+  //   map['gambar_produk_utama'] = gambar_produk_utama;
+  //   map['kode_produk'] = kode_produk;
+  //   map['nama_produk'] = nama_produk;
+  //   map['serial_key'] = serial_key;
+  //   map['imei'] = imei;
+  //   map['hitung_stok'] = hitung_stok;
+  //   map['tampilkan_di_produk'] = tampilkan_di_produk;
+  //   map['harga_beli'] = harga_beli;
+  //   map['hpp'] = hpp;
+  //   map['harga_jual_grosir'] = harga_jual_grosir;
+  //   map['harga_jual_eceran'] = harga_jual_eceran;
+  //   map['harga_jual_pelanggan'] = harga_jual_pelanggan;
+  //   map['pajak'] = pajak;
+  //   map['info_stok_habis'] = info_stok_habis;
+  //   map['ukuran'] = ukuran;
+  //   map['berat'] = berat;
+  //   map['volume_panjang'] = volume_panjang;
+  //   map['volume_lebar'] = volume_lebar;
+  //   map['volume_tinggi'] = volume_tinggi;
+  //   map['jenis_produk'] = jenis_produk;
+  //   map['diskon'] = diskon;
+  //
+  //   return map;
+  // }
+
+  Map<String, dynamic> detailReversal({qty, sub_hpp, sub_hargamodal}) {
+    var map = <String, dynamic>{};
+
+    map['qty'] = qty;
+    map['hpp'] = sub_hpp;
+    map['sub_harga_modal'] = sub_hargamodal;
+
+    return map;
+  }
+
+  reversal(uuidpenjualan) async {
+    print('-------------------Reversal---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var paket = await DBHelper().UPDATE(
+        id: uuidpenjualan, table: 'penjualan', data: dataReversal(reversal: 1));
+    if (paket == 1) {
+      for (var detailitem in detailpenjualan) {
+        print('update stock produk reversal  -->');
+        print(detailitem.nama_produk);
+        print(detailitem.qty);
+        print(detailitem.uuid);
+        await DBHelper().incrementQty(
+            table: 'stock_produk',
+            id_produk: detailitem.idProduk.toString(),
+            increment: detailitem.qty!);
+      }
+
+      // await Get.find<CentralPaketController>()
+      //     .fetchPaketLocal(id_toko: id_toko);
+      await Get.find<HistoryPenjualanController>()
+          .fetchRiwayatPenjualan(id_toko: id_toko);
+      await Get.find<CentralProdukController>()
+          .fetchProdukLocal(id_toko: id_toko);
+      await Get.find<CentralPaketController>()
+          .fetchPaketLocal(id_toko: id_toko);
+      Get.find<KasirController>().availStockMap.clear();
+      Get.back();
+      Get.back();
+      Get.back();
+
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'Berhasil dibatalkan'));
+    } else {
+      Get.back(closeOverlays: true);
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal reversal'));
+    }
+  }
 
   printstruk() {
     var printCon = Get.find<PrintController>();

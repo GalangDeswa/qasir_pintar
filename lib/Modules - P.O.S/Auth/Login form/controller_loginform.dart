@@ -8,11 +8,13 @@ import 'package:meta/meta.dart';
 import 'package:qasir_pintar/Database/DB_helper.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../Services/BoxStorage.dart';
 import '../../../Services/Handler.dart';
 import '../../../Widget/widget.dart';
 import '../../Users/model_user.dart';
 
 class LoginFormController extends GetxController {
+  final StorageService box = Get.find<StorageService>();
   var email = TextEditingController().obs;
   var password = TextEditingController().obs;
   //
@@ -49,38 +51,35 @@ class LoginFormController extends GetxController {
 
       if (query.isNotEmpty) {
         datauser.value = query.map((e) => DataUser.fromJson(e)).toList();
-        await GetStorage().write('user_id', datauser.first.id);
-        await GetStorage().write('uuid', datauser.first.uuid);
-        await GetStorage().write('user_name', datauser.first.name);
-        await GetStorage().write('user_email', datauser.first.email);
-        await GetStorage().write('user_phone', datauser.first.phone);
+        await box.write('user_id', datauser.first.id);
+        await box.write('uuid', datauser.first.uuid);
+        await box.write('user_name', datauser.first.name);
+        await box.write('user_email', datauser.first.email);
+        await box.write('user_phone', datauser.first.phone);
 
-        await GetStorage().write('user_ref_code', datauser.first.referralCode);
-        await GetStorage()
-            .write('user_business_name', datauser.first.businessName);
-        await GetStorage().write('user_pin', datauser.first.pin);
-        await GetStorage().write('user_logo', datauser.first.logo);
-        await GetStorage()
-            .write('user_business_type_id', datauser.first.businessTypeId);
-        await GetStorage().write('user_province_id', datauser.first.provinceId);
-        await GetStorage().write('user_district_id', datauser.first.districtId);
-        await GetStorage().write('user_regency_id', datauser.first.regencyId);
+        await box.write('user_ref_code', datauser.first.referralCode);
+        await box.write('user_business_name', datauser.first.businessName);
+        await box.write('user_pin', datauser.first.pin);
+        await box.write('user_logo', datauser.first.logo);
+        await box.write('user_business_type_id', datauser.first.businessTypeId);
+        await box.write('user_province_id', datauser.first.provinceId);
+        await box.write('user_district_id', datauser.first.districtId);
+        await box.write('user_regency_id', datauser.first.regencyId);
 
-        await GetStorage().write('user_address', datauser.first.address);
+        await box.write('user_address', datauser.first.address);
 
-        await GetStorage().write('user_package_id', datauser.first.packageId);
+        await box.write('user_package_id', datauser.first.packageId);
 
-        await GetStorage().write('user_start_date', datauser.first.startDate);
+        await box.write('user_start_date', datauser.first.startDate);
 
-        await GetStorage().write('user_end_date', datauser.first.endDate);
-        await GetStorage().write('status', datauser.first.status);
+        await box.write('user_end_date', datauser.first.endDate);
+        await box.write('status', datauser.first.status);
 
-        await GetStorage().write('user_logo_url', datauser.first.logoUrl);
+        await box.write('user_logo_url', datauser.first.logoUrl);
 
-        await GetStorage()
-            .write('user_register_date', datauser.first.registerDate);
+        await box.write('user_register_date', datauser.first.registerDate);
 
-        await GetStorage().write('user_status', datauser.first.statusUser);
+        await box.write('user_status', datauser.first.statusUser);
         Get.back(closeOverlays: true);
         Get.offAndToNamed('/basemenu');
         Get.showSnackbar(

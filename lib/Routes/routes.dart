@@ -86,8 +86,16 @@ import 'package:qasir_pintar/Modules - P.O.S/pengaturan/binding_pengaturan.dart'
 import 'package:qasir_pintar/Modules - P.O.S/pengaturan/view_pengaturan.dart';
 import 'package:qasir_pintar/Modules%20-%20Distributor/Base%20Menu/view_basemenu_distributor.dart';
 import 'package:qasir_pintar/Modules%20-%20Distributor/Produk/view_produk_list_distributor.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Beban/Detail%20beban/binding_detail_beban.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Beban/Detail%20beban/view_detail_beban.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Beban/binding_basemenu_beban.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Beban/edit/binding_edit_beban.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Beban/edit/view_edit_beban.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Beban/kategori%20add/view_tambah_kategori_beban.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Beban/view_basemenu_beban.dart';
 import 'package:qasir_pintar/Modules%20-%20P.O.S/Kasir/binding_kasir.dart';
 
+import '../Middleware/RoleMiddleware.dart';
 import '../Modules - Distributor/Base Menu/binding_basemenu_distributor.dart';
 import '../Modules - Distributor/Produk/binding_produk_list_distributor.dart';
 import '../Modules - P.O.S/Auth/Login form/binding_loginform.dart';
@@ -98,6 +106,9 @@ import '../Modules - P.O.S/Auth/Register/binding_register.dart';
 import '../Modules - P.O.S/Auth/Register/view_register.dart';
 import '../Modules - P.O.S/Auth/login karyawan pin/binding_loginpin.dart';
 import '../Modules - P.O.S/Auth/login karyawan pin/view_loginpin.dart';
+import '../Modules - P.O.S/Beban/add/binding_tambah_beban.dart';
+import '../Modules - P.O.S/Beban/add/view_tambah_beban.dart';
+import '../Modules - P.O.S/Beban/kategori add/binding_tambah_kategori_beban.dart';
 import '../Modules - P.O.S/History/detail/binding_detailriwayatpenjualan.dart';
 import '../Modules - P.O.S/Laporan/Laporan Kasir/binding_laporankasir.dart';
 import '../Modules - P.O.S/Laporan/Laporan menu/binding_laporanmenu.dart';
@@ -176,9 +187,13 @@ final List<GetPage<dynamic>> route = [
   GetPage(
       name: "/basemenu", page: () => Basemenu(), binding: BasemenuBinding()),
   GetPage(
-      name: "/basemenuproduk",
-      page: () => BasemenuProduk(),
-      binding: BasemenuProdukBinding()),
+    name: "/basemenuproduk",
+    page: () => BasemenuProduk(),
+    binding: BasemenuProdukBinding(),
+    // middlewares: [
+    //   RoleMiddleware(allowedRoles: ['ADMIN', 'MANAGER'])
+    // ],
+  ),
   GetPage(
       name: "/basemenupelanggan",
       page: () => BasemenuPelanggan(),
@@ -376,4 +391,28 @@ final List<GetPage<dynamic>> route = [
       page: () => UpdateUser(),
       binding: UpdateUserBinding()),
   GetPage(name: "/home", page: () => HomeScreen(), binding: HomeBinding()),
+
+  GetPage(
+      name: "/basemenu_beban",
+      page: () => BasemenuBeban(),
+      binding: BasemenuBebanBinding()),
+  GetPage(
+      name: "/detail_beban",
+      page: () => DetailBeban(),
+      binding: DetailBebanBinding()),
+
+  GetPage(
+      name: "/tambah_beban",
+      page: () => TambahBeban(),
+      binding: TambahBebanBinding()),
+
+  GetPage(
+      name: "/edit_beban",
+      page: () => EditBeban(),
+      binding: EditBebanBinding()),
+
+  GetPage(
+      name: "/tambah_kategori_beban",
+      page: () => TambahKategoriBeban(),
+      binding: TambahKategoriBebanBinding()),
 ];

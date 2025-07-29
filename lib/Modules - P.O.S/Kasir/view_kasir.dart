@@ -9,6 +9,7 @@ import 'package:qasir_pintar/Modules - P.O.S/Kasir/component_produkthumb_kasir.d
 import 'package:qasir_pintar/Modules - P.O.S/Kasir/component_uppermenu_kasir.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Kasir/controller_kasir.dart';
 import 'package:qasir_pintar/Modules%20-%20P.O.S/Kasir%20-%20Pembayaran/controller_pembayaran.dart';
+import 'package:qasir_pintar/Widget/widget.dart';
 import 'package:smooth_sheets/smooth_sheets.dart';
 
 import '../../Config/config.dart';
@@ -36,7 +37,23 @@ class Kasir extends GetView<KasirController> {
                       : Expanded(child: ProdukThumb()),
             ],
           ),
-          if (!isMeja) CartSheet()
+          if (!isMeja)
+            // controller.isbuka.value == false
+            //     ? Positioned(
+            //         bottom: 0,
+            //         child: Container(
+            //           padding: EdgeInsets.all(10),
+            //           color: AppColor.primary,
+            //           height: 80,
+            //           width: Get.width,
+            //           child: button_border_custom(
+            //               onPressed: () {},
+            //               child: Text('Buka Kasir'),
+            //               width: Get.width),
+            //         ),
+            //       )
+            //     : CartSheet()
+            CartSheet()
         ],
       );
     });
@@ -50,6 +67,7 @@ class CartSheet extends GetView<KasirController> {
   Widget build(BuildContext context) {
     return SheetViewport(
         child: Sheet(
+      controller: controller.kasirsheet.value,
       scrollConfiguration: SheetScrollConfiguration(),
       initialOffset: const SheetOffset(0.1),
       physics: BouncingSheetPhysics(),
@@ -232,47 +250,8 @@ class CartSheet extends GetView<KasirController> {
                                               ),
                                               IconButton(
                                                   onPressed: () {
-                                                    print('min-------------->');
-                                                    keranjang[index].qty--;
-
-                                                    // Get the individual product values to subtract
-                                                    final hargaBeliPerItem =
-                                                        keranjang[index]
-                                                                    .isPaket ==
-                                                                false
-                                                            ? keranjang[index]
-                                                                .hargaEceran!
-                                                            : keranjang[index]
-                                                                .hargaPaket;
-                                                    final hppPerItem =
-                                                        keranjang[index].hpp!;
-
-                                                    // Subtract from totals
-                                                    controller.subtotal.value -=
-                                                        hargaBeliPerItem!;
-
-                                                    var sumqty = keranjang.fold(
-                                                        0,
-                                                        (sum, item) =>
-                                                            sum -
-                                                            (item.qty ?? 0));
-                                                    controller.totalItem.value =
-                                                        sumqty;
-
-                                                    if (keranjang[index].qty <=
-                                                        0) {
-                                                      var x = keranjang
-                                                          .removeAt(index);
-                                                      controller
-                                                          .deletedDetailIds
-                                                          .add(x.uuid!);
-                                                      controller.keranjangv2
-                                                          .refresh();
-                                                    }
                                                     controller
-                                                        .hitungPembayaran();
-                                                    controller.keranjangv2
-                                                        .refresh();
+                                                        .decrementItem(index);
                                                   },
                                                   icon: Icon(
                                                     Icons.remove,

@@ -9,6 +9,7 @@ class DataKaryawan {
     this.aktif,
     this.pin,
     this.sync,
+    this.role,
   });
 
   final int? id;
@@ -20,6 +21,7 @@ class DataKaryawan {
   final aktif;
   final pin;
   final String? sync;
+  final String? role;
 
   factory DataKaryawan.fromJsondb(Map<String, dynamic> json) {
     return DataKaryawan(
@@ -32,6 +34,7 @@ class DataKaryawan {
       pin: json['Pin'],
       aktif: json["Aktif"],
       sync: json["sync"],
+      role: json["role"],
     );
   }
 
@@ -46,6 +49,7 @@ class DataKaryawan {
     map['Pin'] = pin;
     map['Aktif'] = aktif;
     map['sync'] = sync;
+    map['role'] = role;
     return map;
   }
 }

@@ -183,19 +183,38 @@ class HistoryPenjualan extends GetView<HistoryPenjualanController> {
     var penjualan = controller.penjualan;
     var x = penjualan.where((p) => p.uuid == item.uuidPenjualan).first;
 
-    return custom_list(
-      gestureroute: '/detail_history',
-      gestureArgument: x,
-      usingGambar: false,
-      title: item.noFaktur,
-      trailing: Text(amountStr),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Total item : ' + item.totalqty.toString(),
-              style: AppFont.regular())
-        ],
-      ),
-    );
+    return x.reversal != 1
+        ? custom_list(
+            gestureroute: '/detail_history',
+            gestureArgument: x,
+            usingGambar: false,
+            title: item.noFaktur,
+            trailing: Text(amountStr),
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Total item : ' + item.totalqty.toString(),
+                    style: AppFont.regular())
+              ],
+            ),
+          )
+        : Container(
+            color: Colors.red.withValues(alpha: 0.2),
+            child: custom_list(
+              gestureroute: '/detail_history',
+              gestureArgument: x,
+              usingGambar: false,
+              title: item.noFaktur,
+              trailing: Text(amountStr),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Total item : ' + item.totalqty.toString(),
+                      style: AppFont.regular()),
+                  Text('Reversal', style: AppFont.regular(color: Colors.red))
+                ],
+              ),
+            ),
+          );
   }
 }

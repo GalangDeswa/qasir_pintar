@@ -4,9 +4,13 @@ import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:qasir_pintar/Config/config.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Base%20menu/controller_basemenu.dart';
+import 'package:qasir_pintar/Services/BoxStorage.dart';
 
+import '../../Controllers/CentralController.dart';
 import '../../Controllers/printerController.dart';
 import '../test.dart';
 
@@ -14,6 +18,7 @@ class HomeScreen extends GetView<BasemenuController> {
   @override
   Widget build(BuildContext context) {
     final PrintController _ctrl = Get.put(PrintController());
+    final StorageService box = Get.find<StorageService>();
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -216,6 +221,15 @@ class HomeScreen extends GetView<BasemenuController> {
             ),
           ),
 
+          IconButton(
+              onPressed: () {
+                box.remove('karyawan_login');
+                box.remove('karyawan_nama');
+                box.remove('karyawan_id');
+                box.remove('karyawan_role');
+              },
+              icon: Icon(FontAwesomeIcons.tractor))
+
           // Obx(() {
           //   return Column(
           //     crossAxisAlignment: CrossAxisAlignment.start,
@@ -312,6 +326,7 @@ class HomeScreen extends GetView<BasemenuController> {
           //   );
           // }),
 
+          ,
           Obx(() {
             return Padding(
               padding: AppPading.defaultBodyPadding(),
@@ -377,5 +392,83 @@ class HomeScreen extends GetView<BasemenuController> {
         ),
       ],
     );
+  }
+
+  Future<String?> karyawanLoginv2() async {
+    final con = Get.find<CentralKaryawanController>();
+
+    // showDialog returns Future<T?> where T is the type you pass to `result`
+    final selectedRole = await Get.dialog<String>(
+      AlertDialog(
+        insetPadding: EdgeInsets.zero,
+        contentPadding: EdgeInsets.zero,
+        content: Builder(
+          builder: (context) {
+            return Column(
+              children: [
+                // ... your DropdownButtonFormField2 and other widgets ...
+                SizedBox(height: 100.0),
+                // PIN entry and button
+                PinCodeTextField(
+                  keyboardType: TextInputType.number,
+                  length: 6,
+                  obscureText: true,
+                  animationType: AnimationType.fade,
+                  pinTheme: PinTheme(
+                      shape: PinCodeFieldShape.circle,
+                      borderRadius: BorderRadius.circular(5),
+                      fieldHeight: 50,
+                      fieldWidth: 40,
+                      activeFillColor: Colors.white,
+                      inactiveColor: AppColor.primary),
+                  animationDuration: Duration(milliseconds: 300),
+                  //backgroundColor: Colors.blue.shade50,
+                  controller: con.verifikasi_kode.value,
+                  onCompleted: (v) {
+                    print("Completed");
+                  },
+                  onChanged: (value) {
+                    print('verifikasi code -->' + value);
+                    print(con.verifikasi_kode.value.text);
+                  },
+                  beforeTextPaste: (text) {
+                    print("Allowing to paste $text");
+                    //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
+                    //but you can show anything you want here, like your pop up saying wrong paste format or etc
+                    return true;
+                  },
+                  appContext: context,
+                ),
+                Container(
+                  margin: EdgeInsets.only(top: 10),
+                  width: 350,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: AppColor.secondary,
+                    ),
+                    onPressed: () {
+                      // You may want to validate code first, then:
+                      con.loginKaryawan(
+                        con.karyawanvalue,
+                        con.verifikasi_kode.value.text,
+                        con.role,
+                      );
+                      // Close the dialog, returning the role:
+                      Get.back(result: con.role);
+                    },
+                    child: Text('Masuk'),
+                  ),
+                ),
+              ],
+            );
+          },
+        ),
+      ),
+      barrierDismissible: false, // optional: force the user to pick
+    );
+
+    // selectedRole will be the con.role passed above (or null if dismissed)
+    return selectedRole;
   }
 }

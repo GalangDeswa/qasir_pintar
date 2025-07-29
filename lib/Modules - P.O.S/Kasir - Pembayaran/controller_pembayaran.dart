@@ -280,34 +280,34 @@ class PembayaranController extends GetxController {
     }
   }
 
-  printstruk() async {
-    var conprint = Get.find<PrintController>();
-    var penjualanprint = DataPenjualan(
-      uuid: uuidpenjualanstruk,
-      idPelanggan: pelangganvalue.value,
-      idToko: id_toko,
-      idLogin: id_toko,
-      tanggal: getTodayDateISO(),
-      noFaktur: nofaktur,
-      subtotal: subtotal.value,
-      diskonNominal: diskonnominal.value,
-      diskonPersen: diskonpersen.value,
-      kembalian: balikvalue.value,
-      kodePromo: promo.value.text,
-      nilaiBayar: bayarvalue.value,
-      nilaiPromo: promovalue.value,
-      totalBayar: total.value,
-      totalQty: totalItem.value,
-      totalDiskon: displaydiskon.value ?? 0.0,
-      namaPelanggan: namaPelanggan.value,
-    );
-    final List<DataProdukTemp> daftarItem = List.from(keranjang);
-    await conprint.printPenjualanReceipt(
-        penjualan: penjualanprint,
-        items: daftarItem,
-        namaPelanggan: namaPelanggan.value,
-        NamaToko: GetStorage().read('user_business_name') ?? 'QASIR PINTAR');
-  }
+  // printstruk() async {
+  //   var conprint = Get.find<PrintController>();
+  //   var penjualanprint = DataPenjualan(
+  //     uuid: uuidpenjualanstruk,
+  //     idPelanggan: pelangganvalue.value,
+  //     idToko: id_toko,
+  //     idLogin: id_toko,
+  //     tanggal: getTodayDateISO(),
+  //     noFaktur: nofaktur,
+  //     subtotal: subtotal.value,
+  //     diskonNominal: diskonnominal.value,
+  //     diskonPersen: diskonpersen.value,
+  //     kembalian: balikvalue.value,
+  //     kodePromo: promo.value.text,
+  //     nilaiBayar: bayarvalue.value,
+  //     nilaiPromo: promovalue.value,
+  //     totalBayar: total.value,
+  //     totalQty: totalItem.value,
+  //     totalDiskon: displaydiskon.value ?? 0.0,
+  //     namaPelanggan: namaPelanggan.value,
+  //   );
+  //   final List<DataProdukTemp> daftarItem = List.from(keranjang);
+  //   await conprint.printPenjualanReceipt(
+  //       penjualan: penjualanprint,
+  //       items: daftarItem,
+  //       namaPelanggan: namaPelanggan.value,
+  //       NamaToko: GetStorage().read('user_business_name') ?? 'QASIR PINTAR');
+  // }
 
   RxList<String> deletedDetailIds = <String>[].obs;
   clearAll() {

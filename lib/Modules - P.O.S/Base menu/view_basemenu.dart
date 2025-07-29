@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:qasir_pintar/Config/config.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Base%20menu/controller_basemenu.dart';
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Kasir/controller_kasir.dart';
 import 'package:qasir_pintar/Widget/widget.dart';
 
 import 'component_drawer.dart';
@@ -44,6 +45,9 @@ class Basemenu extends GetView<BasemenuController> {
               // rightCornerRadius: 30,
               onTap: (index) {
                 controller.index.value = index;
+                if (index == 1) {
+                  Get.find<KasirController>().getKaryawan();
+                }
               }),
           body: Obx(() {
             return controller.views.elementAt(controller.index.value);

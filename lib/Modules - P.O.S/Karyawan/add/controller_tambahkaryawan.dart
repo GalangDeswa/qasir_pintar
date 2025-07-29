@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Karyawan/controller_karyawan.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Karyawan/model_karyawan.dart';
 import 'package:uuid/uuid.dart';
@@ -109,8 +110,8 @@ class TambahKaryawanController extends GetxController {
   List<DateTime?> datedata = [
     //DateTime.now(),
   ];
-  String? jenisvalue;
-  var jenislistlocal = ['Toko', 'CAFE', "JASA"].obs;
+  String? rolevalue;
+  var rolelist = ['ADMIN', 'MANAGER', "KASIR"].obs;
 
   pilihsourcefoto() {
     Get.dialog(
@@ -315,7 +316,7 @@ class TambahKaryawanController extends GetxController {
   }
 
   tambahKaryawanLocal() async {
-    print('-------------------tambah supplier local---------------------');
+    print('-------------------tambah karyawan local---------------------');
 
     Get.dialog(showloading(), barrierDismissible: false);
     var uuid = Uuid().v4();
@@ -328,11 +329,13 @@ class TambahKaryawanController extends GetxController {
                 nohp: telepon.value.text,
                 email: email.value.text,
                 nama_karyawan: nama.value.text,
+                role: rolevalue,
                 pin: pin.value.text)
             .DB());
 
     if (db != null) {
-      await Get.find<KaryawanController>().fetchKaryawanLocal(id_toko: id_toko);
+      await Get.find<CentralKaryawanController>()
+          .fetchKaryawanLocal(id_toko: id_toko);
       Get.back(closeOverlays: true);
       Get.showSnackbar(
           toast().bottom_snackbar_success('Sukses', 'Berhasil registrasi'));

@@ -239,7 +239,7 @@ class ProdukController extends GetxController {
     try {
       final image = await ImagePicker().pickImage(
           source: ImageSource.gallery,
-          imageQuality: 85,
+          imageQuality: 100,
           maxHeight: 300,
           maxWidth: 300);
       if (image == null) return;
@@ -260,7 +260,7 @@ class ProdukController extends GetxController {
     try {
       final image = await ImagePicker().pickImage(
           source: ImageSource.camera,
-          imageQuality: 85,
+          imageQuality: 100,
           maxHeight: 300,
           maxWidth: 300);
       if (image == null) return;

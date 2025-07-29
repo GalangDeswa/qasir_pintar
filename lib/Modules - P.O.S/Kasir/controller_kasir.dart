@@ -15,6 +15,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Karyawan/model_karyawan.dart';
+import 'package:qasir_pintar/Services/BoxStorage.dart';
 import 'package:smooth_sheets/smooth_sheets.dart';
 import 'package:uuid/uuid.dart';
 
@@ -23,6 +24,7 @@ import '../../Controllers/printerController.dart';
 import '../../Database/DB_helper.dart';
 import '../../Widget/popscreen.dart';
 import '../../Widget/widget.dart';
+import '../Base menu/controller_basemenu.dart';
 import '../Kasir - Rincian Pembayaran/view_rincianpembayaran.dart';
 import '../Pelanggan/List Pelanggan/model_pelanggan.dart';
 import '../Pelanggan/List kategori pelanggan/model_kategoriPelanggan.dart';
@@ -33,47 +35,31 @@ import '../Promo/model_promo.dart';
 import '../Users/model_user.dart';
 import 'model_penjualan.dart';
 
+final StorageService box = Get.find<StorageService>();
+
 class KasirController extends GetxController {
   @override
   Future<void> onInit() async {
     // TODO: implement onInit
     super.onInit();
     print('Kasir CON INIt--------------------------------->');
-    uuid.value = await GetStorage().read('uuid');
-    // await fetchKaryawanLocal(id_toko: id_toko);
-    // await checkKaryawan();
-    // cari cara karyawan login
+    uuid.value = box.read('uuid', fallback: 'null');
+    // await getKaryawan();
 
-    // await checktour();
-    await fetchUserLocal(uuid);
-    await fetchKategoriProdukLocal(id_toko: id_toko);
-    await fetchSubKategoriProdukLocal(id_toko: id_toko);
-    await fetchProdukLocal(id_toko: id_toko);
-
-    print('init pembayranadasdsada');
     await fetchPromo(id_toko: id_toko);
     await Get.find<CentralPelangganController>()
         .fetchPelangganLocal(id_toko: id_toko);
-    // if (data != null) {
-    //   keranjang.value = data['keranjang'];
-    //   // totalItem.value = data['totalItem'];
-    //   // subtotal.value = data['subtotal'];
-    //   // sub = keranjang.fold(
-    //   //     0.0, (sum, item) => sum + (item.harga_jual_eceran! * item.qty));
-    // }
-    // totalItem.value = keranjangv2.fold(0, (sum, item) => sum + (item.qty ?? 0));
-    // subtotal.value = keranjangv2.fold(
-    //     0.0, (sum, item) => sum + (item.hargaEceran! * item.qty));
-    // print('item :' + totalItem.toString());
-    // print('subtotal :' + subtotal.toString());
-    // selecteddiskon.value = opsidiskon[0];
-    // await totalval();
+    namatoko.value = box.read('user_business_name', fallback: 'Default Toko');
+    namaKaryawan.value =
+        box.read('karyawan_nama', fallback: 'Default karyawan');
   }
+
+  var namatoko = ''.obs;
 
   /// transfer pembayaran
   /// dari pembayaran controller ke kasir controller
 
-  var id_toko = GetStorage().read('uuid');
+  var id_toko = box.read('uuid', fallback: 'null');
   var diskondisplay = false.obs;
   var promodisplay = false.obs;
   var diskon = TextEditingController().obs;
@@ -96,6 +82,304 @@ class KasirController extends GetxController {
   var sub;
   var jumlahdiskonkasir = 0.0.obs;
   var pelangganpilih = DataPelanggan;
+
+  var savedCart = <DataKeranjangSavev2>[].obs;
+
+  //TODO : sistem login karyawan buat kasir
+
+  getKaryawan() async {
+    var isLogin = await GetStorage().read('karyawan_login') ?? false;
+    if (!isLogin) {
+      popLoginKaryawan();
+    } else {
+      return;
+    }
+
+    // print('get karyawanb --->');
+    // var con = Get.find<CentralKaryawanController>();
+    // con.fetchKaryawanLocal(id_toko: id_toko);
+    // if (con.karyawanList.isEmpty) {
+    //   print('karyawan kosong');
+    //   Popscreen().noKaryawan();
+    // } else {
+    //   var isLogin = await GetStorage().read('karyawan_login') ?? false;
+    //   print('status karyawan login');
+    //
+    //   print(isLogin);
+    //   if (!isLogin) {
+    //     Popscreen().karyawanLogin(this);
+    //   } else {
+    //     Popscreen().bukakasir();
+    //     // print(namaKaryawan);
+    //     // Get.snackbar('karyawan', namaKaryawan.value);
+    //   }
+    // }
+  }
+
+  getAvailableStock(String productUuid) async {
+    final reserved = await _computeReservedByProduct();
+    final reservedQty = reserved[productUuid] ?? 0;
+
+    // Get actual stock from database
+    final product = Get.find<CentralProdukController>()
+        .produk
+        .firstWhere((p) => p.uuid == productUuid);
+
+    final actualStock = product.qty! - product.info_stok_habis! ?? 0;
+    final availableStock = actualStock - reservedQty;
+    print('avail stock ------------->' + availableStock.toString());
+
+    if (reservedQty == 0) {
+      print('reserved qty = 0');
+    }
+    return availableStock > 0 ? availableStock : 0;
+  }
+
+// Also add this method to get available stock for packages
+  Future<int> getAvailableStockForPackage(String packageUuid) async {
+    final reserved = await _computeReservedByProduct();
+
+    // Get package details
+    final packageItem = Get.find<CentralPaketController>()
+        .paketproduk
+        .firstWhere((p) => p.uuid == packageUuid);
+
+    var details = await fetchdetailpaket(
+      id_toko: packageItem.id_toko,
+      id_paket_produk: packageUuid,
+    );
+
+    int minAvailablePackages = 999999; // Large number as starting point
+
+    for (var detail in details) {
+      final productUuid = detail.id_produk.toString();
+      final product = Get.find<CentralProdukController>()
+          .produk
+          .firstWhereOrNull((p) => p.uuid == productUuid);
+
+      if (product != null && product.hitung_stok == 1) {
+        final actualStock = product.qty ?? 0;
+        final reservedQty = reserved[productUuid] ?? 0;
+        final availableStock = actualStock - reservedQty;
+
+        // Calculate how many packages can be made with this product
+        final possiblePackages = (availableStock / detail.qty).floor();
+
+        if (possiblePackages < minAvailablePackages) {
+          minAvailablePackages = possiblePackages;
+        }
+      }
+    }
+
+    return minAvailablePackages > 0 ? minAvailablePackages : 0;
+  }
+
+  // map uuid → stock observable
+  final availStockMap = <String, RxInt>{}.obs;
+
+  Future<void> loadStock(String uuid) async {
+    final s = await getAvailableStock(uuid);
+    // initialize or update the existing RxInt
+    availStockMap[uuid] = (availStockMap[uuid] ?? 0.obs)..value = s;
+    print('s------>');
+    print(s);
+  }
+
+  Future<void> loadStockPackage(String uuid) async {
+    final s = await getAvailableStockForPackage(uuid);
+    // initialize or update the existing RxInt
+    availStockMap[uuid] = (availStockMap[uuid] ?? 0.obs)..value = s;
+    print('s------>');
+    print(s);
+  }
+
+  // Widget buildStockDisplayv2(dynamic item, bool isPackage) {
+  //   if (isPackage) {
+  //     // For packages, we don't show individual stock
+  //     return Text(
+  //       'Package',
+  //       overflow: TextOverflow.ellipsis,
+  //       style: AppFont.small(),
+  //     );
+  //   } else {
+  //     if (item.hitung_stok == 1) {
+  //       var p = getAvailableStock(item.uuid);
+  //
+  //       final availableStock = p;
+  //       final actualStock = item.qty ?? 0;
+  //       return Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           Text(
+  //             'Available: $availableStock',
+  //             overflow: TextOverflow.ellipsis,
+  //             style: AppFont.small().copyWith(
+  //               color: availableStock == 0
+  //                   ? Colors.red
+  //                   : availableStock < 5
+  //                       ? Colors.orange
+  //                       : Colors.green,
+  //               fontWeight: FontWeight.bold,
+  //             ),
+  //           ),
+  //           if (availableStock != actualStock)
+  //             Text(
+  //               'Total: $actualStock',
+  //               overflow: TextOverflow.ellipsis,
+  //               style: AppFont.small().copyWith(
+  //                 color: Colors.grey,
+  //                 fontSize: 10,
+  //               ),
+  //             ),
+  //         ],
+  //       );
+  //     } else {
+  //       return Text(
+  //         'Nonstock',
+  //         overflow: TextOverflow.ellipsis,
+  //         style: AppFont.small(),
+  //       );
+  //     }
+  //   }
+  // }
+
+  var savedDiskon = 0.0.obs;
+  var savedMetodeDiskon = 0.obs;
+  var savedPromovalue = 0.0.obs;
+  var savedNamaPromo = ''.obs;
+  var savedPromoUUID;
+  var savedCustomerUUID = ''.obs;
+  var savedCustumerName = ''.obs;
+  var savedDisplayDiskon = 0.0.obs;
+
+  saveCartv2() {
+    print('saved cart v2 == >');
+    final snapshot = List<DataKeranjang>.from(keranjangv2);
+    // Save each cart with its own discount/coupon information
+    savedCart.add(DataKeranjangSavev2(
+      idToko: id_toko,
+      savedAt: DateTime.now(),
+      item: snapshot,
+      // Store current discount/coupon info with this specific cart
+      diskon: jumlahdiskonkasir.value,
+      promoValue: promovalue.value,
+      namaPromo: namaPromo.value,
+      promoUUID: promolistvalue ?? null,
+      customerName: namaPelanggan.value,
+      customerUUID: pelangganvalue.value,
+      metodeDiskon: metode_diskon.value,
+      displayDiskon: displaydiskon.value,
+    ));
+    print('saved cart -->');
+    print(savedCart.map((e) => e.item.map((x) => x.uuid)));
+    clearAll();
+  }
+
+  openSavedCart() {
+    Get.dialog(AlertDialog(
+      insetPadding: EdgeInsets.zero,
+      contentPadding: EdgeInsets.zero,
+      content: Builder(
+        builder: (context) {
+          var height = MediaQuery.of(context).size.height;
+          var width = MediaQuery.of(context).size.width;
+
+          return Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(10)),
+                color: Colors.white,
+              ),
+              padding: EdgeInsets.all(20),
+              width: width - 30,
+              height: height - 200,
+              child: ListView.builder(
+                  itemCount: savedCart.length,
+                  itemBuilder: (context, index) {
+                    var cart = savedCart[index];
+
+                    return ExpansionTile(
+                      trailing: IconButton(
+                        onPressed: () async {
+                          print('add saved cart');
+
+                          // 1) FIRST: pull it out of savedCart so your validator won't double‑count it
+                          final restored = savedCart.removeAt(index);
+                          savedCart.refresh();
+                          Get.back();
+
+                          // 2) THEN: restore all the items
+                          for (final item in restored.item) {
+                            if (item.qty > 1) {
+                              for (var i = 0; i < item.qty; i++) {
+                                addToCart(
+                                    item); // or just addToCart(item) if sync
+                              }
+                            } else {
+                              addToCart(item);
+                            }
+                          }
+
+                          // 3) Restore all your discount/promo/customer info
+                          jumlahdiskonkasir.value = restored.diskon;
+                          promovalue.value = restored.promoValue;
+                          namaPromo.value = restored.namaPromo;
+                          promolistvalue = restored.promoUUID;
+                          namaPelanggan.value = restored.customerName;
+                          pelangganvalue.value = restored.customerUUID;
+                          metode_diskon.value = restored.metodeDiskon;
+                          displaydiskon.value = restored.displayDiskon;
+
+                          print('restored discount info for this cart:');
+                          print(' Discount: ${restored.diskon}');
+                          print(' Promo:    ${restored.namaPromo}');
+                          print(' Customer: ${restored.customerName}');
+
+                          // 4) slide the sheet up
+                          kasirsheet.value.animateTo(SheetOffset(1));
+                        },
+                        icon: Icon(
+                          FontAwesomeIcons.cartShopping,
+                        ),
+                      ),
+                      title: Text('qweqwe'),
+                      childrenPadding: EdgeInsets.zero,
+                      children: cart.item.map((data) {
+                        print(data);
+                        return ListTile(
+                          trailing: Text((data.isPaket == true
+                                  ? 'Rp. ' +
+                                      AppFormat().numFormat(
+                                          data.hargaPaket! * data.qty)
+                                  : 'Rp. ' +
+                                      AppFormat().numFormat(
+                                          data.hargaEceran! * data.qty))
+                              .toString()),
+                          title: data.isPaket == true
+                              ? Text(data.namaPaket!)
+                              : Text(data.namaProduk!),
+                          subtitle: Row(
+                            children: [
+                              Text(
+                                data.isPaket == true
+                                    ? 'Rp. ' +
+                                        AppFormat().numFormat(data.hargaPaket)
+                                    : 'Rp. ' +
+                                        AppFormat().numFormat(data.hargaEceran),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.only(left: 5),
+                                child: Text('x ' + data.qty.toString()),
+                              ),
+                            ],
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  }));
+        },
+      ),
+    ));
+  }
 
   //printer----------------
 
@@ -236,26 +520,27 @@ class KasirController extends GetxController {
     var bayar = await DBHelper().INSERT(
       'penjualan',
       DataPenjualan(
-              uuid: uuidpenjualan,
-              idPelanggan: pelangganvalue.value,
-              idToko: id_toko,
-              idLogin: id_toko,
-              tanggal: getTodayDateISO(),
-              noFaktur: generateInvoiceNumber(),
-              subtotal: subtotal.value,
-              diskonNominal: diskonnominal.value,
-              diskonPersen: diskonpersen.value,
-              kembalian: balikvalue.value,
-              kodePromo: promolistvalue,
-              nilaiBayar: bayarvalue.value,
-              nilaiPromo: promovalue.value,
-              totalBayar: total.value,
-              totalQty: totalItem.value,
-              totalDiskon: displaydiskon.value ?? 0.0,
-              namaPelanggan: namaPelanggan.value,
-              namaPromo: namaPromo.value,
-              totalPajak: totalTax.value)
-          .DB(),
+        uuid: uuidpenjualan,
+        idPelanggan: pelangganvalue.value,
+        idToko: id_toko,
+        idLogin: id_toko,
+        tanggal: getTodayDateISO(),
+        noFaktur: generateInvoiceNumber(),
+        subtotal: subtotal.value,
+        diskonNominal: diskonnominal.value,
+        diskonPersen: diskonpersen.value,
+        kembalian: balikvalue.value,
+        kodePromo: promolistvalue,
+        nilaiBayar: bayarvalue.value,
+        nilaiPromo: promovalue.value,
+        totalBayar: total.value,
+        totalQty: totalItem.value,
+        totalDiskon: displaydiskon.value ?? 0.0,
+        namaPelanggan: namaPelanggan.value,
+        namaPromo: namaPromo.value,
+        totalPajak: totalTax.value,
+        id_karyawan: karyawanvalue,
+      ).DB(),
     );
 
     if (bayar != null) {
@@ -336,8 +621,10 @@ class KasirController extends GetxController {
         }
       }
       Popscreen().berhasilbayar(this);
-      await Get.find<KasirController>().fetchProdukLocal(id_toko: id_toko);
-      clearAll();
+
+      await Get.find<CentralProdukController>()
+          .fetchProdukLocal(id_toko: id_toko);
+      //clearAll();
     } else {
       Get.back();
       Get.showSnackbar(toast().bottom_snackbar_error('error', 'gagal'));
@@ -347,46 +634,61 @@ class KasirController extends GetxController {
   printstruk() async {
     var conprint = Get.find<PrintController>();
     var penjualanprint = DataPenjualan(
-      uuid: uuidpenjualanstruk,
-      idPelanggan: pelangganvalue.value,
-      idToko: id_toko,
-      idLogin: id_toko,
-      tanggal: getTodayDateISO(),
-      noFaktur: nofaktur,
-      subtotal: subtotal.value,
-      diskonNominal: diskonnominal.value,
-      diskonPersen: diskonpersen.value,
-      kembalian: balikvalue.value,
-      kodePromo: promo.value.text,
-      nilaiBayar: bayarvalue.value,
-      nilaiPromo: promovalue.value,
-      totalBayar: total.value,
-      totalQty: totalItem.value,
-      totalDiskon: displaydiskon.value ?? 0.0,
-      namaPelanggan: namaPelanggan.value,
-    );
-    final List<DataProdukTemp> daftarItem = List.from(keranjang);
+        uuid: uuidpenjualanstruk,
+        idPelanggan: pelangganvalue.value,
+        idToko: id_toko,
+        idLogin: id_toko,
+        tanggal: getTodayDateISO(),
+        noFaktur: nofaktur,
+        subtotal: subtotal.value,
+        diskonNominal: diskonnominal.value,
+        diskonPersen: diskonpersen.value,
+        kembalian: balikvalue.value,
+        kodePromo: promo.value.text,
+        nilaiBayar: bayarvalue.value,
+        nilaiPromo: promovalue.value,
+        totalBayar: total.value,
+        totalQty: totalItem.value,
+        totalDiskon: displaydiskon.value ?? 0.0,
+        namaPelanggan: namaPelanggan.value,
+        totalPajak: totalTax.value,
+        id_karyawan: karyawanvalue,
+        namaKaryawan: namaKaryawan.value,
+        namaPromo: namaPromo.value);
+    final List<DataKeranjang> daftarItem = List.from(keranjangv2);
     await conprint.printPenjualanReceipt(
         penjualan: penjualanprint,
         items: daftarItem,
         namaPelanggan: namaPelanggan.value,
-        NamaToko: GetStorage().read('user_business_name') ?? 'QASIR PINTAR');
+        NamaToko: 'qwe');
+    //clearAll();
   }
 
   RxList<String> deletedDetailIds = <String>[].obs;
+
   clearAll() {
     print('clear all -->');
     var x = Get.find<KasirController>();
-    x.keranjangv2.value.clear();
+    x.keranjangv2.clear();
     x.keranjangv2.refresh();
     x.totalitem.value = 0;
     x.totalItem.value = 0;
     x.subtotal.value = 0.0;
     total.value = 0.0;
-    keranjangv2.value.clear();
+    keranjangv2.clear();
+    jumlahdiskonkasir.value = 0.0;
+    promovalue.value = 0.0;
+    namaPromo.value = '';
+    promolistvalue = null;
+    namaPelanggan.value = '';
+    pelangganvalue.value = '';
+    metode_diskon.value = 9;
+    displaydiskon.value = 0.0;
+    totalTax.value = 0.0;
     //Get.delete<PembayaranController>();
   }
 
+  var kasirsheet = SheetController().obs;
   var balikvalue = 0.0.obs;
 
   balik() {
@@ -443,6 +745,7 @@ class KasirController extends GetxController {
   ];
   var promolist = <DataPromo>[].obs;
   var promolistvalue;
+
   fetchPromo({id_toko}) async {
     print('-------------------fetch produk local---------------------');
 
@@ -461,6 +764,7 @@ class KasirController extends GetxController {
 
   var metode_diskon = 9.obs;
   RxDouble displaydiskon = 0.0.obs;
+
   editDiskonKasir(KasirController controller, promouuid) {
     Get.dialog(
         AlertDialog(
@@ -821,6 +1125,7 @@ class KasirController extends GetxController {
   }
 
   var namaPromo = ''.obs;
+
   popListPromo() async {
     Get.dialog(SheetViewport(
         child: Sheet(
@@ -974,6 +1279,7 @@ class KasirController extends GetxController {
   var usertemp = <DataUser>[].obs;
   var promonominal = 0.0.obs;
   var promopersen = 0.0.obs;
+
   tambahPromo() async {
     print('-------------------tambah pelanggan local---------------------');
 
@@ -1009,191 +1315,220 @@ class KasirController extends GetxController {
   }
 
   final formKey = GlobalKey<FormState>();
-  final verifikasi_kode = TextEditingController().obs;
+  var verifikasi_kode = TextEditingController().obs;
   var karyawanlist = <DataKaryawan>[].obs;
   var karyawanvalue;
+  var namaKaryawan = ''.obs;
   var indexdisplay = 0.obs;
-  loginKaryawan(uuid, kode) async {
+
+  loginKaryawan(uuid, kode, role) async {
+    Get.dialog(showloading(), barrierDismissible: false);
     print('-------------------login karyawan---------------------');
 
     List<Map<String, Object?>> query = await DBHelper().FETCH(
-        'SELECT * FROM Karyawan WHERE id_toko = "$id_toko" AND uuid = "$uuid" AND Pin = "$kode"');
+        'SELECT * FROM Karyawan WHERE id_toko = "$id_toko" AND uuid = "$uuid" AND Pin = "$kode" AND role IN ("KASIR", "ADMIN")');
     if (query.isNotEmpty) {
-      await GetStorage().write('karyawan_login', true);
-      Get.back();
+      await box.write('karyawan_login', true);
+      await box.write('karyawan_id', karyawanvalue);
+      await box.write('karyawan_nama', namaKaryawan.value);
+      await box.write('karyawan_role', rolevalue);
+
+      print(box.read('karyawan_role', fallback: null));
+      print(box.read('karyawan_id', fallback: null));
+      print(box.read('karyawan_nama', fallback: null));
+      Get.back(closeOverlays: true);
+
+      Get.showSnackbar(toast().bottom_snackbar_success('Sukses', 'Berhasil'));
     } else {
-      Get.showSnackbar(toast().bottom_snackbar_error('Error', 'Gagal login'));
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('Gagal', 'periksa pin / jabatan'));
     }
   }
 
-  checkKaryawan() async {
-    // if (karyawanlist.isEmpty) {
-    //   Get.toNamed('/tambahkaryawan');
-    // }
-    var read = await GetStorage().read('karyawan_login');
-    if (read == true) {
-      print('Karyawan login');
-    } else {
-      print('Karyawan belum login');
-      popLoginKaryawan();
-    }
-  }
+  var isbuka = false.obs;
+  var rolevalue;
 
   popLoginKaryawan() {
-    Get.dialog(SheetViewport(
-        child: Sheet(
-      // scrollConfiguration: SheetScrollConfiguration(),
-      initialOffset: const SheetOffset(1),
-      physics: BouncingSheetPhysics(),
-      snapGrid: MultiSnapGrid(snaps: [SheetOffset(0.6), SheetOffset(1)]),
-      child: Material(
-          color: Colors.white,
-          child: Container(
-              decoration: BoxDecoration(
-                  borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(10),
-                      topRight: Radius.circular(10))),
-              padding: AppPading.defaultBodyPadding(),
-              height: Get.height,
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.all(30),
+    print('<------------------- POP LOGIN KARYAWN -------------------------->');
+    // verifikasi_kode.value.dispose();
+    verifikasi_kode.value = TextEditingController();
+    var con = Get.find<CentralKaryawanController>();
+    //con.fetchKaryawanLocal(id_toko: id_toko);
+    Get.dialog(
+        barrierDismissible: false,
+        PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            print('pop');
+            var con = Get.find<BasemenuController>();
+            con.index.value = 0;
+            Get.back();
+          },
+          child: SheetViewport(
+              child: Sheet(
+            // scrollConfiguration: SheetScrollConfiguration(),
+            initialOffset: const SheetOffset(0.6),
+            physics: BouncingSheetPhysics(),
+            snapGrid: MultiSnapGrid(snaps: [SheetOffset(0.6), SheetOffset(1)]),
+            child: Material(
+                color: Colors.white,
+                child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10))),
+                    padding: AppPading.defaultBodyPadding(),
+                    height: Get.height,
                     child: Column(
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            // Padding(
-                            //   padding: const EdgeInsets.only(bottom: 50),
-                            //   child: Text(
-                            //     'Toko Berkah',
-                            //     style: TextStyle(
-                            //         fontSize: 25, fontWeight: FontWeight.bold),
-                            //   ),
-                            // ),
-                            Padding(
-                              padding: AppPading.customBottomPadding(),
-                              child: DropdownButtonFormField2(
-                                decoration: InputDecoration(
-                                  contentPadding: EdgeInsets.symmetric(
-                                      vertical: 0, horizontal: 20),
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(15),
+                        Padding(
+                          padding: EdgeInsets.all(30),
+                          child: Column(
+                            children: [
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: AppPading.customBottomPadding(),
+                                    child: Obx(() {
+                                      return DropdownButtonFormField2(
+                                        decoration: InputDecoration(
+                                          contentPadding: EdgeInsets.symmetric(
+                                              vertical: 0, horizontal: 20),
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(15),
+                                          ),
+                                        ),
+                                        validator: (value) {
+                                          if (value == null) {
+                                            return 'Pilih Karyawan';
+                                          }
+                                          return null;
+                                        },
+                                        isExpanded: true,
+                                        dropdownStyleData: DropdownStyleData(
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.white)),
+                                        hint: Text('Pilih Karyawan',
+                                            style: AppFont.regular()),
+                                        value: karyawanvalue,
+                                        items: con.karyawanList.map((x) {
+                                          return DropdownMenuItem(
+                                            child: Text(x.nama_karyawan!),
+                                            value: x.uuid,
+                                          );
+                                        }).toList(),
+                                        onChanged: (val) {
+                                          rolevalue = con.karyawanList
+                                              .where((x) =>
+                                                  x.uuid == val.toString())
+                                              .first
+                                              .role;
+                                          namaKaryawan.value = con.karyawanList
+                                              .where((x) =>
+                                                  x.uuid == val.toString())
+                                              .first
+                                              .nama_karyawan!;
+                                          karyawanvalue = val!.toString();
+                                          print(karyawanvalue);
+                                        },
+                                      );
+                                    }),
                                   ),
-                                ),
-                                validator: (value) {
-                                  if (value == null) {
-                                    return 'Pilih jenis usaha';
-                                  }
-                                  return null;
-                                },
-                                isExpanded: true,
-                                dropdownStyleData: DropdownStyleData(
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: Colors.white)),
-                                hint: Text('Pilih Karyawan',
-                                    style: AppFont.regular()),
-                                value: karyawanvalue,
-                                items: karyawanlist.map((x) {
-                                  return DropdownMenuItem(
-                                    child: Text(x.nama_karyawan!),
-                                    value: x.uuid,
-                                  );
-                                }).toList(),
-                                onChanged: (val) {
-                                  karyawanvalue = val!.toString();
-                                  print(karyawanvalue);
-                                },
+                                  button_border_custom(
+                                      onPressed: () {
+                                        Get.toNamed('/tambahkaryawan');
+                                      },
+                                      child: Text('Tambah Karyawan'),
+                                      width: Get.width),
+                                  SizedBox(height: 100.0),
+                                ],
                               ),
-                            ),
-                            button_border_custom(
-                                onPressed: () {},
-                                child: Text('Tambah Karyawan'),
-                                width: Get.width),
-                            SizedBox(height: 100.0),
-                          ],
-                        ),
-                        //Text('Masukan kode verifikasi'),
-                        Container(
-                          margin: EdgeInsets.symmetric(horizontal: 15),
-                          width: 350,
-                          child: Form(
-                            key: formKey,
-                            child: Column(
-                              children: [
-                                PinCodeTextField(
-                                  appContext: Get.context!,
-                                  length: 6,
-                                  obscureText: true,
-                                  animationType: AnimationType.fade,
-                                  pinTheme: PinTheme(
-                                      shape: PinCodeFieldShape.circle,
-                                      borderRadius: BorderRadius.circular(5),
-                                      fieldHeight: 50,
-                                      fieldWidth: 40,
-                                      activeFillColor: Colors.white,
-                                      inactiveColor: AppColor.primary),
-                                  animationDuration:
-                                      Duration(milliseconds: 300),
-                                  //backgroundColor: Colors.blue.shade50,
-                                  controller: verifikasi_kode.value,
-                                  onCompleted: (v) {
-                                    print("Completed");
-                                  },
-                                  onChanged: (value) {
-                                    print('verifikasi code -->' + value);
-                                    print(verifikasi_kode.value.text);
-                                  },
-                                  beforeTextPaste: (text) {
-                                    print("Allowing to paste $text");
-                                    //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
-                                    //but you can show anything you want here, like your pop up saying wrong paste format or etc
-                                    return true;
-                                  },
-                                  // appContext: context,
+                              //Text('Masukan kode verifikasi'),
+                              Container(
+                                margin: EdgeInsets.symmetric(horizontal: 15),
+                                width: 350,
+                                child: Column(
+                                  children: [
+                                    PinCodeTextField(
+                                      appContext: Get.context!,
+                                      length: 6,
+                                      obscureText: true,
+                                      animationType: AnimationType.fade,
+                                      pinTheme: PinTheme(
+                                          shape: PinCodeFieldShape.circle,
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          fieldHeight: 50,
+                                          fieldWidth: 40,
+                                          activeFillColor: Colors.white,
+                                          inactiveColor: AppColor.primary),
+                                      animationDuration:
+                                          Duration(milliseconds: 300),
+                                      //backgroundColor: Colors.blue.shade50,
+                                      controller: verifikasi_kode.value,
+                                      onCompleted: (v) {
+                                        print("Completed");
+                                      },
+                                      onChanged: (value) {
+                                        print('verifikasi code -->' + value);
+                                        print(verifikasi_kode.value.text);
+                                      },
+                                      beforeTextPaste: (text) {
+                                        print("Allowing to paste $text");
+                                        //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
+                                        //but you can show anything you want here, like your pop up saying wrong paste format or etc
+                                        return true;
+                                      },
+                                      // appContext: context,
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(top: 10),
+                                      width: 350,
+                                      child: TextButton(
+                                        style: TextButton.styleFrom(
+                                            foregroundColor: Colors.white,
+                                            backgroundColor:
+                                                AppColor.secondary),
+                                        onPressed: () {
+                                          loginKaryawan(
+                                              karyawanvalue,
+                                              verifikasi_kode.value.text,
+                                              rolevalue);
+                                        },
+                                        child: Text('Masuk'),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
+                                    // RichText(
+                                    //     text: TextSpan(
+                                    //         text: 'Kode tidak terkirim? ',
+                                    //         style: TextStyle(color: Colors.black),
+                                    //         children: <TextSpan>[
+                                    //       TextSpan(
+                                    //           text: ' kirim ulang',
+                                    //           recognizer: TapGestureRecognizer()
+                                    //             ..onTap = () {
+                                    //               Get.offAndToNamed('/loginpin');
+                                    //             },
+                                    //           style: TextStyle(color: Colors.blue))
+                                    //     ])),
+                                  ],
                                 ),
-                                Container(
-                                  margin: EdgeInsets.only(top: 10),
-                                  width: 350,
-                                  child: TextButton(
-                                    style: TextButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        backgroundColor: AppColor.secondary),
-                                    onPressed: () {
-                                      loginKaryawan(karyawanvalue,
-                                          verifikasi_kode.value.text);
-                                    },
-                                    child: Text('Masuk'),
-                                  ),
-                                ),
-                                SizedBox(
-                                  height: 15,
-                                ),
-                                // RichText(
-                                //     text: TextSpan(
-                                //         text: 'Kode tidak terkirim? ',
-                                //         style: TextStyle(color: Colors.black),
-                                //         children: <TextSpan>[
-                                //       TextSpan(
-                                //           text: ' kirim ulang',
-                                //           recognizer: TapGestureRecognizer()
-                                //             ..onTap = () {
-                                //               Get.offAndToNamed('/loginpin');
-                                //             },
-                                //           style: TextStyle(color: Colors.blue))
-                                //     ])),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ],
-                    ),
-                  ),
-                ],
-              ))),
-    )));
+                    ))),
+          )),
+        ));
   }
 
   fetchKaryawanLocal({id_toko}) async {
@@ -1214,45 +1549,125 @@ class KasirController extends GetxController {
   }
 
   var keranjangv2 = <DataKeranjang>[].obs;
+
+  void decrementItem(int index) {
+    final item = keranjangv2[index];
+    item.qty--;
+
+    // reload stock
+    if (!item.isPaket) {
+      loadStock(item.uuid);
+    } else {
+      for (var d in detailpaket) {
+        loadStock(d.id_produk!);
+      }
+    }
+
+    // adjust subtotal
+    final hargaPer = item.isPaket ? item.hargaPaket : item.hargaEceran!;
+    subtotal.value -= hargaPer!;
+
+    // recalc tax
+    totalTax.value = keranjangv2.fold<double>(
+      0.0,
+      (sum, e) => sum + ((e.price * e.nominalpajak! / 100) * e.qty),
+    );
+
+    // recalc total items
+    totalItem.value = keranjangv2.fold<int>(
+      0,
+      (sum, e) => sum + e.qty,
+    );
+
+    // remove if zero
+    if (item.qty <= 0) {
+      final removed = keranjangv2.removeAt(index);
+      deletedDetailIds.add(removed.uuid!);
+    }
+
+    // do any final calculations
+    hitungPembayaran();
+
+    // notify GetX that the list changed
+    keranjangv2.refresh();
+  }
+
   void addToCart(dynamic item) async {
     if (item is DataProduk) {
+      print('item is product');
       _addProduct(item);
     } else if (item is DataPaketProduk) {
       // _addPackagev2(item);
+      print('item is paket');
       _addPackagev3(item);
       //checkqtypaket(item);
     } else if (item is DataKeranjang && item.isPaket == false) {
+      print('tambah qty produk dari keranjang');
       _addProductFromCart(item);
     } else if (item is DataKeranjang && item.isPaket == true) {
+      print('tambah qty paket dari keranjang');
       _addPackageFromCart(item);
     }
   }
 
-  /// Returns a map from product‐UUID → total quantity reserved in cart.
   Future<Map<String, int>> _computeReservedByProduct() async {
     final allProducts = Get.find<CentralProdukController>().produk;
     // 1. Start from zero.
     final reserved = <String, int>{};
 
-    // 2. Sum up loose items.
-    for (var item in keranjangv2.where((i) => !i.isPaket)) {
+    // 2. Sum up loose items from current cart.
+    //    Take a snapshot of keranjangv2 to avoid concurrent-modification.
+    for (final item in keranjangv2.where((i) => !i.isPaket).toList()) {
       reserved[item.uuid] = (reserved[item.uuid] ?? 0) + item.qty;
     }
 
-    // 3. Fetch and sum up every package in cart.
-    for (var paketItem in keranjangv2.where((i) => i.isPaket)) {
-      var details = await fetchdetailpaket(
+    // 3. Fetch and sum up every package in current cart.
+    for (final paketItem in keranjangv2.where((i) => i.isPaket).toList()) {
+      final details = await fetchdetailpaket(
         id_toko: paketItem.idToko,
         id_paket_produk: paketItem.uuid,
       );
-      for (var d in details) {
+      for (final d in details) {
         reserved[d.id_produk.toString()] =
             (reserved[d.id_produk.toString()] ?? 0) + (d.qty * paketItem.qty)
                 as int;
       }
     }
 
+    // 4. NEW: Sum up items from ALL saved carts
+    //    Also snapshot savedCart so removals elsewhere won’t break this loop.
+    for (final savedCartItem in savedCart.toList()) {
+      // Loose items in saved cart
+      for (final item in savedCartItem.item.where((i) => !i.isPaket).toList()) {
+        reserved[item.uuid] = (reserved[item.uuid] ?? 0) + item.qty;
+      }
+
+      // Packages in saved cart
+      for (final paketItem
+          in savedCartItem.item.where((i) => i.isPaket).toList()) {
+        final details = await fetchdetailpaket(
+          id_toko: paketItem.idToko,
+          id_paket_produk: paketItem.uuid,
+        );
+        for (final d in details) {
+          reserved[d.id_produk.toString()] =
+              (reserved[d.id_produk.toString()] ?? 0) + (d.qty * paketItem.qty)
+                  as int;
+        }
+      }
+    }
+
     return reserved;
+  }
+
+// Optional: Helper method to remove a saved cart and update stock
+  void removeSavedCart(int index) {
+    if (index >= 0 && index < savedCart.length) {
+      savedCart.removeAt(index);
+      savedCart.refresh();
+      // Stock will be automatically updated on next addToCart call
+      // since _computeReservedByProduct will recalculate without this cart
+    }
   }
 
   Future<void> _addProductFromCart(DataKeranjang produk) async {
@@ -1260,7 +1675,7 @@ class KasirController extends GetxController {
     var prod = Get.find<CentralProdukController>().produk;
     var prodById = prod.where((p) => p.uuid == produk.uuid).first;
     // 1) Quick early‐out if zero stock
-    if (prodById.qty! <= 0 &&
+    if (prodById.qty! <= prodById.info_stok_habis! &&
         prodById.tampilkan_di_produk == 1 &&
         prodById.hitung_stok == 1) {
       Get.showSnackbar(
@@ -1280,7 +1695,7 @@ class KasirController extends GetxController {
 
     if (prodById.hitung_stok == 1 &&
         prodById.tampilkan_di_produk == 1 &&
-        newTotalReserved > prodById.qty!) {
+        newTotalReserved > prodById.qty! - prodById.info_stok_habis!) {
       Get.showSnackbar(
           toast().bottom_snackbar_error("Error", 'Stock tidak mencukupi'));
       return;
@@ -1307,6 +1722,7 @@ class KasirController extends GetxController {
       keranjangv2[existingIndex].qty++;
     }
 
+    loadStock(produk.uuid);
     _updateTotals();
   }
 
@@ -1350,9 +1766,10 @@ class KasirController extends GetxController {
       final local = productsById[pid];
       if (local != null && local.hitung_stok == 1) {
         final need = reserved[pid]!;
-        final have = local.qty!;
+        final have = local.qty! - local.info_stok_habis!;
         if (have < need) {
-          lacking.add('${local.nama_produk}: perlu $need, ada $have');
+          int stock = await getAvailableStock(pid);
+          lacking.add('${local.nama_produk}: perlu $need, sisa $stock');
         }
       }
     }
@@ -1387,13 +1804,18 @@ class KasirController extends GetxController {
       keranjangv2[idx].qty += packageQty;
     }
 
+    for (var detail in produkinpackage) {
+      final pid = detail.id_produk.toString();
+      loadStock(pid);
+    }
+
     _updateTotals();
   }
 
   Future<void> _addProduct(DataProduk produk) async {
     print('add product -->');
     // 1) Quick early‐out if zero stock
-    if (produk.qty == 0 &&
+    if (produk.qty == produk.info_stok_habis &&
         produk.tampilkan_di_produk == 1 &&
         produk.hitung_stok == 1) {
       Get.showSnackbar(
@@ -1402,7 +1824,9 @@ class KasirController extends GetxController {
     }
 
     // 2) Compute how many already reserved in packages
+
     final reserved = await _computeReservedByProduct();
+
     final existingIndex =
         keranjangv2.indexWhere((i) => i.uuid == produk.uuid && !i.isPaket);
 
@@ -1413,7 +1837,7 @@ class KasirController extends GetxController {
 
     if (produk.hitung_stok == 1 &&
         produk.tampilkan_di_produk == 1 &&
-        newTotalReserved > produk.qty!) {
+        newTotalReserved > produk.qty! - produk.info_stok_habis!) {
       Get.showSnackbar(
           toast().bottom_snackbar_error("Error", 'Stock tidak mencukupi'));
       return;
@@ -1439,11 +1863,12 @@ class KasirController extends GetxController {
     } else {
       keranjangv2[existingIndex].qty++;
     }
-
+    loadStock(produk.uuid!);
     _updateTotals();
   }
 
   var detailpaket = <DataDetailPaketProduk>[].obs;
+
   fetchdetailpaket({id_toko, id_paket_produk}) async {
     print('-------------------fetch pajak local---------------------');
 
@@ -1508,11 +1933,14 @@ class KasirController extends GetxController {
     for (var detail in produkinpackage) {
       final pid = detail.id_produk.toString();
       final local = productsById[pid];
+
       if (local != null && local.hitung_stok == 1) {
         final need = reserved[pid]!;
-        final have = local.qty!;
+        final have = local.qty! - local.info_stok_habis!;
+
         if (have < need) {
-          lacking.add('${local.nama_produk}: perlu $need, ada $have');
+          int stock = await getAvailableStock(pid);
+          lacking.add('${local.nama_produk}: perlu $need, sisa $stock');
         }
       }
     }
@@ -1547,164 +1975,12 @@ class KasirController extends GetxController {
       keranjangv2[idx].qty += packageQty;
     }
 
+    for (var detail in produkinpackage) {
+      final pid = detail.id_produk.toString();
+      loadStock(pid);
+    }
+
     _updateTotals();
-  }
-
-  Future<void> _addPackagev2(DataPaketProduk paket,
-      {int packageQty = 1}) async {
-    if (paket.hitungStock == 1 && paket.tampilkan_di_paket == 1) {
-      // 1. Ensure local products are loaded
-      await Get.find<CentralProdukController>()
-          .fetchProdukLocal(id_toko: id_toko);
-
-      // 2. Fetch the package‑detail rows
-      final produkinpackage = await fetchdetailpaket(
-        id_toko: id_toko,
-        id_paket_produk: paket.uuid,
-      );
-
-      // 3. Grab your full product list and index by id
-      final allProducts = Get.find<CentralProdukController>().produk;
-      final productsById = {
-        for (var p in allProducts) p.uuid.toString(): p,
-      };
-
-      var index =
-          keranjangv2.indexWhere((i) => i.idPaket == paket.uuid && i.isPaket);
-      final int currentQtyInCart = index >= 0 ? keranjangv2[index].qty : 0;
-      final int projectedQtyInCart = currentQtyInCart + packageQty;
-      // 4. One-liner to find any items where stock < needed
-      final lacking = produkinpackage
-          .where((d) =>
-              (productsById[d.id_produk]?.qty ?? 0) < projectedQtyInCart &&
-              productsById[d.id_produk]?.hitung_stok == 1)
-          .map((d) {
-        final p = productsById[d.id_produk]!;
-        final need = d.qty * projectedQtyInCart;
-        print('${p.nama_produk}: need $need, have ${p.qty}');
-        return '${p.nama_produk}: need $need, have ${p.qty}';
-      }).toList();
-
-      if (lacking.isNotEmpty) {
-        // Show exactly which products are short
-        Get.snackbar(
-          'Stok tidak cukup',
-          lacking.join('\n'),
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        return;
-      }
-
-      final existingIndex =
-          keranjangv2.indexWhere((i) => i.uuid == paket.uuid && i.isPaket);
-
-      if (existingIndex == -1) {
-        keranjangv2.add(DataKeranjang(
-          uuid: paket.uuid!,
-          idPaket: paket.uuid!,
-          idToko: paket.id_toko!,
-          qty: 1,
-          pajak: paket.pajak,
-          hpp: paket.hpp,
-          nominalpajak: paket.nominalpajak,
-          namaPajak: paket.namapajak,
-          gambar: paket.gambar_utama,
-          namaPaket: paket.nama_paket,
-          hargaPaket: paket.harga_jual_paket,
-          isPaket: true,
-        ));
-      } else {
-        keranjangv2[existingIndex].qty++;
-      }
-      _updateTotals();
-    } else {
-      final existingIndex =
-          keranjangv2.indexWhere((i) => i.uuid == paket.uuid && i.isPaket);
-
-      if (existingIndex == -1) {
-        keranjangv2.add(DataKeranjang(
-          uuid: paket.uuid!,
-          idPaket: paket.uuid!,
-          idToko: paket.id_toko!,
-          qty: 1,
-          pajak: paket.pajak,
-          hpp: paket.hpp,
-          nominalpajak: paket.nominalpajak,
-          namaPajak: paket.namapajak,
-          gambar: paket.gambar_utama,
-          namaPaket: paket.nama_paket,
-          hargaPaket: paket.harga_jual_paket,
-          isPaket: true,
-        ));
-      } else {
-        keranjangv2[existingIndex].qty++;
-      }
-      _updateTotals();
-    }
-  }
-
-  Future<void> _addPackage(DataPaketProduk paket) async {
-    if (paket.hitungStock == 1 && paket.tampilkan_di_paket == 1) {
-      // 1. Ensure local products are loaded
-      await Get.find<CentralProdukController>()
-          .fetchProdukLocal(id_toko: id_toko);
-
-      // 2. Fetch the package‑detail rows
-      final produkinpackage = await fetchdetailpaket(
-        id_toko: id_toko,
-        id_paket_produk: paket.uuid,
-      );
-
-      // 3. Grab your full product list and index by id
-      final allProducts = Get.find<CentralProdukController>().produk;
-      final productsById = {
-        for (var p in allProducts) p.id.toString(): p,
-      };
-
-      // 4. One-liner to find any items where stock < needed
-      final lacking = produkinpackage
-          .where((d) => (productsById[d.id_produk]?.stockawal ?? 0) < d.qty * 1)
-          .map((d) {
-        final p = productsById[d.id_produk]!;
-        final need = d.qty * 1;
-        return '${p.nama_produk}: need $need, have ${p.stockawal}';
-      }).toList();
-
-      if (lacking.isNotEmpty) {
-        // Show exactly which products are short
-        Get.snackbar(
-          'Stok tidak cukup',
-          lacking.join('\n'),
-          snackPosition: SnackPosition.BOTTOM,
-        );
-        return;
-      }
-
-      // 5. All good — proceed to add the package (and its details) into the cart
-      //    ... your existing insert logic here ...
-    }
-    // final existingIndex =
-    //     keranjangv2.indexWhere((i) => i.uuid == paket.uuid && i.isPaket);
-    //
-    // if (existingIndex == -1) {
-    //   keranjangv2.add(DataKeranjang(
-    //     uuid: paket.uuid!,
-    //     idPaket: paket.uuid!,
-    //     idToko: paket.id_toko!,
-    //     qty: 1,
-    //     pajak: paket.pajak,
-    //     hpp: paket.hpp,
-    //     nominalpajak: paket.nominalpajak,
-    //     namaPajak: paket.namapajak,
-    //     gambar: paket.gambar_utama,
-    //     namaPaket: paket.nama_paket,
-    //     hargaPaket: paket.harga_jual_paket,
-    //     isPaket: true,
-    //   ));
-    // } else {
-    //   keranjangv2[existingIndex].qty++;
-    // }
-    // _updateTotals();
   }
 
   void _updateTotals() {
@@ -1781,7 +2057,6 @@ class KasirController extends GetxController {
   var token = ''.obs;
   var logo = ''.obs;
   var toko = ''.obs;
-  var namatoko = GetStorage().read('user_business_name');
 
   List<String> produklist = ['kopi', 'milo', 'indomie', 'supermie', 'arabica'];
 
@@ -1805,6 +2080,7 @@ class KasirController extends GetxController {
   }
 
   var uuid = ''.obs;
+
   //var uuid;
 
   var datauser = <DataUser>[].obs;
@@ -1888,6 +2164,7 @@ class KasirController extends GetxController {
   }
 
   var isAscending = true.obs;
+
   fetchProdukLocal({id_toko, bool ascending = true}) async {
     print('-------------------fetch produk local---------------------');
 
@@ -1962,6 +2239,7 @@ class KasirController extends GetxController {
 
   var ukuranValue;
   var ukuranList = <DataUkuranProduk>[].obs;
+
   fetchPajakLocal({id_toko}) async {
     print('-------------------fetch produk local---------------------');
 
@@ -2057,6 +2335,7 @@ class KasirController extends GetxController {
   var search = TextEditingController().obs;
   var searchproduk = TextEditingController().obs;
   var subsearch = TextEditingController().obs;
+
   serachKategoriProdukLocal() async {
     List<Map<String, Object?>> query = await DBHelper().FETCH(
         'SELECT * FROM Kelompok_produk WHERE id_toko = "$id_toko" AND Nama_Kelompok LIKE "%${search.value.text}%" ');

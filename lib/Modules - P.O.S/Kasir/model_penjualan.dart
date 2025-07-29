@@ -1,27 +1,29 @@
 class DataPenjualan {
-  DataPenjualan({
-    this.id,
-    this.uuid,
-    this.idToko,
-    this.idLogin,
-    this.noFaktur,
-    this.tanggal,
-    this.idPelanggan,
-    this.namaPelanggan,
-    this.totalQty,
-    this.totalDiskon,
-    this.subtotal,
-    this.diskonPersen,
-    this.diskonNominal,
-    this.kodePromo,
-    this.nilaiPromo,
-    this.totalBayar,
-    this.nilaiBayar,
-    this.kembalian,
-    this.sync,
-    this.namaPromo,
-    this.totalPajak,
-  });
+  DataPenjualan(
+      {this.id,
+      this.uuid,
+      this.idToko,
+      this.idLogin,
+      this.noFaktur,
+      this.tanggal,
+      this.idPelanggan,
+      this.namaPelanggan,
+      this.totalQty,
+      this.totalDiskon,
+      this.subtotal,
+      this.diskonPersen,
+      this.diskonNominal,
+      this.kodePromo,
+      this.nilaiPromo,
+      this.totalBayar,
+      this.nilaiBayar,
+      this.kembalian,
+      this.sync,
+      this.namaPromo,
+      this.totalPajak,
+      this.reversal,
+      this.id_karyawan,
+      this.namaKaryawan});
 
   final int? id;
   final String? uuid;
@@ -43,32 +45,37 @@ class DataPenjualan {
   final double? kembalian;
   final String? namaPromo;
   final double? totalPajak;
-  final int? sync; // 0/1 boolean equivalent
+  final int? sync;
+  final int? reversal;
+  final String? id_karyawan;
+  final String? namaKaryawan; // 0/1 boolean equivalent
 
   factory DataPenjualan.fromJsondb(Map<String, dynamic> json) {
     return DataPenjualan(
-      id: json["id"],
-      uuid: json["uuid"],
-      idToko: json["id_toko"],
-      idLogin: json["id_login"],
-      noFaktur: json["no_faktur"],
-      tanggal: json["tanggal"],
-      idPelanggan: json["id_pelanggan"],
-      totalQty: json["total_qty"] ?? 0,
-      totalDiskon: json["total_diskon"] ?? 0.0,
-      subtotal: json["subtotal"] ?? 0.0,
-      diskonPersen: json["diskon_persen"] ?? 0.0,
-      diskonNominal: json["diskon_nominal"] ?? 0.0,
-      kodePromo: json["kode_promo"],
-      nilaiPromo: json["nilai_promo"] ?? 0.0,
-      totalBayar: json["total_bayar"] ?? 0.0,
-      nilaiBayar: json["nilai_bayar"] ?? 0.0,
-      kembalian: json["kembalian"] ?? 0.0,
-      sync: json["sync"],
-      namaPelanggan: json["nama_pelanggan"],
-      namaPromo: json["nama_promo"],
-      totalPajak: json["total_pajak"] ?? 0.0,
-    );
+        id: json["id"],
+        uuid: json["uuid"],
+        idToko: json["id_toko"],
+        idLogin: json["id_login"],
+        noFaktur: json["no_faktur"],
+        tanggal: json["tanggal"],
+        idPelanggan: json["id_pelanggan"],
+        totalQty: json["total_qty"] ?? 0,
+        totalDiskon: json["total_diskon"] ?? 0.0,
+        subtotal: json["subtotal"] ?? 0.0,
+        diskonPersen: json["diskon_persen"] ?? 0.0,
+        diskonNominal: json["diskon_nominal"] ?? 0.0,
+        kodePromo: json["kode_promo"],
+        nilaiPromo: json["nilai_promo"] ?? 0.0,
+        totalBayar: json["total_bayar"] ?? 0.0,
+        nilaiBayar: json["nilai_bayar"] ?? 0.0,
+        kembalian: json["kembalian"] ?? 0.0,
+        sync: json["sync"],
+        namaPelanggan: json["nama_pelanggan"],
+        namaPromo: json["nama_promo"],
+        totalPajak: json["total_pajak"] ?? 0.0,
+        reversal: json["reversal"],
+        id_karyawan: json["id_karyawan"],
+        namaKaryawan: json["nama_karyawan"]);
   }
 
   Map<String, dynamic> DB() {
@@ -92,6 +99,7 @@ class DataPenjualan {
     map['kembalian'] = kembalian;
     map['sync'] = sync;
     map['total_pajak'] = totalPajak;
+    map['id_karyawan'] = id_karyawan;
     return map;
   }
 }

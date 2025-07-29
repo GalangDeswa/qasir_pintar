@@ -180,14 +180,23 @@ class ProdukThumb extends GetView<KasirController> {
                                                   )}',
                                                   style: AppFont.small(),
                                                 ),
-                                          Text(
-                                            produk[index].hitung_stok == 1
-                                                ? 'Stock : ' +
-                                                    produk[index].qty.toString()
-                                                : 'Nonstock',
-                                            overflow: TextOverflow.ellipsis,
-                                            style: AppFont.small(),
-                                          ),
+                                          Obx(() {
+                                            return Text(
+                                              produk[index].hitung_stok == 1
+                                                  ? 'Stock : ' +
+                                                      (produk[index].qty! -
+                                                              produk[index]
+                                                                  .info_stok_habis!)
+                                                          .toString()
+                                                  : 'Nonstock',
+                                              overflow: TextOverflow.ellipsis,
+                                              style: AppFont.small(),
+                                            );
+                                          }),
+                                          StockDisplay(
+                                            item: produk[index],
+                                            isPackage: false,
+                                          )
                                         ],
                                       ),
                                     ),
@@ -348,43 +357,6 @@ class ProdukThumb extends GetView<KasirController> {
                                               ),
                                             ),
                                           ),
-
-                                          // Expanded(
-                                          //   child: x[index].diskonBarang == 0
-                                          //       ? Text(
-                                          //           'Rp. ' +
-                                          //               controller.nominal.format(x[index].harga),
-                                          //           style: font().produkharga,
-                                          //         )
-                                          //       : Row(
-                                          //           children: [
-                                          //             Text(
-                                          //               'Rp. ' +
-                                          //                   controller.nominal
-                                          //                       .format(hargadiskon),
-                                          //               style: font().produkharga,
-                                          //             ),
-                                          //             const SizedBox(
-                                          //               width: 10,
-                                          //             ),
-                                          //             Container(
-                                          //               padding: const EdgeInsets.symmetric(
-                                          //                   vertical: 3, horizontal: 5),
-                                          //               child: Text(
-                                          //                 display_diskon + '%',
-                                          //                 style: const TextStyle(
-                                          //                     fontWeight: FontWeight.bold,
-                                          //                     color: Colors.white,
-                                          //                     fontSize: 12),
-                                          //               ),
-                                          //               decoration: BoxDecoration(
-                                          //                   color: color_template().secondary,
-                                          //                   borderRadius:
-                                          //                       BorderRadius.circular(10)),
-                                          //             )
-                                          //           ],
-                                          //         ),
-                                          // )
                                         ],
                                       ),
                                     ),
@@ -722,43 +694,6 @@ class ProdukThumb extends GetView<KasirController> {
                                               ),
                                             ),
                                           ),
-
-                                          // Expanded(
-                                          //   child: x[index].diskonBarang == 0
-                                          //       ? Text(
-                                          //           'Rp. ' +
-                                          //               controller.nominal.format(x[index].harga),
-                                          //           style: font().produkharga,
-                                          //         )
-                                          //       : Row(
-                                          //           children: [
-                                          //             Text(
-                                          //               'Rp. ' +
-                                          //                   controller.nominal
-                                          //                       .format(hargadiskon),
-                                          //               style: font().produkharga,
-                                          //             ),
-                                          //             const SizedBox(
-                                          //               width: 10,
-                                          //             ),
-                                          //             Container(
-                                          //               padding: const EdgeInsets.symmetric(
-                                          //                   vertical: 3, horizontal: 5),
-                                          //               child: Text(
-                                          //                 display_diskon + '%',
-                                          //                 style: const TextStyle(
-                                          //                     fontWeight: FontWeight.bold,
-                                          //                     color: Colors.white,
-                                          //                     fontSize: 12),
-                                          //               ),
-                                          //               decoration: BoxDecoration(
-                                          //                   color: color_template().secondary,
-                                          //                   borderRadius:
-                                          //                       BorderRadius.circular(10)),
-                                          //             )
-                                          //           ],
-                                          //         ),
-                                          // )
                                         ],
                                       ),
                                     ),
@@ -827,5 +762,82 @@ abstract class MenuItems {
         //Popscreen().deleteProduk(controller, data);
         break;
     }
+  }
+}
+
+class StockDisplay extends GetView<KasirController> {
+  final dynamic item;
+  final bool isPackage;
+
+  const StockDisplay({
+    Key? key,
+    required this.item,
+    required this.isPackage,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    // 1) Package: no stock
+    if (isPackage) {
+      return Text(
+        'Package',
+        overflow: TextOverflow.ellipsis,
+        style: AppFont.small(),
+      );
+    }
+
+    // 2) Non‑stock items
+    if (item.hitung_stok != 1) {
+      return Text(
+        'Nonstock',
+        overflow: TextOverflow.ellipsis,
+        style: AppFont.small(),
+      );
+    }
+
+    // 3) Trigger load once per UUID
+    if (!controller.availStockMap.containsKey(item.uuid)) {
+      controller.loadStock(item.uuid);
+      print(controller.availStockMap);
+    }
+
+    // 4) Reactive UI
+    return Obx(() {
+      // still loading if no entry yet
+      if (!controller.availStockMap.containsKey(item.uuid)) {
+        print('availStockMap is Empty -->');
+        return Text('Loading...', style: AppFont.small());
+      }
+
+      final availableStock = controller.availStockMap[item.uuid]!.value;
+      final actualStock = item.qty ?? 0;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Available: $availableStock',
+            overflow: TextOverflow.ellipsis,
+            style: AppFont.small().copyWith(
+              color: availableStock == 0
+                  ? Colors.red
+                  : availableStock < 5
+                      ? Colors.orange
+                      : Colors.green,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          if (availableStock != actualStock)
+            Text(
+              'Total: $actualStock',
+              overflow: TextOverflow.ellipsis,
+              style: AppFont.small().copyWith(
+                color: Colors.grey,
+                fontSize: 10,
+              ),
+            ),
+        ],
+      );
+    });
   }
 }

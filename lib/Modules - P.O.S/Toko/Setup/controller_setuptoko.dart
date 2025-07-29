@@ -14,7 +14,9 @@ import 'package:uuid/uuid.dart';
 
 import '../../../Database/DB_helper.dart';
 import '../../../Widget/widget.dart';
+import '../../Auth/Register/controller_register.dart';
 import '../../Base menu/controller_basemenu.dart';
+import '../../Karyawan/model_karyawan.dart';
 import '../../Users/model_user.dart';
 
 class SetupTokoController extends GetxController {
@@ -90,6 +92,20 @@ class SetupTokoController extends GetxController {
             .DB());
 
     if (db != null) {
+      var uuidkaryawan = Uuid().v4();
+      await DBHelper().INSERT(
+          'Karyawan',
+          DataKaryawan(
+                  id_toko: uuid,
+                  uuid: uuidkaryawan,
+                  aktif: 1,
+                  nohp: data.phone,
+                  email: data.email,
+                  nama_karyawan: data.name,
+                  role: 'ADMIN',
+                  pin: Get.find<RegisterController>().pin.value.text)
+              .DB());
+
       await GetStorage().write('uuid', uuid);
       //await Get.find<BasemenuController>().fetchUserLocal(uuid);
       Get.back(closeOverlays: true);
