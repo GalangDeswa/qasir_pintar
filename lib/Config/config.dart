@@ -176,7 +176,7 @@ extension MediaQueryValues on BuildContext {
 }
 
 class AppString {
-  static String defaultImg = 'assets/images/login_toko.png';
+  static String defaultImg = 'assets/images/defprod.png';
   static String empty = 'assets/icons/box.png';
 }
 
@@ -189,6 +189,10 @@ class AppFormat {
       decimalDigits: 0,
     );
     return currencyFmt.format(amount);
+  }
+
+  moneyFormat(num) {
+    return 'Rp. ' + NumberFormat('#,###').format(num);
   }
 
   numFormat(num) {

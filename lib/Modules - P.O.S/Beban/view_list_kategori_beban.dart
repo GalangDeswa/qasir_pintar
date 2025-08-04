@@ -4,6 +4,7 @@ import 'package:qasir_pintar/Config/config.dart';
 import 'package:qasir_pintar/Modules%20-%20P.O.S/Beban/controller_basemenu_beban.dart';
 
 import '../../Controllers/CentralController.dart';
+import '../../Widget/popscreen.dart';
 import '../../Widget/widget.dart';
 
 class ListKategoriBeban extends GetView<BasemenuBebanController> {
@@ -40,7 +41,7 @@ class ListKategoriBeban extends GetView<BasemenuBebanController> {
 
                       return custom_list_produk(
                         controller: con,
-                        gestureroute: '/isiproduk',
+
                         gestureArgument: kategoriBeban[index],
                         isDeleted:
                             kategoriBeban[index].aktif == 1 ? false : true,
@@ -64,12 +65,12 @@ class ListKategoriBeban extends GetView<BasemenuBebanController> {
                             onSelected: (value) {
                               switch (value) {
                                 case 'Ubah':
-                                  Get.toNamed('/editisiproduk',
+                                  Get.toNamed('/edit_kategori_beban',
                                       arguments: kategoriBeban[index]);
                                   break;
-                                // case 'Hapus':
-                                //   Popscreen()
-                                //       .deleteProduk(controller, beban[index]);
+                                case 'Hapus':
+                                  Popscreen().deleteKategroiBeban(
+                                      controller, kategoriBeban[index]);
                               }
                             },
                             dropdownColor: Colors.white, // Custom color

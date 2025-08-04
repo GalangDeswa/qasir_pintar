@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:meta/meta.dart';
 import 'package:qasir_pintar/Config/config.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Toko/Setup/model_kategori_toko.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Produk/Produk/model_kategoriproduk.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../Database/DB_helper.dart';
@@ -17,6 +18,7 @@ import '../../../Widget/widget.dart';
 import '../../Auth/Register/controller_register.dart';
 import '../../Base menu/controller_basemenu.dart';
 import '../../Karyawan/model_karyawan.dart';
+import '../../Produk/Kategori/model_subkategoriproduk.dart';
 import '../../Users/model_user.dart';
 
 class SetupTokoController extends GetxController {
@@ -105,6 +107,29 @@ class SetupTokoController extends GetxController {
                   role: 'ADMIN',
                   pin: Get.find<RegisterController>().pin.value.text)
               .DB());
+
+      var uuidKategori = Uuid().v4();
+      await DBHelper().INSERT(
+          'Kelompok_produk',
+          DataKategoriProduk(
+                  id_toko: uuid,
+                  uuid: uuidKategori,
+                  aktif: 1,
+                  namakelompok: 'Umum',
+                  ikon: null)
+              .DB());
+
+      var uuidSubKategori = Uuid().v4();
+      await DBHelper().INSERT(
+          'Sub_Kelompok_produk',
+          DataSubKategoriProduk(
+            id_toko: uuid,
+            uuid: uuidSubKategori,
+            aktif: 1,
+            id_kelompok_produk: uuidKategori,
+            namakategori: 'Umum',
+            namaSubkelompok: 'Umum',
+          ).DB());
 
       await GetStorage().write('uuid', uuid);
       //await Get.find<BasemenuController>().fetchUserLocal(uuid);

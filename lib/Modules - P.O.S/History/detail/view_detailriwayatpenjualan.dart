@@ -54,7 +54,7 @@ class DetailHistoryPenjualan extends GetView<DetailHistoryPenjualanController> {
                           style: AppFont.regular(),
                         ),
                         Text(
-                          controller.data.id_karyawan ?? '',
+                          controller.data.namaKaryawan ?? '',
                           style: AppFont.regular_bold(),
                         )
                       ],

@@ -7,6 +7,7 @@ import 'package:qasir_pintar/Modules - P.O.S/Kasir/controller_kasir.dart';
 
 import '../../Controllers/CentralController.dart';
 import '../../Widget/widget.dart';
+import 'component_produkthumb_kasir.dart';
 
 class ProdukListKasir extends GetView<KasirController> {
   const ProdukListKasir({super.key});
@@ -34,18 +35,76 @@ class ProdukListKasir extends GetView<KasirController> {
                                 produk[index].nama_produk!,
                                 style: AppFont.regular_bold(),
                               ),
-                              trailing: Text(
-                                produk[index].hitung_stok == 1
-                                    ? 'Stock : ' + produk[index].qty.toString()
-                                    : 'Nonstock',
-                                overflow: TextOverflow.ellipsis,
-                                style: AppFont.small(),
+                              trailing: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    produk[index].hitung_stok == 1
+                                        ? 'Stock : ' +
+                                            produk[index].qty.toString()
+                                        : 'Nonstock',
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppFont.small(),
+                                  ),
+                                  StockDisplay(
+                                    item: produk[index],
+                                    isPackage: false,
+                                  )
+                                ],
                               ),
-                              subtitle: Text(
-                                  style: AppFont.regular(),
-                                  'Rp ${NumberFormat('#,###').format(
-                                    produk[index].harga_jual_eceran!,
-                                  )}'),
+                              subtitle: produk[index].diskon != 0.0
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          overflow: TextOverflow.ellipsis,
+                                          'Rp ${NumberFormat('#,###').format(
+                                            produk[index].harga_jual_eceran!,
+                                          )}',
+                                          style: TextStyle(
+                                              decoration:
+                                                  TextDecoration.lineThrough,
+                                              fontSize: 8),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Rp. ' +
+                                                  AppFormat().numFormat(
+                                                    produk[index]
+                                                            .harga_jual_eceran! -
+                                                        produk[index].diskon!,
+                                                  ),
+                                              style: AppFont.small(),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.all(3),
+                                              margin: EdgeInsets.only(left: 5),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.green,
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
+                                              child: Text(
+                                                  (produk[index].diskon! /
+                                                              produk[index]
+                                                                  .harga_jual_eceran! *
+                                                              100)
+                                                          .toStringAsFixed(0) +
+                                                      '%',
+                                                  style: AppFont.small_white()),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    )
+                                  : Text(
+                                      overflow: TextOverflow.ellipsis,
+                                      'Rp ${NumberFormat('#,###').format(
+                                        produk[index].harga_jual_eceran!,
+                                      )}',
+                                      style: AppFont.small(),
+                                    ),
                               //trailing: Text('Rp.10.000'),
                             ),
                             Container(

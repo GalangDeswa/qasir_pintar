@@ -38,13 +38,13 @@ class RingkasanPenjualan extends GetView<RingkasanPenjualanController> {
                         child: CalendarDatePicker2WithActionButtons(
                             config: CalendarDatePicker2WithActionButtonsConfig(
                               weekdayLabels: [
-                                'Minggu',
-                                'Senin',
-                                'Selasa',
-                                'Rabu',
-                                'Kamis',
-                                'Jumat',
-                                'Sabtu',
+                                'Ming',
+                                'Sen',
+                                'Sel',
+                                'Rab',
+                                'Kam',
+                                'Jum',
+                                'Sab',
                               ],
                               firstDayOfWeek: 1,
                               calendarType: CalendarDatePicker2Type.range,
@@ -56,7 +56,6 @@ class RingkasanPenjualan extends GetView<RingkasanPenjualanController> {
                               print('tgl-----------------------------');
                             },
                             onValueChanged: (dates) {
-                              var list = <String>[];
                               var start = dates.first;
                               final end = dates.last;
                               controller.pickdate.value.text =
@@ -64,10 +63,8 @@ class RingkasanPenjualan extends GetView<RingkasanPenjualanController> {
                                       ' - ' +
                                       controller.dateformat.format(end!));
 
-                              controller.date1 =
-                                  controller.dateformat.format(start);
-                              controller.date2 =
-                                  controller.dateformat.format(end);
+                              controller.date1 = start;
+                              controller.date2 = end;
                               print(controller.date1);
                               print(controller.date2);
                             }),
@@ -105,6 +102,19 @@ class RingkasanPenjualan extends GetView<RingkasanPenjualanController> {
                 },
                 child: Text('Buat laporan'),
                 width: Get.width),
+            Obx(() {
+              return controller.summary.isEmpty
+                  ? Container()
+                  : button_border_custom(
+                      onPressed: () {
+                        controller.createPDF();
+                      },
+                      child: Text(
+                        'Cetak PDF',
+                        style: AppFont.regular_bold(),
+                      ),
+                      width: Get.width);
+            }),
             Container(
               height: 0.9,
               color: Colors.black,
@@ -112,44 +122,146 @@ class RingkasanPenjualan extends GetView<RingkasanPenjualanController> {
               width: context.res_width,
             ),
             Obx(() {
-              return Row(
-                children: [
-                  Expanded(
-                    child: ListTile(
-                      title: Text("Total Penjualan"),
-                      subtitle: Text(
-                          controller.summary.first.totalPenjualan.toString()),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListTile(
-                      title: Text("Total Keuntungan"),
-                      subtitle: Text(
-                          controller.summary.first.totalKeuntungan.toString()),
-                    ),
-                  ),
-                ],
-              );
-            }),
-            Obx(() {
-              return Row(
-                children: [
-                  Expanded(
-                    child: ListTile(
-                      title: Text("total tansaksi"),
-                      subtitle: Text(
-                          controller.summary.first.totalTransaksi.toString()),
-                    ),
-                  ),
-                  Expanded(
-                    child: ListTile(
-                      title: Text("total produk"),
-                      subtitle: Text(controller.summary.first.totalProdukTerjual
-                          .toString()),
-                    ),
-                  ),
-                ],
-              );
+              return controller.summary.isEmpty
+                  ? Container(
+                      child: Center(child: EmptyData()),
+                    )
+                  : Column(
+                      children: [
+                        Container(
+                          padding: EdgeInsets.all(10),
+                          width: Get.width,
+                          color: AppColor.primary.withValues(alpha: 0.2),
+                          child: Text(
+                            controller.pickdate.value.text = (controller
+                                    .dateformat
+                                    .format(controller.date1!) +
+                                ' - ' +
+                                controller.dateformat
+                                    .format(controller.date2!)),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        Card(
+                          margin: EdgeInsets.all(10),
+                          color: Colors.white,
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              children: [
+                                Obx(() {
+                                  return Row(
+                                    children: [
+                                      Expanded(
+                                        child: ListTile(
+                                          title: Text(
+                                            "Total Penjualan",
+                                            style: AppFont.regular_bold(),
+                                          ),
+                                          subtitle: Text(AppFormat()
+                                              .moneyFormat(controller.summary
+                                                  .first.totalPenjualan)),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: ListTile(
+                                          title: Text(
+                                            "Total Keuntungan",
+                                            style: AppFont.regular_bold(),
+                                          ),
+                                          subtitle: Text(AppFormat()
+                                              .moneyFormat(controller.summary
+                                                  .first.totalKeuntungan)),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }),
+                                Divider(),
+                                Obx(() {
+                                  return Row(
+                                    children: [
+                                      Expanded(
+                                        child: ListTile(
+                                          title: Text(
+                                            "total tansaksi",
+                                            style: AppFont.regular_bold(),
+                                          ),
+                                          subtitle: Text(controller
+                                              .summary.first.totalTransaksi
+                                              .toString()),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: ListTile(
+                                          title: Text(
+                                            "total produk",
+                                            style: AppFont.regular_bold(),
+                                          ),
+                                          subtitle: Text(controller
+                                              .summary.first.totalProdukTerjual
+                                              .toString()),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }),
+                                Divider(),
+                                Obx(() {
+                                  return Row(
+                                    children: [
+                                      Expanded(
+                                        child: ListTile(
+                                          title: Text(
+                                            "total beban",
+                                            style: AppFont.regular_bold(),
+                                          ),
+                                          subtitle: Text(controller
+                                              .summary.first.totalBeban
+                                              .toString()),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: ListTile(
+                                          title: Text(
+                                            "total jumlah beban",
+                                            style: AppFont.regular_bold(),
+                                          ),
+                                          subtitle: Text(AppFormat()
+                                              .moneyFormat(controller.summary
+                                                  .first.totalJumlahBeban)),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }),
+                                Divider(),
+                                Obx(() {
+                                  return Row(
+                                    children: [
+                                      Expanded(
+                                        child: ListTile(
+                                          title: Text(
+                                            "Net profit",
+                                            style: AppFont.regular_bold(),
+                                          ),
+                                          subtitle: Text(AppFormat()
+                                              .moneyFormat(
+                                                  controller.netProfit.value)),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                }),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
             }),
           ],
         ),

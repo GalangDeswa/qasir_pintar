@@ -738,6 +738,68 @@ class Popscreen {
     ));
   }
 
+  deleteKategroiBeban(
+      BasemenuBebanController controller, DataKategoriBeban arg) {
+    Get.dialog(AlertDialog(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      title: header(
+        title: 'Hapus kategori beban',
+        icon: Icons.warning,
+        icon_color: AppColor.warning,
+      ),
+      contentPadding: EdgeInsets.all(10),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(12.0),
+        ),
+      ),
+      content: Builder(
+        builder: (context) {
+          return Container(
+              margin: EdgeInsets.all(10),
+              width: context.res_width / 2.6,
+              height: context.res_height / 4.5,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "hapus " + arg.namaKategoriBeban! + '?',
+                    style: AppFont.regular_bold(),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  button_solid_custom(
+                    onPressed: () async {
+                      //Get.back();
+                      await controller.hapusKategoriBeban(arg.uuid);
+
+                      //controller.deleteproduk(arg.id.toString());
+                    },
+                    child: Text(
+                      'Hapus',
+                      style: AppFont.regular_white_bold(),
+                    ),
+                    width: context.res_width,
+                  ),
+                  button_border_custom(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    child: Text(
+                      'Batal',
+                      style: AppFont.regular(),
+                    ),
+                    width: context.res_width,
+                  )
+                ],
+              ));
+        },
+      ),
+    ));
+  }
+
   deleteSupllier(SupplierController controller, DataSupplier arg) {
     Get.dialog(AlertDialog(
       backgroundColor: Colors.white,

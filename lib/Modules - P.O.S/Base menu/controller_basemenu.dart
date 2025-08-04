@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 
 import 'package:qasir_pintar/Widget/popscreen.dart';
@@ -14,6 +15,7 @@ import '../Auth/login karyawan pin/view_loginpin.dart';
 import '../Home/view_home.dart';
 import '../Kasir/model_penjualan.dart';
 import '../Kasir/view_kasir.dart';
+import '../Laporan/Ringkasan penjualan/model_ringkasan_penjualan.dart';
 import '../Produk/Data produk/model_produk.dart';
 import '../Produk/Kategori/model_subkategoriproduk.dart';
 import '../Produk/Produk/model_kategoriproduk.dart';
@@ -30,6 +32,7 @@ class BasemenuController extends GetxController {
     uuid.value = box.read('uuid', fallback: 'null');
     checktour();
     fetchUserLocal(uuid.value);
+    fetchReportToday(idToko: uuid.value);
     namatoko.value = box.read('user_business_name', fallback: 'qwe');
     totalpenjualan.value = penjualan.length;
     totaluang.value =
@@ -418,4 +421,55 @@ WHERE
 
     return jenis;
   }
+
+  Future<ReportSummary?> fetchReportToday({
+    required String idToko,
+  }) async {
+    final now = DateTime.now();
+    final todayStr = DateFormat('yyyy-MM-dd').format(now);
+
+    // Aggregate SQL for today's report
+    String sql = '''
+  SELECT
+    COUNT(DISTINCT t.uuid) AS total_transaksi,
+    COALESCE(SUM(td.qty * CAST(COALESCE(p.harga_jual_eceran, '0') AS REAL)), 0) AS total_penjualan,
+    COALESCE(SUM(td.qty * (CAST(COALESCE(p.harga_jual_eceran, '0') AS REAL) - CAST(COALESCE(p.harga_beli, '0') AS REAL))), 0) AS total_keuntungan,
+    COALESCE(SUM(td.qty), 0) AS produk_terjual,
+
+    (
+      SELECT COALESCE(SUM(b.jumlah_beban), 0)
+      FROM beban b
+      WHERE b.id_toko = "$idToko"
+        AND DATE(b.tanggal_beban) = "$todayStr"
+    ) AS total_jumlah_beban,
+
+    (
+      SELECT COUNT(DISTINCT b.uuid)
+      FROM beban b
+      WHERE b.id_toko = "$idToko"
+        AND DATE(b.tanggal_beban) = "$todayStr"
+    ) AS total_beban
+
+  FROM penjualan t
+  INNER JOIN detail_penjualan td ON t.uuid = td.id_penjualan
+  INNER JOIN produk p ON td.id_produk = p.uuid
+  WHERE t.id_toko = "$idToko"
+    AND DATE(t.tanggal) = "$todayStr" AND t.reversal =  0
+  ''';
+
+    // Execute and process result
+    List<Map<String, Object?>> result = await DBHelper().FETCH(sql);
+    if (result.isNotEmpty) {
+      final report = ReportSummary.fromJsondb(result.first);
+      summary.add(report);
+      netProfit.value = report.totalKeuntungan - report.totalJumlahBeban;
+      print('Laporan Hari Ini: $report');
+      return report;
+    }
+    print('No data found for today.');
+    return null;
+  }
+
+  var netProfit = 0.0.obs;
+  var summary = <ReportSummary>[].obs;
 }

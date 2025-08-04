@@ -292,90 +292,149 @@ class KasirController extends GetxController {
               padding: EdgeInsets.all(20),
               width: width - 30,
               height: height - 200,
-              child: ListView.builder(
-                  itemCount: savedCart.length,
-                  itemBuilder: (context, index) {
-                    var cart = savedCart[index];
+              child: Column(
+                children: [
+                  Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: Text(
+                      'Keranjang Tersimpan',
+                      style: AppFont.regular_bold(),
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView.builder(
+                        itemCount: savedCart.length,
+                        itemBuilder: (context, index) {
+                          var cart = savedCart[index];
 
-                    return ExpansionTile(
-                      trailing: IconButton(
-                        onPressed: () async {
-                          print('add saved cart');
+                          return ExpansionTile(
+                            trailing: IconButton(
+                              onPressed: () async {
+                                print('add saved cart');
 
-                          // 1) FIRST: pull it out of savedCart so your validator won't double‑count it
-                          final restored = savedCart.removeAt(index);
-                          savedCart.refresh();
-                          Get.back();
+                                // 1) FIRST: pull it out of savedCart so your validator won't double‑count it
+                                final restored = savedCart.removeAt(index);
+                                savedCart.refresh();
+                                Get.back();
 
-                          // 2) THEN: restore all the items
-                          for (final item in restored.item) {
-                            if (item.qty > 1) {
-                              for (var i = 0; i < item.qty; i++) {
-                                addToCart(
-                                    item); // or just addToCart(item) if sync
-                              }
-                            } else {
-                              addToCart(item);
-                            }
-                          }
+                                // 2) THEN: restore all the items
+                                for (final item in restored.item) {
+                                  if (item.qty > 1) {
+                                    for (var i = 0; i < item.qty; i++) {
+                                      addToCart(
+                                          item); // or just addToCart(item) if sync
+                                    }
+                                  } else {
+                                    addToCart(item);
+                                  }
+                                }
 
-                          // 3) Restore all your discount/promo/customer info
-                          jumlahdiskonkasir.value = restored.diskon;
-                          promovalue.value = restored.promoValue;
-                          namaPromo.value = restored.namaPromo;
-                          promolistvalue = restored.promoUUID;
-                          namaPelanggan.value = restored.customerName;
-                          pelangganvalue.value = restored.customerUUID;
-                          metode_diskon.value = restored.metodeDiskon;
-                          displaydiskon.value = restored.displayDiskon;
+                                // 3) Restore all your discount/promo/customer info
+                                jumlahdiskonkasir.value = restored.diskon;
+                                promovalue.value = restored.promoValue;
+                                namaPromo.value = restored.namaPromo;
+                                promolistvalue = restored.promoUUID;
+                                namaPelanggan.value = restored.customerName;
+                                pelangganvalue.value = restored.customerUUID;
+                                metode_diskon.value = restored.metodeDiskon;
+                                displaydiskon.value = restored.displayDiskon;
 
-                          print('restored discount info for this cart:');
-                          print(' Discount: ${restored.diskon}');
-                          print(' Promo:    ${restored.namaPromo}');
-                          print(' Customer: ${restored.customerName}');
+                                print('restored discount info for this cart:');
+                                print(' Discount: ${restored.diskon}');
+                                print(' Promo:    ${restored.namaPromo}');
+                                print(' Customer: ${restored.customerName}');
 
-                          // 4) slide the sheet up
-                          kasirsheet.value.animateTo(SheetOffset(1));
-                        },
-                        icon: Icon(
-                          FontAwesomeIcons.cartShopping,
-                        ),
-                      ),
-                      title: Text('qweqwe'),
-                      childrenPadding: EdgeInsets.zero,
-                      children: cart.item.map((data) {
-                        print(data);
-                        return ListTile(
-                          trailing: Text((data.isPaket == true
-                                  ? 'Rp. ' +
-                                      AppFormat().numFormat(
-                                          data.hargaPaket! * data.qty)
-                                  : 'Rp. ' +
-                                      AppFormat().numFormat(
-                                          data.hargaEceran! * data.qty))
-                              .toString()),
-                          title: data.isPaket == true
-                              ? Text(data.namaPaket!)
-                              : Text(data.namaProduk!),
-                          subtitle: Row(
-                            children: [
-                              Text(
-                                data.isPaket == true
-                                    ? 'Rp. ' +
-                                        AppFormat().numFormat(data.hargaPaket)
-                                    : 'Rp. ' +
-                                        AppFormat().numFormat(data.hargaEceran),
-                              ),
-                              Padding(
-                                padding: EdgeInsets.only(left: 5),
-                                child: Text('x ' + data.qty.toString()),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    );
-                  }));
+                                // 4) slide the sheet up
+                                kasirsheet.value.animateTo(SheetOffset(1));
+                              },
+                              icon: Icon(FontAwesomeIcons.cartPlus),
+                            ),
+                            title: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  DateFormat('HH:mm dd-MM-yyyy')
+                                      .format(cart.savedAt),
+                                  style: AppFont.regular_bold(),
+                                ),
+                                Text(
+                                  'Keranjang nomor : ${index + 1}',
+                                  style: AppFont.regular(),
+                                ),
+                              ],
+                            ),
+                            childrenPadding: EdgeInsets.zero,
+                            children: cart.item.map((data) {
+                              print(data);
+                              return Container(
+                                padding: EdgeInsets.all(10),
+                                color: AppColor.primary.withValues(alpha: 0.1),
+                                child: Column(
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text('Produk',
+                                            style: AppFont.regular()),
+                                        Text('subtotal',
+                                            style: AppFont.regular())
+                                      ],
+                                    ),
+                                    Divider(),
+                                    ListTile(
+                                      contentPadding: EdgeInsets.zero,
+                                      trailing: Text(
+                                        (data.isPaket == true
+                                                ? 'Rp. ' +
+                                                    AppFormat().numFormat(
+                                                        data.hargaPaket! *
+                                                            data.qty)
+                                                : 'Rp. ' +
+                                                    AppFormat().numFormat(
+                                                        data.hargaEceran! *
+                                                            data.qty))
+                                            .toString(),
+                                        style: AppFont.regular(),
+                                      ),
+                                      title: data.isPaket == true
+                                          ? Text(
+                                              data.namaPaket!,
+                                              style: AppFont.regular(),
+                                            )
+                                          : Text(
+                                              data.namaProduk!,
+                                              style: AppFont.regular(),
+                                            ),
+                                      subtitle: Row(
+                                        children: [
+                                          Text(
+                                            data.isPaket == true
+                                                ? 'Rp. ' +
+                                                    AppFormat().numFormat(
+                                                        data.hargaPaket)
+                                                : 'Rp. ' +
+                                                    AppFormat().numFormat(
+                                                        data.hargaEceran),
+                                            style: AppFont.regular(),
+                                          ),
+                                          Padding(
+                                            padding: EdgeInsets.only(left: 5),
+                                            child: Text(
+                                                'x ' + data.qty.toString()),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }).toList(),
+                          );
+                        }),
+                  ),
+                ],
+              ));
         },
       ),
     ));
@@ -520,27 +579,28 @@ class KasirController extends GetxController {
     var bayar = await DBHelper().INSERT(
       'penjualan',
       DataPenjualan(
-        uuid: uuidpenjualan,
-        idPelanggan: pelangganvalue.value,
-        idToko: id_toko,
-        idLogin: id_toko,
-        tanggal: getTodayDateISO(),
-        noFaktur: generateInvoiceNumber(),
-        subtotal: subtotal.value,
-        diskonNominal: diskonnominal.value,
-        diskonPersen: diskonpersen.value,
-        kembalian: balikvalue.value,
-        kodePromo: promolistvalue,
-        nilaiBayar: bayarvalue.value,
-        nilaiPromo: promovalue.value,
-        totalBayar: total.value,
-        totalQty: totalItem.value,
-        totalDiskon: displaydiskon.value ?? 0.0,
-        namaPelanggan: namaPelanggan.value,
-        namaPromo: namaPromo.value,
-        totalPajak: totalTax.value,
-        id_karyawan: karyawanvalue,
-      ).DB(),
+              uuid: uuidpenjualan,
+              idPelanggan: pelangganvalue.value,
+              idToko: id_toko,
+              idLogin: id_toko,
+              tanggal: getTodayDateISO(),
+              noFaktur: generateInvoiceNumber(),
+              subtotal: subtotal.value,
+              diskonNominal: diskonnominal.value,
+              diskonPersen: diskonpersen.value,
+              kembalian: balikvalue.value,
+              kodePromo: promolistvalue,
+              nilaiBayar: bayarvalue.value,
+              nilaiPromo: promovalue.value,
+              totalBayar: total.value,
+              totalQty: totalItem.value,
+              totalDiskon: diskonnominal.value + diskonpersen.value ?? 0.0,
+              namaPelanggan: namaPelanggan.value,
+              namaPromo: namaPromo.value,
+              totalPajak: totalTax.value,
+              id_karyawan: karyawanvalue,
+              reversal: 0)
+          .DB(),
     );
 
     if (bayar != null) {

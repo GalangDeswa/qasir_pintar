@@ -17,9 +17,7 @@ import 'package:qasir_pintar/Modules - P.O.S/Kasir%20-%20Pembayaran/binding_pemb
 import 'package:qasir_pintar/Modules - P.O.S/Kasir%20-%20Pembayaran/view_pembayaran.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Kasir%20-%20Rincian%20Pembayaran/binding_rincianpembayaran.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Kasir%20-%20Rincian%20Pembayaran/view_rincianpembayaran.dart';
-import 'package:qasir_pintar/Modules - P.O.S/Laporan/Kas%20kasir/binding_kaskasir.dart';
-import 'package:qasir_pintar/Modules - P.O.S/Laporan/Kas%20kasir/view_kaskasir.dart';
-import 'package:qasir_pintar/Modules - P.O.S/Laporan/Laporan%20Kasir/view_laporankasir.dart';
+
 import 'package:qasir_pintar/Modules - P.O.S/Laporan/Ringkasan%20penjualan/view_ringkasanpenjualan.dart';
 
 import 'package:qasir_pintar/Modules - P.O.S/OTP/binding_otp.dart';
@@ -94,6 +92,7 @@ import 'package:qasir_pintar/Modules%20-%20P.O.S/Beban/edit/view_edit_beban.dart
 import 'package:qasir_pintar/Modules%20-%20P.O.S/Beban/kategori%20add/view_tambah_kategori_beban.dart';
 import 'package:qasir_pintar/Modules%20-%20P.O.S/Beban/view_basemenu_beban.dart';
 import 'package:qasir_pintar/Modules%20-%20P.O.S/Kasir/binding_kasir.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Laporan/Penjualan/binding_penjualan_laporan.dart';
 
 import '../Middleware/RoleMiddleware.dart';
 import '../Modules - Distributor/Base Menu/binding_basemenu_distributor.dart';
@@ -109,10 +108,15 @@ import '../Modules - P.O.S/Auth/login karyawan pin/view_loginpin.dart';
 import '../Modules - P.O.S/Beban/add/binding_tambah_beban.dart';
 import '../Modules - P.O.S/Beban/add/view_tambah_beban.dart';
 import '../Modules - P.O.S/Beban/kategori add/binding_tambah_kategori_beban.dart';
+import '../Modules - P.O.S/Beban/kategori edit/binding_kategori_edit.dart';
+import '../Modules - P.O.S/Beban/kategori edit/view_kategori_edit.dart';
 import '../Modules - P.O.S/History/detail/binding_detailriwayatpenjualan.dart';
-import '../Modules - P.O.S/Laporan/Laporan Kasir/binding_laporankasir.dart';
-import '../Modules - P.O.S/Laporan/Laporan menu/binding_laporanmenu.dart';
-import '../Modules - P.O.S/Laporan/Laporan menu/view_laporanmenu.dart';
+import '../Modules - P.O.S/Laporan/Beban/binding_beban_laporan.dart';
+import '../Modules - P.O.S/Laporan/Beban/view_beban_laporan.dart';
+
+import '../Modules - P.O.S/Laporan/Penjualan/view_penjualan_laporan.dart';
+import '../Modules - P.O.S/Laporan/Reversal/binding_reversal_laporan.dart';
+import '../Modules - P.O.S/Laporan/Reversal/view_reversal_laporan.dart';
 import '../Modules - P.O.S/Laporan/Ringkasan penjualan/binding_ringkasanpenjualan.dart';
 
 import '../Modules - P.O.S/Pelanggan/List Pelanggan/view_pelanggan.dart';
@@ -370,19 +374,21 @@ final List<GetPage<dynamic>> route = [
 
   // ======================== REPORTS ========================
   GetPage(
-      name: "/laporanmenu",
-      page: () => LaporanMenu(),
-      binding: LaporanMenuBinding()),
+      name: "/reversal_laporan",
+      page: () => ReversalLaporan(),
+      binding: ReversalLaporanBinding()),
   GetPage(
-      name: "/laporankasir",
-      page: () => LaporanKasir(),
-      binding: LaporanKasirBinding()),
+      name: "/penjualan_laporan",
+      page: () => PenjualanLaporan(),
+      binding: PenjualanLaporanBinding()),
   GetPage(
       name: "/ringkasanpenjualan",
       page: () => RingkasanPenjualan(),
       binding: RingkasanPenjualanBinding()),
   GetPage(
-      name: "/kaskasir", page: () => KasKasir(), binding: KasKasirBinding()),
+      name: "/beban_laporan",
+      page: () => BebanLaporan(),
+      binding: BebanLaporanBinding()),
 
   // ======================== USER MANAGEMENT ========================
   GetPage(name: "/user", page: () => User(), binding: UserBinding()),
@@ -410,6 +416,11 @@ final List<GetPage<dynamic>> route = [
       name: "/edit_beban",
       page: () => EditBeban(),
       binding: EditBebanBinding()),
+
+  GetPage(
+      name: "/edit_kategori_beban",
+      page: () => EditKategoriBeban(),
+      binding: EditKategoriBebanBinding()),
 
   GetPage(
       name: "/tambah_kategori_beban",

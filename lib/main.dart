@@ -28,7 +28,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: appTheme,
       getPages: route,
-      initialRoute: '/splash', initialBinding: InitialBinding(),
+      initialRoute: '/splash',
+      // initialBinding: InitialBinding(),
       //initialBinding: splashBinding(),
     );
   }

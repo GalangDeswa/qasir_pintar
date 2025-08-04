@@ -67,4 +67,26 @@ class BasemenuBebanController extends GetxController {
           toast().bottom_snackbar_error('error', 'gagal edit data local'));
     }
   }
+
+  hapusKategoriBeban(uuid) async {
+    print('-------------------edit kategori local---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var beban =
+        await DBHelper().softDelete(table: 'kategori_beban', uuid: uuid);
+    print('respon softdeleter kategori beban ---->');
+    print(beban);
+    if (beban == 1) {
+      await Get.find<CentralBebanController>().fetchKategoriBeban();
+      Get.back();
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'berhasil dihapus'));
+    } else {
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal edit data local'));
+    }
+  }
 }

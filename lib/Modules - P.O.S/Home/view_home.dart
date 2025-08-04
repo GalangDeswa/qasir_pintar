@@ -5,6 +5,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:qasir_pintar/Config/config.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Base%20menu/controller_basemenu.dart';
@@ -49,7 +50,8 @@ class HomeScreen extends GetView<BasemenuController> {
                         fit: BoxFit.cover,
                         opacity: 0.35,
                         colorFilter: ColorFilter.mode(
-                            Colors.black.withOpacity(0.2), BlendMode.multiply)),
+                            Colors.greenAccent.withOpacity(0.2),
+                            BlendMode.multiply)),
                     gradient: AppGradient.customGradient(),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
@@ -65,68 +67,82 @@ class HomeScreen extends GetView<BasemenuController> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Penjualan Hari ini',
-                                  style: AppFont.regular_white(),
-                                ),
-                                SizedBox(height: 5),
-                                Obx(() {
-                                  return Text(
-                                    'Rp. ' +
-                                        AppFormat().numFormat(
-                                            controller.totaluang.value),
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  );
-                                }),
-                              ],
+                      Padding(
+                        padding: AppPading.customBottomPadding(),
+                        child: Text(
+                            DateFormat('EEEE, dd MMMM yyyy')
+                                .format(DateTime.now()),
+                            style: AppFont.regular_white_bold()),
+                      ),
+                      Expanded(
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Pendapatan Hari ini',
+                                    style: AppFont.regular_white(),
+                                  ),
+                                  SizedBox(height: 5),
+                                  Obx(() {
+                                    return Text(
+                                      'Rp. ' +
+                                          AppFormat().numFormat(
+                                              controller.netProfit.value),
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    );
+                                  }),
+                                ],
+                              ),
                             ),
-                          ),
-                          Container(
-                            width: 1.2,
-                            color: Colors.white,
-                            height: 100,
-                            margin: EdgeInsets.symmetric(horizontal: 20),
-                          ),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Text(
-                                //   'Beban Hari ini',
-                                //   style: AppFont.regular_white(),
-                                // ),
-                                // SizedBox(height: 1),
-                                // Text(
-                                //   '\Rp. 10,000',
-                                //   style: AppFont.regular_white_bold(),
-                                // ),
-                                // SizedBox(height: 10),
-                                Text(
-                                  'transaksi Hari ini',
-                                  style: AppFont.regular_white(),
-                                ),
-                                SizedBox(height: 1),
-                                Obx(() {
-                                  return Text(
-                                    controller.totalpenjualan.toString(),
-                                    style: AppFont.regular_white_bold(),
-                                  );
-                                }),
-                                SizedBox(height: 2),
-                              ],
+                            Container(
+                              width: 1.2,
+                              color: Colors.white,
+                              height: 100,
+                              margin: EdgeInsets.symmetric(horizontal: 20),
                             ),
-                          ),
-                        ],
+                            Expanded(
+                              child: Column(
+                                //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Penjualan Hari ini',
+                                    style: AppFont.regular_white(),
+                                  ),
+                                  SizedBox(height: 1),
+                                  Obx(() {
+                                    return Text(
+                                      AppFormat().moneyFormat(controller
+                                          .summary.first.totalKeuntungan),
+                                      style: AppFont.regular_white_bold(),
+                                    );
+                                  }),
+                                  SizedBox(height: 10),
+                                  Text(
+                                    'beban Hari ini',
+                                    style: AppFont.regular_white(),
+                                  ),
+                                  SizedBox(height: 1),
+                                  Obx(() {
+                                    return Text(
+                                      AppFormat().moneyFormat(controller
+                                          .summary.first.totalJumlahBeban),
+                                      style: AppFont.regular_white_bold(),
+                                    );
+                                  }),
+                                  SizedBox(height: 2),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
 
                       // LinearProgressIndicator(
@@ -165,11 +181,39 @@ class HomeScreen extends GetView<BasemenuController> {
 
           SizedBox(height: context.res_height * 0.13),
           // Shortcut Icons
+
+          //TODO : validasi role
+
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 20),
+            child: Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'Welcome',
+                  style: AppFont.regular_bold(fontSize: 20),
+                ),
+                Expanded(
+                  child: Container(
+                      margin: EdgeInsets.only(left: 10),
+                      width: Get.width,
+                      height: 3,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: AppColor.primary)),
+                )
+              ],
+            ),
+          ),
           Padding(
             padding: AppPading.defaultBodyPadding(),
             child: Container(
-              // color: Colors.red,
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  color: Colors.cyan.withValues(alpha: 0.1)),
+              padding: EdgeInsets.all(20),
               width: Get.width,
+              height: Get.height * 0.15,
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 alignment: WrapAlignment.spaceBetween,
@@ -213,22 +257,22 @@ class HomeScreen extends GetView<BasemenuController> {
           ),
           SizedBox(height: 25),
           // Recent Transactions
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 20),
-            child: Text(
-              'Transaksi hari ini',
-              style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
-            ),
-          ),
+          // Padding(
+          //   padding: EdgeInsets.symmetric(horizontal: 20),
+          //   child: Text(
+          //     'Transaksi hari ini',
+          //     style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold),
+          //   ),
+          // ),
 
-          IconButton(
-              onPressed: () {
-                box.remove('karyawan_login');
-                box.remove('karyawan_nama');
-                box.remove('karyawan_id');
-                box.remove('karyawan_role');
-              },
-              icon: Icon(FontAwesomeIcons.tractor))
+          // IconButton(
+          //     onPressed: () {
+          //       box.remove('karyawan_login');
+          //       box.remove('karyawan_nama');
+          //       box.remove('karyawan_id');
+          //       box.remove('karyawan_role');
+          //     },
+          //     icon: Icon(FontAwesomeIcons.tractor))
 
           // Obx(() {
           //   return Column(
@@ -326,41 +370,40 @@ class HomeScreen extends GetView<BasemenuController> {
           //   );
           // }),
 
-          ,
-          Obx(() {
-            return Padding(
-              padding: AppPading.defaultBodyPadding(),
-              child: ListView.builder(
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                itemCount: controller.penjualan.length,
-                itemBuilder: (context, index) {
-                  var penjualan = controller.penjualan[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Get.toNamed('/detail_history', arguments: penjualan);
-                    },
-                    child: ListTile(
-                      leading: Container(
-                        padding: EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Icon(Icons.receipt, color: Colors.blue),
-                      ),
-                      title: Text(
-                        penjualan.noFaktur!,
-                        style: AppFont.regular_bold(),
-                      ),
-                      subtitle:
-                          Text(penjualan.tanggal!, style: AppFont.small()),
-                    ),
-                  );
-                },
-              ),
-            );
-          }),
+          // Obx(() {
+          //   return Padding(
+          //     padding: AppPading.defaultBodyPadding(),
+          //     child: ListView.builder(
+          //       shrinkWrap: true,
+          //       physics: NeverScrollableScrollPhysics(),
+          //       itemCount: controller.penjualan.length,
+          //       itemBuilder: (context, index) {
+          //         var penjualan = controller.penjualan[index];
+          //         return GestureDetector(
+          //           onTap: () {
+          //             Get.toNamed('/detail_history', arguments: penjualan);
+          //           },
+          //           child: ListTile(
+          //             leading: Container(
+          //               padding: EdgeInsets.all(8),
+          //               decoration: BoxDecoration(
+          //                 color: Colors.blue.withOpacity(0.1),
+          //                 borderRadius: BorderRadius.circular(8),
+          //               ),
+          //               child: Icon(Icons.receipt, color: Colors.blue),
+          //             ),
+          //             title: Text(
+          //               penjualan.noFaktur!,
+          //               style: AppFont.regular_bold(),
+          //             ),
+          //             subtitle:
+          //                 Text(penjualan.tanggal!, style: AppFont.small()),
+          //           ),
+          //         );
+          //       },
+          //     ),
+          //   );
+          // }),
         ],
       ),
     );
@@ -380,8 +423,8 @@ class HomeScreen extends GetView<BasemenuController> {
             ),
             child: SvgPicture.asset(
               iconPath,
-              width: 30,
-              height: 30,
+              width: 35,
+              height: 35,
             ),
           ),
         ),

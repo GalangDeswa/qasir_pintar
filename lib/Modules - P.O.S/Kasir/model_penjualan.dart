@@ -100,6 +100,7 @@ class DataPenjualan {
     map['sync'] = sync;
     map['total_pajak'] = totalPajak;
     map['id_karyawan'] = id_karyawan;
+    map['reversal'] = reversal;
     return map;
   }
 }
@@ -182,6 +183,7 @@ class DataDetailPenjualan {
 
 class PenjualanItem {
   final String noFaktur;
+  final int reversal; // ← add this
   final String uuidPenjualan;
   final String tanggal; // e.g. "2025-05-17"
   final double totalBayar; // e.g. 50000.0
@@ -194,11 +196,13 @@ class PenjualanItem {
     required this.tanggal,
     required this.totalBayar,
     required this.totalqty,
+    required this.reversal,
   });
 
   /// Convert from your existing DB‐map.
   factory PenjualanItem.fromDataPenjualan(DataPenjualan dp) {
     return PenjualanItem(
+      reversal: dp.reversal!, // ← convert to bool
       noFaktur: dp.noFaktur ?? '—',
       tanggal: dp.tanggal ?? '',
       totalBayar: dp.totalBayar ?? 0.0,

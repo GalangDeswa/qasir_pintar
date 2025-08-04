@@ -52,8 +52,10 @@ class TambahBeban extends GetView<TambahBebanController> {
                                     hint: Text('Pilih beban rutin',
                                         style: AppFont.regular()),
                                     value: controller.bebanvalue.value,
-                                    items:
-                                        controller.con.listBebanRutin.map((x) {
+                                    items: controller.con.listBebanRutin
+                                        .where((y) => y.aktif == 1)
+                                        .toList()
+                                        .map((x) {
                                       return DropdownMenuItem(
                                         child: Text(x.namaBeban!),
                                         value: x.uuid,
@@ -140,7 +142,9 @@ class TambahBeban extends GetView<TambahBebanController> {
                                       color: Colors.white)),
                               hint: Text('kategori', style: AppFont.regular()),
                               value: controller.kategorivalue.value,
-                              items: controller.con.listKategoriBeban.map((x) {
+                              items: controller.con.listKategoriBeban
+                                  .where((y) => y.aktif == 1)
+                                  .map((x) {
                                 return DropdownMenuItem(
                                   child: Text(x.namaKategoriBeban!),
                                   value: x.uuid,

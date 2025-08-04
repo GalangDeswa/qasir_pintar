@@ -37,6 +37,17 @@ class TambahBebanController extends GetxController {
 
   var tambahBaru = ''.obs;
 
+  String getTodayDateISO() {
+    // Get the current date
+    DateTime now = DateTime.now();
+
+    // Format the date as "YYYY-MM-DD"
+    String formattedDate =
+        "${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}";
+
+    return formattedDate;
+  }
+
   checkContactPermission() async {
     DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
@@ -147,7 +158,7 @@ class TambahBebanController extends GetxController {
           namaBeban: nama.value.text,
           idKategoriBeban: kategorivalue.value,
           jumlahBeban: double.parse(jumlahbeban.value.text.replaceAll(',', '')),
-          tanggalBeban: tanggal.value.text,
+          tanggalBeban: datedata.first!.toIso8601String(),
         ).DB());
 
     if (db != null) {

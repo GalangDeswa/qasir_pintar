@@ -59,7 +59,7 @@ class DrawerBase extends GetView<BasemenuController> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        controller.namatoko.value,
+                        controller.datauser.first.businessName!,
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 18,
@@ -166,40 +166,33 @@ class DrawerBase extends GetView<BasemenuController> {
                   ),
                   children: [
                     _buildDrawerItem(
-                      icon: FontAwesomeIcons.receipt,
+                      icon: FontAwesomeIcons.book,
                       title: 'Umum',
                       onTap: () {
                         Get.toNamed('/ringkasanpenjualan');
                       },
                     ),
                     _buildDrawerItem(
-                      icon: FontAwesomeIcons.chartSimple,
+                      icon: FontAwesomeIcons.cartShopping,
                       title: 'Penjualan',
                       onTap: () {
-                        Get.toNamed('/laporankasir');
+                        Get.toNamed('/penjualan_laporan');
                       },
                     ),
                     _buildDrawerItem(
-                      icon: FontAwesomeIcons.chartSimple,
+                      icon: FontAwesomeIcons.moneyBill,
                       title: 'Beban',
                       onTap: () {
-                        Get.toNamed('/kaskasir');
+                        Get.toNamed('/beban_laporan');
                       },
                     ),
                     _buildDrawerItem(
-                      icon: FontAwesomeIcons.chartSimple,
+                      icon: FontAwesomeIcons.cancel,
                       title: 'Reversal',
                       onTap: () {
-                        Get.toNamed('/laporanmenu');
+                        Get.toNamed('/reversal_laporan');
                       },
                     ),
-                    // _buildDrawerItem(
-                    //   icon: FontAwesomeIcons.book,
-                    //   title: 'Laporan',
-                    //   onTap: () {
-                    //     Get.toNamed('/laporanmenu');
-                    //   },
-                    // ),
                   ],
                 ),
                 Padding(

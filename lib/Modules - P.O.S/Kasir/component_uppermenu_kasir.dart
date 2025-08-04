@@ -171,7 +171,8 @@ class UpperMenuKasir extends GetView<KasirController> {
                         controller.openSavedCart();
                       },
                       icon: Icon(
-                        FontAwesomeIcons.receipt,
+                        FontAwesomeIcons.cartShopping,
+                        // color: AppColor.primary,
                       ),
                     ),
                     Positioned(
@@ -197,8 +198,9 @@ class UpperMenuKasir extends GetView<KasirController> {
         Container(
           margin: EdgeInsets.only(top: 15),
           width: Get.width,
-          //color: Colors.cyan,
-          height: 50,
+          padding: EdgeInsets.all(10),
+          color: Colors.cyan.withValues(alpha: 0.25),
+          height: Get.height / 14,
           child: Obx(() {
             return GroupButton(
               isRadio: true,

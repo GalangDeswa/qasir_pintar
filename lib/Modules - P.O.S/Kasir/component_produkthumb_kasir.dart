@@ -816,7 +816,7 @@ class StockDisplay extends GetView<KasirController> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Available: $availableStock',
+            'Tersedia: $availableStock',
             overflow: TextOverflow.ellipsis,
             style: AppFont.small().copyWith(
               color: availableStock == 0
@@ -827,15 +827,15 @@ class StockDisplay extends GetView<KasirController> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          if (availableStock != actualStock)
-            Text(
-              'Total: $actualStock',
-              overflow: TextOverflow.ellipsis,
-              style: AppFont.small().copyWith(
-                color: Colors.grey,
-                fontSize: 10,
-              ),
-            ),
+          // if (availableStock != actualStock)
+          //   Text(
+          //     'Total: $actualStock',
+          //     overflow: TextOverflow.ellipsis,
+          //     style: AppFont.small().copyWith(
+          //       color: Colors.grey,
+          //       fontSize: 10,
+          //     ),
+          //   ),
         ],
       );
     });
