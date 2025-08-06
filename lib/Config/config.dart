@@ -177,6 +177,7 @@ extension MediaQueryValues on BuildContext {
 
 class AppString {
   static String defaultImg = 'assets/images/defprod.png';
+  static String defaultImgStore = 'assets/images/login_toko.png';
   static String empty = 'assets/icons/box.png';
 }
 

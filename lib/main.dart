@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       theme: appTheme,
       getPages: route,
       initialRoute: '/splash',
-      // initialBinding: InitialBinding(),
+      initialBinding: InitialBinding(),
       //initialBinding: splashBinding(),
     );
   }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:qasir_pintar/Config/config.dart';
 import 'package:qasir_pintar/Controllers/CentralController.dart';
@@ -24,6 +25,22 @@ class BottomMenuPembayaran extends GetView<KasirController> {
             padding: AppPading.defaultBodyPadding(),
             child: Column(
               children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Kasir : ' + controller.namaKaryawan.value,
+                        style: AppFont.regular()),
+                    IconButton(
+                        onPressed: () {
+                          controller.popLoginKaryawanUlang();
+                        },
+                        icon: Icon(
+                          FontAwesomeIcons.userGear,
+                          color: AppColor.primary,
+                          size: 15,
+                        ))
+                  ],
+                ),
                 Padding(
                   padding: AppPading.customBottomPaddingSmall(),
                   child: Row(

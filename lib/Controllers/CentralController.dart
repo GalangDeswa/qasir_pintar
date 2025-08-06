@@ -1,7 +1,9 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
@@ -12,10 +14,13 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:smooth_sheets/smooth_sheets.dart';
 import 'package:uuid/uuid.dart';
 
 import '../Database/DB_helper.dart';
+import '../Modules - P.O.S/Base menu/controller_basemenu.dart';
 import '../Modules - P.O.S/Beban/model_beban.dart';
 import '../Modules - P.O.S/Karyawan/model_karyawan.dart';
 import '../Modules - P.O.S/Kasir/model_penjualan.dart';
@@ -1142,6 +1147,7 @@ class CentralKaryawanController extends GetxController {
     // TODO: implement onInit
     super.onInit();
     await fetchKaryawanLocal(id_toko: id_toko);
+    //role.value = '';
   }
 
   deleteKaryawan({uuid}) async {
@@ -1185,33 +1191,404 @@ class CentralKaryawanController extends GetxController {
 
   var karyawanList = <DataKaryawan>[].obs;
   var karyawanvalue;
-  var role;
+  var role = Rxn<String>();
   var namaKaryawan = ''.obs;
   var search = TextEditingController().obs;
   var verifikasi_kode = TextEditingController().obs;
+  var rolevalue;
+  var popResult = false.obs;
 
-  loginKaryawan(uuid, kode, roleval) async {
-    Get.dialog(showloading(), barrierDismissible: false);
+  Future<bool> popLoginKaryawan(List<String> allowedRoles) async {
+    final completer = Completer<bool>(); // To return the login result
+
+    print('popLoginKaryawan started');
+    print('<------------------- POP LOGIN KARYAWN -------------------------->');
+
+    verifikasi_kode.value = TextEditingController();
+
+    Get.dialog<bool>(
+        barrierDismissible: false,
+        SheetViewport(
+            child: Sheet(
+          // scrollConfiguration: SheetScrollConfiguration(),
+          initialOffset: const SheetOffset(0.6),
+          physics: BouncingSheetPhysics(),
+          snapGrid: MultiSnapGrid(snaps: [SheetOffset(0.6), SheetOffset(1)]),
+          child: Material(
+              color: Colors.white,
+              child: Container(
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(10),
+                          topRight: Radius.circular(10))),
+                  padding: AppPading.defaultBodyPadding(),
+                  height: Get.height,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.all(30),
+                        child: Column(
+                          children: [
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Padding(
+                                  padding: AppPading.customBottomPadding(),
+                                  child: Obx(() {
+                                    return DropdownButtonFormField2(
+                                      decoration: InputDecoration(
+                                        contentPadding: EdgeInsets.symmetric(
+                                            vertical: 0, horizontal: 20),
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                        ),
+                                      ),
+                                      validator: (value) {
+                                        if (value == null) {
+                                          return 'Pilih Karyawan';
+                                        }
+                                        return null;
+                                      },
+                                      isExpanded: true,
+                                      dropdownStyleData: DropdownStyleData(
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: Colors.white)),
+                                      hint: Text('Pilih Karyawan',
+                                          style: AppFont.regular()),
+                                      value: karyawanvalue,
+                                      items: karyawanList.map((x) {
+                                        return DropdownMenuItem(
+                                          child: Text(x.nama_karyawan!),
+                                          value: x.uuid,
+                                        );
+                                      }).toList(),
+                                      onChanged: (val) {
+                                        rolevalue = karyawanList
+                                            .where(
+                                                (x) => x.uuid == val.toString())
+                                            .first
+                                            .role;
+                                        namaKaryawan.value = karyawanList
+                                            .where(
+                                                (x) => x.uuid == val.toString())
+                                            .first
+                                            .nama_karyawan!;
+                                        karyawanvalue = val!.toString();
+                                        print(karyawanvalue);
+                                      },
+                                    );
+                                  }),
+                                ),
+                                // button_border_custom(
+                                //     onPressed: () {
+                                //       Get.toNamed('/tambahkaryawan');
+                                //     },
+                                //     child: Text('Tambah Karyawan'),
+                                //     width: Get.width),
+                                // SizedBox(height: 100.0),
+                              ],
+                            ),
+                            //Text('Masukan kode verifikasi'),
+                            Container(
+                              margin: EdgeInsets.symmetric(horizontal: 15),
+                              width: 350,
+                              child: Column(
+                                children: [
+                                  PinCodeTextField(
+                                    appContext: Get.context!,
+                                    length: 6,
+                                    obscureText: true,
+                                    animationType: AnimationType.fade,
+                                    pinTheme: PinTheme(
+                                        shape: PinCodeFieldShape.circle,
+                                        borderRadius: BorderRadius.circular(5),
+                                        fieldHeight: 50,
+                                        fieldWidth: 40,
+                                        activeFillColor: Colors.white,
+                                        inactiveColor: AppColor.primary),
+                                    animationDuration:
+                                        Duration(milliseconds: 300),
+                                    //backgroundColor: Colors.blue.shade50,
+                                    controller: verifikasi_kode.value,
+                                    onCompleted: (v) {
+                                      print("Completed");
+                                    },
+                                    onChanged: (value) {
+                                      print('verifikasi code -->' + value);
+                                      print(verifikasi_kode.value.text);
+                                    },
+                                    beforeTextPaste: (text) {
+                                      print("Allowing to paste $text");
+
+                                      return true;
+                                    },
+                                    // appContext: context,
+                                  ),
+                                  Container(
+                                    margin: EdgeInsets.only(top: 10),
+                                    width: 350,
+                                    child: TextButton(
+                                      style: TextButton.styleFrom(
+                                          foregroundColor: Colors.white,
+                                          backgroundColor: AppColor.secondary),
+                                      onPressed: () async {
+                                        loginFailed.value =
+                                            false; // Reset error state
+                                        final success = await loginKaryawan(
+                                            karyawanvalue,
+                                            verifikasi_kode.value.text,
+                                            role.value,
+                                            allowedRoles);
+                                        if (success) {
+                                          print(
+                                              'khsegfiueksghfdiuseghfiusegfiusegfiusegfiuesgfiusegfiusegf');
+
+                                          // Close the sheet on success
+                                          completer.complete(
+                                              true); // Return true to the caller
+                                        } else {
+                                          loginFailed.value =
+                                              true; // Show error, keep sheet open
+                                        }
+                                      },
+                                      child: Text('Masuk'),
+                                    ),
+                                  ),
+                                  SizedBox(
+                                    height: 15,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ))),
+        )));
+
+    return completer.future;
+  }
+
+  var popSheetController = SheetController;
+  RxBool roleSheetShown = false.obs;
+  popLoginKaryawanv2(List<String> allowedRoles) async {
+    isLogin.value = false;
+    print('popLoginKaryawan started');
+    print('<------------------- POP LOGIN KARYAWN -------------------------->');
+
+    verifikasi_kode.value = TextEditingController();
+
+    Get.dialog(
+        barrierDismissible: false,
+        PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            // if the user manually backed out AND login never succeeded
+            if (isLogin.value == false) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                Get.offAllNamed('/basemenu');
+              });
+            }
+          },
+          child: SheetViewport(
+              child: Sheet(
+            // scrollConfiguration: SheetScrollConfiguration(),
+            initialOffset: const SheetOffset(0.6),
+            physics: BouncingSheetPhysics(),
+            snapGrid: MultiSnapGrid(snaps: [SheetOffset(0.6), SheetOffset(1)]),
+            child: Material(
+                color: Colors.white,
+                child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(10),
+                            topRight: Radius.circular(10))),
+                    padding: AppPading.defaultBodyPadding(),
+                    height: Get.height,
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.all(30),
+                          child: Column(
+                            children: [
+                              Center(
+                                child: Container(
+                                    margin: AppPading.customBottomPadding(),
+                                    padding: EdgeInsets.all(15),
+                                    child: Text(
+                                      'Hak akses : ' + allowedRoles.toString(),
+                                      style: AppFont.regular_white_bold(),
+                                    ),
+                                    decoration: BoxDecoration(
+                                        color: AppColor.primary,
+                                        borderRadius:
+                                            BorderRadius.circular(10))),
+                              ),
+                              Padding(
+                                padding: AppPading.customBottomPadding(),
+                                child: Obx(() {
+                                  return DropdownButtonFormField2(
+                                    decoration: InputDecoration(
+                                      contentPadding: EdgeInsets.symmetric(
+                                          vertical: 0, horizontal: 20),
+                                      border: OutlineInputBorder(
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                    ),
+                                    validator: (value) {
+                                      if (value == null) {
+                                        return 'Pilih Karyawan';
+                                      }
+                                      return null;
+                                    },
+                                    isExpanded: true,
+                                    dropdownStyleData: DropdownStyleData(
+                                        decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                            color: Colors.white)),
+                                    hint: Text('Pilih Karyawan',
+                                        style: AppFont.regular()),
+                                    value: karyawanvalue,
+                                    items: karyawanList.map((x) {
+                                      return DropdownMenuItem(
+                                        child: Text(x.nama_karyawan!),
+                                        value: x.uuid,
+                                      );
+                                    }).toList(),
+                                    onChanged: (val) {
+                                      rolevalue = karyawanList
+                                          .where(
+                                              (x) => x.uuid == val.toString())
+                                          .first
+                                          .role;
+                                      namaKaryawan.value = karyawanList
+                                          .where(
+                                              (x) => x.uuid == val.toString())
+                                          .first
+                                          .nama_karyawan!;
+                                      karyawanvalue = val!.toString();
+                                      print(karyawanvalue);
+                                    },
+                                  );
+                                }),
+                              ),
+                              //Text('Masukan kode verifikasi'),
+                              Container(
+                                margin: EdgeInsets.symmetric(horizontal: 15),
+                                width: 350,
+                                child: Column(
+                                  children: [
+                                    PinCodeTextField(
+                                      appContext: Get.context!,
+                                      length: 6,
+                                      obscureText: true,
+                                      animationType: AnimationType.fade,
+                                      pinTheme: PinTheme(
+                                          shape: PinCodeFieldShape.circle,
+                                          borderRadius:
+                                              BorderRadius.circular(5),
+                                          fieldHeight: 50,
+                                          fieldWidth: 40,
+                                          activeFillColor: Colors.white,
+                                          inactiveColor: AppColor.primary),
+                                      animationDuration:
+                                          Duration(milliseconds: 300),
+                                      //backgroundColor: Colors.blue.shade50,
+                                      controller: verifikasi_kode.value,
+                                      onCompleted: (v) {
+                                        print("Completed");
+                                      },
+                                      onChanged: (value) {
+                                        print('verifikasi code -->' + value);
+                                        print(verifikasi_kode.value.text);
+                                      },
+                                      beforeTextPaste: (text) {
+                                        print("Allowing to paste $text");
+
+                                        return true;
+                                      },
+                                      // appContext: context,
+                                    ),
+                                    Container(
+                                      margin: EdgeInsets.only(top: 10),
+                                      width: 350,
+                                      child: TextButton(
+                                        style: TextButton.styleFrom(
+                                            foregroundColor: Colors.white,
+                                            backgroundColor:
+                                                AppColor.secondary),
+                                        onPressed: () async {
+                                          loginFailed.value =
+                                              false; // Reset error state
+                                          final success = await loginKaryawan(
+                                              karyawanvalue,
+                                              verifikasi_kode.value.text,
+                                              role.value,
+                                              allowedRoles);
+                                          if (success) {
+                                            print('loginKaryawan() success');
+                                          } else {
+                                            loginFailed.value = true;
+                                            roleSheetShown.value =
+                                                false; // Show error, keep sheet open
+                                          }
+                                        },
+                                        child: Text('Masuk'),
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      height: 15,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ))),
+          )),
+        ));
+  }
+
+  var loginFailed = false.obs; // Tracks if login failed
+  var isLogin = false.obs;
+  Future<bool> loginKaryawan(
+      uuid, kode, roleval, List<String> allowedRoles) async {
+    //Get.dialog(showloading(), barrierDismissible: false);
     print('-------------------login karyawan---------------------');
-
+    isLogin.value = false;
     List<Map<String, Object?>> query = await DBHelper().FETCH(
-        'SELECT * FROM Karyawan WHERE id_toko = "$id_toko" AND uuid = "$uuid" AND Pin = "$kode" AND role IN ("KASIR", "ADMIN")');
+        'SELECT * FROM Karyawan WHERE id_toko = "$id_toko" AND uuid = "$uuid" AND Pin = "$kode"');
+    print('<------------->');
+    print(query);
     if (query.isNotEmpty) {
-      await box.write('karyawan_login', true);
-      await box.write('karyawan_id', karyawanvalue);
-      await box.write('karyawan_nama', namaKaryawan.value);
-      await box.write('karyawan_role', role);
+      print('login berhasil');
+      var data = query.map((e) => DataKaryawan.fromJsondb(e)).toList();
+      karyawanvalue = data.first.uuid;
+      role.value = data.first.role!;
 
-      print(box.read('karyawan_role', fallback: ''));
-      print(box.read('karyawan_id', fallback: ''));
-      print(box.read('karyawan_nama', fallback: ''));
-      Get.back(closeOverlays: true);
+      if (!allowedRoles.contains(role.value)) {
+        print('tidak ada role ---->');
+        Get.showSnackbar(toast().bottom_snackbar_error(
+            'Error', 'Hanya bisa diakses oleh : $allowedRoles'));
+      } else {
+        isLogin.value = true;
+        Get.back();
+      }
 
-      Get.showSnackbar(toast().bottom_snackbar_success('Sukses', 'Berhasil'));
+      return true;
     } else {
-      Get.back();
+      print('login gagal');
+      //Get.back();
       Get.showSnackbar(
-          toast().bottom_snackbar_error('Gagal', 'periksa pin / jabatan'));
+          toast().bottom_snackbar_error('Error', 'Kode Verifikasi Salah'));
+      return false;
     }
   }
 

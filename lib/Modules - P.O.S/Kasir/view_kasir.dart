@@ -96,6 +96,7 @@ class CartSheet extends GetView<KasirController> {
                       margin: EdgeInsets.only(top: 10),
                     ),
                   ),
+
                   Row(
                     children: [
                       Expanded(

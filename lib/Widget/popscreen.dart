@@ -1640,7 +1640,7 @@ class Popscreen {
                                 .where((x) => x.uuid == val.toString())
                                 .first
                                 .nama_karyawan!;
-                            con.role = con.karyawanList
+                            con.role.value = con.karyawanList
                                 .where((x) => x.uuid == val.toString())
                                 .first
                                 .role!;
@@ -1704,11 +1704,11 @@ class Popscreen {
                                     foregroundColor: Colors.white,
                                     backgroundColor: AppColor.secondary),
                                 onPressed: () {
-                                  con.loginKaryawan(
-                                    con.karyawanvalue,
-                                    con.verifikasi_kode.value.text,
-                                    con.role,
-                                  );
+                                  // con.loginKaryawan(
+                                  //   con.karyawanvalue,
+                                  //   con.verifikasi_kode.value.text,
+                                  //   con.role,
+                                  // );
                                 },
                                 child: Text('Masuk'),
                               ),
@@ -1786,11 +1786,11 @@ class Popscreen {
                     ),
                     onPressed: () {
                       // You may want to validate code first, then:
-                      con.loginKaryawan(
-                        con.karyawanvalue,
-                        con.verifikasi_kode.value.text,
-                        con.role,
-                      );
+                      // con.loginKaryawan(
+                      //   con.karyawanvalue,
+                      //   con.verifikasi_kode.value.text,
+                      //   con.role,
+                      // );
                       // Close the dialog, returning the role:
                       Get.back(result: con.role);
                     },

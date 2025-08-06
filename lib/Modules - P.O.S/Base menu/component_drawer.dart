@@ -47,7 +47,7 @@ class DrawerBase extends GetView<BasemenuController> {
                     backgroundImage: controller.datauser.first.logo != '-'
                         ? MemoryImage(
                             base64Decode(controller.datauser.first.logo!))
-                        : AssetImage(AppString.defaultImg),
+                        : AssetImage(AppString.defaultImgStore),
                     backgroundColor: Colors.white,
                     radius: 40,
                   );

@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:qasir_pintar/Config/config.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Promo/controller_promo.dart';
 
+import '../../Middleware/customPageRole.dart';
 import '../../Widget/popscreen.dart';
 import '../../Widget/widget.dart';
 import 'model_promo.dart';
@@ -14,8 +15,9 @@ class Promo extends GetView<PromoController> {
 
   @override
   Widget build(BuildContext context) {
-    return Builder(builder: (context) {
-      return Scaffold(
+    return CustomRole(
+      allowedRoles: ['ADMIN', 'MANAGER'],
+      child: Scaffold(
         floatingActionButton: customFloat(onPressed: () {
           Get.toNamed('/tambah_promo');
         }),
@@ -149,8 +151,8 @@ class Promo extends GetView<PromoController> {
             ],
           ),
         ),
-      );
-    });
+      ),
+    );
   }
 }
 

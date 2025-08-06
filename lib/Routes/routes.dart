@@ -195,7 +195,7 @@ final List<GetPage<dynamic>> route = [
     page: () => BasemenuProduk(),
     binding: BasemenuProdukBinding(),
     // middlewares: [
-    //   RoleMiddleware(allowedRoles: ['ADMIN', 'MANAGER'])
+    //   AuthMiddleware(allowedRoles: ['ADMIN', 'MANAGER']),
     // ],
   ),
   GetPage(

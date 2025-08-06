@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import 'Controllers/CentralController.dart';
 import 'Controllers/printerController.dart';
+import 'Middleware/Navigation.dart';
 import 'Modules - P.O.S/Base menu/controller_basemenu.dart';
 import 'Modules - P.O.S/Kasir/controller_kasir.dart';
 import 'Modules - P.O.S/Users/controller_user.dart';
@@ -11,6 +12,7 @@ class InitialBinding extends Bindings {
   @override
   void dependencies() {
     print(' <-- Initial binding -->');
+
     //Get.put(PrintController(), permanent: true);
     Get.lazyPut<PrintController>(() => PrintController(), fenix: true);
     // Get.put(CentralProdukController());
@@ -37,5 +39,6 @@ class InitialBinding extends Bindings {
 
     Get.lazyPut<PengaturanController>(() => PengaturanController());
     Get.lazyPut<UserController>(() => UserController());
+    //Get.put(NavigationService(), permanent: true);
   }
 }

@@ -13,6 +13,7 @@ import 'package:qasir_pintar/Services/BoxStorage.dart';
 
 import '../../Controllers/CentralController.dart';
 import '../../Controllers/printerController.dart';
+import '../../Middleware/Navigation.dart';
 import '../test.dart';
 
 class HomeScreen extends GetView<BasemenuController> {
@@ -20,6 +21,8 @@ class HomeScreen extends GetView<BasemenuController> {
   Widget build(BuildContext context) {
     final PrintController _ctrl = Get.put(PrintController());
     final StorageService box = Get.find<StorageService>();
+    //final nav = Get.find<NavigationService>();
+
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -187,6 +190,7 @@ class HomeScreen extends GetView<BasemenuController> {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
             child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
               //mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
@@ -211,9 +215,10 @@ class HomeScreen extends GetView<BasemenuController> {
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
                   color: Colors.cyan.withValues(alpha: 0.1)),
-              padding: EdgeInsets.all(20),
+              padding: EdgeInsets.all(25),
               width: Get.width,
-              height: Get.height * 0.15,
+              //height: Get.height * 0.15,
+              //TODO : kasir sistem buka tutup / db proper constraint
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 alignment: WrapAlignment.spaceBetween,
@@ -221,10 +226,10 @@ class HomeScreen extends GetView<BasemenuController> {
                 runSpacing: 20, // Vertical space between icons
                 children: [
                   _buildShortcutIcon(
-                    'assets/icons/customer.svg',
-                    'Pelanggan',
+                    'assets/icons/inventory.svg',
+                    'Inventori',
                     () {
-                      Get.toNamed('/basemenupelanggan');
+                      Get.toNamed('/basemenu_stock');
                     },
                   ),
                   _buildShortcutIcon(
@@ -238,6 +243,7 @@ class HomeScreen extends GetView<BasemenuController> {
                     'assets/icons/box.svg',
                     'Produk',
                     () {
+                      //nav.toProduk();
                       Get.toNamed('/basemenuproduk');
                       // Navigator.of(context).push(MaterialPageRoute(
                       //     builder: (context) => PhysicsAndSnapGridExample()));
@@ -272,7 +278,7 @@ class HomeScreen extends GetView<BasemenuController> {
           //       box.remove('karyawan_id');
           //       box.remove('karyawan_role');
           //     },
-          //     icon: Icon(FontAwesomeIcons.tractor))
+          //     icon: Icon(FontAwesomeIcons.remove))
 
           // Obx(() {
           //   return Column(
@@ -435,83 +441,5 @@ class HomeScreen extends GetView<BasemenuController> {
         ),
       ],
     );
-  }
-
-  Future<String?> karyawanLoginv2() async {
-    final con = Get.find<CentralKaryawanController>();
-
-    // showDialog returns Future<T?> where T is the type you pass to `result`
-    final selectedRole = await Get.dialog<String>(
-      AlertDialog(
-        insetPadding: EdgeInsets.zero,
-        contentPadding: EdgeInsets.zero,
-        content: Builder(
-          builder: (context) {
-            return Column(
-              children: [
-                // ... your DropdownButtonFormField2 and other widgets ...
-                SizedBox(height: 100.0),
-                // PIN entry and button
-                PinCodeTextField(
-                  keyboardType: TextInputType.number,
-                  length: 6,
-                  obscureText: true,
-                  animationType: AnimationType.fade,
-                  pinTheme: PinTheme(
-                      shape: PinCodeFieldShape.circle,
-                      borderRadius: BorderRadius.circular(5),
-                      fieldHeight: 50,
-                      fieldWidth: 40,
-                      activeFillColor: Colors.white,
-                      inactiveColor: AppColor.primary),
-                  animationDuration: Duration(milliseconds: 300),
-                  //backgroundColor: Colors.blue.shade50,
-                  controller: con.verifikasi_kode.value,
-                  onCompleted: (v) {
-                    print("Completed");
-                  },
-                  onChanged: (value) {
-                    print('verifikasi code -->' + value);
-                    print(con.verifikasi_kode.value.text);
-                  },
-                  beforeTextPaste: (text) {
-                    print("Allowing to paste $text");
-                    //if you return true then it will show the paste confirmation dialog. Otherwise if false, then nothing will happen.
-                    //but you can show anything you want here, like your pop up saying wrong paste format or etc
-                    return true;
-                  },
-                  appContext: context,
-                ),
-                Container(
-                  margin: EdgeInsets.only(top: 10),
-                  width: 350,
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: AppColor.secondary,
-                    ),
-                    onPressed: () {
-                      // You may want to validate code first, then:
-                      con.loginKaryawan(
-                        con.karyawanvalue,
-                        con.verifikasi_kode.value.text,
-                        con.role,
-                      );
-                      // Close the dialog, returning the role:
-                      Get.back(result: con.role);
-                    },
-                    child: Text('Masuk'),
-                  ),
-                ),
-              ],
-            );
-          },
-        ),
-      ),
-      barrierDismissible: false, // optional: force the user to pick
-    );
-
-    // selectedRole will be the con.role passed above (or null if dismissed)
-    return selectedRole;
   }
 }

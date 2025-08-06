@@ -137,11 +137,61 @@ class ProdukListKasir extends GetView<KasirController> {
                               //   overflow: TextOverflow.ellipsis,
                               //   style: AppFont.small(),
                               // ),
-                              subtitle: Text(
-                                  style: AppFont.regular(),
-                                  'Rp ${NumberFormat('#,###').format(
-                                    paketproduk[index].harga_jual_paket!,
-                                  )}'),
+                              subtitle: paketproduk[index].diskon != 0.0
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          overflow: TextOverflow.ellipsis,
+                                          'Rp ${NumberFormat('#,###').format(
+                                            paketproduk[index]
+                                                .harga_jual_paket!,
+                                          )}',
+                                          style: TextStyle(
+                                              decoration:
+                                                  TextDecoration.lineThrough,
+                                              fontSize: 8),
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Rp. ' +
+                                                  AppFormat().numFormat(
+                                                    paketproduk[index]
+                                                            .harga_jual_paket! -
+                                                        paketproduk[index]
+                                                            .diskon!,
+                                                  ),
+                                              style: AppFont.small(),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.all(3),
+                                              margin: EdgeInsets.only(left: 5),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.green,
+                                                  borderRadius:
+                                                      BorderRadius.circular(5)),
+                                              child: Text(
+                                                  (paketproduk[index].diskon! /
+                                                              paketproduk[index]
+                                                                  .harga_jual_paket! *
+                                                              100)
+                                                          .toStringAsFixed(0) +
+                                                      '%',
+                                                  style: AppFont.small_white()),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    )
+                                  : Text(
+                                      overflow: TextOverflow.ellipsis,
+                                      'Rp ${NumberFormat('#,###').format(
+                                        paketproduk[index].harga_jual_paket!,
+                                      )}',
+                                      style: AppFont.small(),
+                                    ),
                               //trailing: Text('Rp.10.000'),
                             ),
                             Container(
