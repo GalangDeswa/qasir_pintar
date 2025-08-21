@@ -29,12 +29,12 @@ class intro extends GetView<SplashController> {
               backgroundColor: MaterialStatePropertyAll<Color>(Colors.white)),
           listContentConfig: [
             ContentConfig(
-              title: "qasir pintar",
+              title: "TubinMart",
               styleTitle: TextStyle(
                   fontSize: 25,
                   fontWeight: FontWeight.bold,
                   color: Colors.white),
-              pathImage: "assets/icons/splash.png",
+              pathImage: "assets/icons/splashv2.png",
               description: "Aplikasi P.O.S lengkap",
               styleDescription: TextStyle(
                   fontSize: 20,
@@ -53,7 +53,7 @@ class intro extends GetView<SplashController> {
                   color: Colors.white),
               title: "Fitur lengkap",
               pathImage: "assets/images/intro2.png",
-              description: "Nikmati berbagai fitur menarik qasir pintar",
+              description: "Nikmati berbagai fitur menarik TubinMart",
               backgroundImage: "assets/images/bg.png",
             ),
             ContentConfig(

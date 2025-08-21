@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/Data%20produk/add/controller_addproduk.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/Produk/model_kategoriproduk.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/controller_basemenuproduk.dart';
@@ -63,8 +64,8 @@ class TambahSubKategoriController extends GetxController {
   fetchKategoriProdukLocal({id_toko}) async {
     print('-------------------fetch pelanggan local---------------------');
 
-    List<Map<String, Object?>> query = await DBHelper()
-        .FETCH('SELECT * FROM Kelompok_produk WHERE id_toko = "$id_toko"');
+    List<Map<String, Object?>> query = await DBHelper().FETCH(
+        'SELECT * FROM Kelompok_produk WHERE id_toko = "$id_toko" AND aktif = 1');
     if (query.isNotEmpty) {
       List<DataKategoriProduk> data =
           query.map((e) => DataKategoriProduk.fromJsondb(e)).toList();
@@ -310,9 +311,9 @@ class TambahSubKategoriController extends GetxController {
     tanggal.value.text = ff;
   }
 
-  tambahSubKategoriPelangganLocal() async {
+  tambahSubKategoriProdukLocal() async {
     print(
-        '-------------------tambah kategori pelanggan local---------------------');
+        '-------------------tambah sub kategori produk local---------------------');
 
     Get.dialog(showloading(), barrierDismissible: false);
     var uuid = Uuid().v4();
@@ -328,7 +329,7 @@ class TambahSubKategoriController extends GetxController {
 
     if (db != null) {
       print(db);
-      await Get.find<BaseMenuProdukController>()
+      await Get.find<CentralKategoriProdukController>()
           .fetchSubKategoriProdukLocal(id_toko: id_toko);
       // await Get.find<TambahProdukController>()
       //     .fetchSubKategoriProdukLocal(id_toko: id_toko);

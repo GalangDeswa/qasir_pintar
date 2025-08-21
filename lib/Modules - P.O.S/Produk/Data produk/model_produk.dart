@@ -675,7 +675,7 @@ class DataPaketProduk {
       nominalpajak: json["nominal_pajak"] ?? 0.0,
       namapajak: json["nama_pajak"],
       hitungStock: json["hitung_stock"],
-      diskon: json["diskon"] ?? 0,
+      diskon: json["diskon"] ?? 0.0,
     );
   }
 

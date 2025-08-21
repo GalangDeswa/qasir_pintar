@@ -198,6 +198,66 @@ class header extends StatelessWidget {
 }
 
 class Popscreen {
+  cancelreversalpop(
+      DetailHistoryPenjualanController controller, DataPenjualan arg) {
+    Get.dialog(AlertDialog(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      title: header(
+        title: 'Batalkan reversal Transaksi',
+        icon: Icons.warning,
+        icon_color: AppColor.warning,
+      ),
+      contentPadding: EdgeInsets.all(10),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(12.0),
+        ),
+      ),
+      content: Builder(
+        builder: (context) {
+          return Container(
+              margin: EdgeInsets.all(10),
+              width: context.res_width / 2.6,
+              height: context.res_height / 4.5,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    'Batalkan reversal ini?',
+                    style: AppFont.regular_bold(),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  button_solid_custom(
+                    onPressed: () async {
+                      //Get.back();
+                      await controller.cancelreversal(arg.uuid);
+                    },
+                    child: Text(
+                      'Batalkan',
+                      style: AppFont.regular_white_bold(),
+                    ),
+                    width: context.res_width,
+                  ),
+                  button_border_custom(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    child: Text(
+                      'Kembali',
+                      style: AppFont.regular(),
+                    ),
+                    width: context.res_width,
+                  )
+                ],
+              ));
+        },
+      ),
+    ));
+  }
+
   reversalpop(DetailHistoryPenjualanController controller, DataPenjualan arg) {
     Get.dialog(AlertDialog(
       backgroundColor: Colors.white,
@@ -291,7 +351,7 @@ class Popscreen {
                   button_solid_custom(
                     onPressed: () async {
                       //Get.back();
-                      await controller.deletePromo(uuid: arg.uuid);
+                      await controller.deletePromov2(arg.uuid);
                     },
                     child: Text(
                       'Hapus',
@@ -350,7 +410,7 @@ class Popscreen {
                   button_solid_custom(
                     onPressed: () async {
                       //Get.back();
-                      await controller.deletepaket(uuid: arg.uuid);
+                      await controller.deletepaketv2(arg.uuid);
                     },
                     child: Text(
                       'Hapus',
@@ -409,7 +469,7 @@ class Popscreen {
                   button_solid_custom(
                     onPressed: () async {
                       //Get.back();
-                      await controller.deleteKaryawan(uuid: arg.uuid);
+                      await controller.deleteKaryawanv2(arg.uuid);
 
                       //controller.deleteproduk(arg.id.toString());
                     },
@@ -471,7 +531,7 @@ class Popscreen {
                   button_solid_custom(
                     onPressed: () async {
                       //Get.back();
-                      await controller.deleteKategoriProduk(uuid: arg.uuid);
+                      await controller.deleteKategoriProdukv2(arg.uuid);
 
                       //controller.deleteproduk(arg.id.toString());
                     },
@@ -532,7 +592,7 @@ class Popscreen {
                   button_solid_custom(
                     onPressed: () async {
                       //Get.back();
-                      await controller.deletepajak(uuid: arg.uuid);
+                      await controller.deletepajakv2(arg.uuid);
                     },
                     child: Text(
                       'Hapus',
@@ -591,7 +651,7 @@ class Popscreen {
                   button_solid_custom(
                     onPressed: () async {
                       //Get.back();
-                      await controller.deleteukuran(uuid: arg.uuid);
+                      await controller.deleteukuranv2(arg.uuid);
                     },
                     child: Text(
                       'Hapus',
@@ -650,7 +710,7 @@ class Popscreen {
                   button_solid_custom(
                     onPressed: () async {
                       //Get.back();
-                      await controller.deleteProduk(uuid: arg.uuid);
+                      await controller.deleteProdukv2(arg.uuid);
 
                       //controller.deleteproduk(arg.id.toString());
                     },
@@ -773,7 +833,7 @@ class Popscreen {
                   button_solid_custom(
                     onPressed: () async {
                       //Get.back();
-                      await controller.hapusKategoriBeban(arg.uuid);
+                      await controller.hapusKategoriBebanv2(arg.uuid);
 
                       //controller.deleteproduk(arg.id.toString());
                     },
@@ -834,7 +894,7 @@ class Popscreen {
                   button_solid_custom(
                     onPressed: () async {
                       //Get.back();
-                      await controller.deleteSupplier(uuid: arg.uuid);
+                      await controller.deleteSupplierv2(arg.uuid);
 
                       //controller.deleteproduk(arg.id.toString());
                     },
@@ -896,7 +956,7 @@ class Popscreen {
                   button_solid_custom(
                     onPressed: () async {
                       //Get.back();
-                      await controller.deleteKategoriPelanggan(uuid: arg.uuid);
+                      await controller.deleteKategoriPelangganv2(arg.uuid);
 
                       //controller.deleteproduk(arg.id.toString());
                     },
@@ -957,7 +1017,7 @@ class Popscreen {
                   button_solid_custom(
                     onPressed: () async {
                       //Get.back();
-                      await controller.deletePelanggan(uuid: arg.uuid);
+                      await controller.deletePelangganv2(arg.uuid);
 
                       //controller.deleteproduk(arg.id.toString());
                     },
@@ -1019,7 +1079,7 @@ class Popscreen {
                   button_solid_custom(
                     onPressed: () async {
                       //Get.back();
-                      await controller.deleteSubKategoriProduk(uuid: arg.uuid);
+                      await controller.deleteSubKategoriProdukv2(arg.uuid);
 
                       //controller.deleteproduk(arg.id.toString());
                     },
@@ -1201,13 +1261,13 @@ class Popscreen {
                       MaterialStatePropertyAll<Color>(Colors.white)),
               listContentConfig: [
                 ContentConfig(
-                  title: "qasir pintar",
+                  title: "TubinMart",
                   styleTitle: TextStyle(
                       fontSize: 25,
                       fontWeight: FontWeight.bold,
                       color: Colors.white),
-                  pathImage: "assets/icons/splash.png",
-                  description: "Selamat datang di qasir pintar!",
+                  pathImage: "assets/icons/splashv2.png",
+                  description: "Selamat datang di TubinMart!",
                   styleDescription: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
@@ -1226,7 +1286,7 @@ class Popscreen {
                       color: Colors.white),
                   title: "Fitur lengkap",
                   pathImage: "assets/images/intro2.png",
-                  description: "Nikmati berbagai fitur menarik qasir pintar",
+                  description: "Nikmati berbagai fitur menarik TubinMart",
                   backgroundImage: "assets/images/bg.png",
                   backgroundColor: Colors.white,
                 ),

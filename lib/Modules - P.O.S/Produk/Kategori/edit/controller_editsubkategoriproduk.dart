@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/Kategori/model_subkategoriproduk.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/controller_basemenuproduk.dart';
 
@@ -20,12 +21,6 @@ import '../../../Region/model_district.dart';
 import '../../Produk/model_kategoriproduk.dart';
 
 class EditSubKategoriProdukController extends GetxController {
-  final _obj = ''.obs;
-
-  set obj(value) => _obj.value = value;
-
-  get obj => _obj.value;
-
   @override
   Future<void> onInit() async {
     // TODO: implement onInit
@@ -101,11 +96,13 @@ class EditSubKategoriProdukController extends GetxController {
     print(query);
     if (query == 1) {
       //print('edit user local berhasil------------------------------------->');
-      await Get.find<BaseMenuProdukController>()
+      await Get.find<CentralKategoriProdukController>()
           .fetchSubKategoriProdukLocal(id_toko: id_toko);
+      await Get.find<CentralProdukController>()
+          .fetchProdukLocal(id_toko: id_toko);
       Get.back(closeOverlays: true);
-      Get.showSnackbar(toast()
-          .bottom_snackbar_success('sukses', 'Pelanggan berhasil diedit'));
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'berhasil diedit'));
     } else {
       Get.back(closeOverlays: true);
       Get.showSnackbar(

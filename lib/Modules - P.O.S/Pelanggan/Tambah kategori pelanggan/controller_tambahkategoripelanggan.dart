@@ -9,6 +9,7 @@ import 'package:image/image.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Pelanggan/List%20kategori%20pelanggan/controller_kategoripelanggan.dart';
 import 'package:uuid/uuid.dart';
 
@@ -322,7 +323,7 @@ class TambahKategoriPelangganController extends GetxController {
 
     if (db != null) {
       print(db);
-      await Get.find<KategoriPelangganController>()
+      await Get.find<CentralPelangganController>()
           .fetchKategoriPelangganLocal(id_toko);
       await Get.find<TambahPelangganController>()
           .fetchKategoriPelangganLocal(id_toko);
@@ -338,14 +339,6 @@ class TambahKategoriPelangganController extends GetxController {
       Get.back();
       Get.showSnackbar(toast().bottom_snackbar_error('error', 'gagal'));
     }
-
-    // if (add == 1) {
-    //
-    // } else {
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(
-    //       toast().bottom_snackbar_error('error', 'gagal tambah data local'));
-    // }
   }
 
   getProviceLocal() async {

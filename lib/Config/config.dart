@@ -131,7 +131,7 @@ class AppGradient {
 
 class AppPading {
   static EdgeInsets defaultBodyPadding() {
-    return const EdgeInsets.all(20.0);
+    return const EdgeInsets.all(15.0);
   }
 
   static EdgeInsets customPadding({
@@ -150,6 +150,10 @@ class AppPading {
 
   static EdgeInsets customBottomPadding() {
     return const EdgeInsets.only(bottom: 20);
+  }
+
+  static EdgeInsets customListPadding({double bottomPadding = 50}) {
+    return EdgeInsets.only(bottom: bottomPadding);
   }
 
   static EdgeInsets customBottomPaddingSmall() {
@@ -211,5 +215,12 @@ class AppFormat {
   dateFormat(date) {
     final dateformat = DateFormat('dd-MM-yyyy');
     return dateformat.format(DateTime.parse(date));
+  }
+
+  String dateISO(date) {
+    String formattedDate =
+        "${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}";
+
+    return formattedDate;
   }
 }

@@ -33,19 +33,18 @@ class Splash extends GetView<SplashController> {
                 child: Container(
                   width: 250,
                   height: 250,
-                  child: Lottie.asset('assets/animation/Newspaper.json',
-                      animate: true, fit: BoxFit.cover, repeat: false),
+                  child: Image.asset('assets/icons/splashv2.png'),
                 ),
               ),
-              Text(
-                'qasir pintar',
-                style: TextStyle(
-                    fontSize: 25,
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold),
-              ),
+              // Text(
+              //   'TubinMart',
+              //   style: TextStyle(
+              //       fontSize: 25,
+              //       color: Colors.white,
+              //       fontWeight: FontWeight.bold),
+              // ),
               SizedBox(
-                height: 200,
+                height: 150,
               ),
               Padding(
                 padding:

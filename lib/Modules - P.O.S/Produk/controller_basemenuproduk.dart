@@ -19,12 +19,16 @@ class BaseMenuProdukController extends GetxController {
   Future<void> onInit() async {
     // TODO: implement onInit
     super.onInit();
-    await fetchKategoriProdukLocal(id_toko: id_toko);
-    await fetchSubKategoriProdukLocal(id_toko: id_toko);
-    await fetchProdukLocal(id_toko: id_toko);
-    await fetchPajakLocal(id_toko: id_toko);
-    await fetchUkuranLocal(id_toko: id_toko);
-    await fetchPaketLocal(id_toko: id_toko);
+    await Get.find<CentralKategoriProdukController>()
+        .fetchKategoriProdukLocal(id_toko: id_toko);
+    await Get.find<CentralKategoriProdukController>()
+        .fetchSubKategoriProdukLocal(id_toko: id_toko);
+    await Get.find<CentralProdukController>()
+        .fetchProdukLocal(id_toko: id_toko);
+    await Get.find<CentralPajakController>().fetchPajakLocal(id_toko: id_toko);
+    await Get.find<CentralUkuranProdukController>()
+        .fetchUkuranLocal(id_toko: id_toko);
+    await Get.find<CentralPaketController>().fetchPaketLocal(id_toko: id_toko);
   }
 
   var thumb = false.obs;
@@ -89,6 +93,28 @@ class BaseMenuProdukController extends GetxController {
     // }
   }
 
+  deletepajakv2(uuid) async {
+    print('-------------------edit  produk local---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var produk = await DBHelper().softDelete(table: 'pajak_produk', uuid: uuid);
+    print('respon softdeleter pajak ---->');
+    print(produk);
+    if (produk == 1) {
+      await Get.find<CentralPajakController>()
+          .fetchPajakLocal(id_toko: id_toko);
+      Get.back();
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'berhasil dihapus'));
+    } else {
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal edit data local'));
+    }
+  }
+
   deletepaket({uuid}) async {
     print('delete paket local---------------------------------------->');
     Get.dialog(const showloading(), barrierDismissible: false);
@@ -146,6 +172,29 @@ class BaseMenuProdukController extends GetxController {
     //   Get.showSnackbar(toast()
     //       .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
     // }
+  }
+
+  deletepaketv2(uuid) async {
+    print('-------------------edit  produk local---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var produk = await DBHelper()
+        .softDeletePaketProduk(table: 'paket_produk', uuid: uuid);
+    print('respon softdeleter paket_produk ---->');
+    print(produk);
+    if (produk == 1) {
+      await Get.find<CentralPaketController>()
+          .fetchPaketLocal(id_toko: id_toko);
+      Get.back();
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'berhasil dihapus'));
+    } else {
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal edit data local'));
+    }
   }
 
   deleteukuran({uuid}) async {
@@ -207,6 +256,29 @@ class BaseMenuProdukController extends GetxController {
     // }
   }
 
+  deleteukuranv2(uuid) async {
+    print('-------------------edit ukuran  produk local---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var produk =
+        await DBHelper().softDelete(table: 'ukuran_produk', uuid: uuid);
+    print('respon softdeleter ukuran ---->');
+    print(produk);
+    if (produk == 1) {
+      await Get.find<CentralUkuranProdukController>()
+          .fetchUkuranLocal(id_toko: id_toko);
+      Get.back();
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'berhasil dihapus'));
+    } else {
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal edit data local'));
+    }
+  }
+
   deleteKategoriProduk({uuid}) async {
     print(
         'delete kategori produk local---------------------------------------->');
@@ -266,6 +338,29 @@ class BaseMenuProdukController extends GetxController {
     // }
   }
 
+  deleteKategoriProdukv2(uuid) async {
+    print('-------------------edit  produk local---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var produk =
+        await DBHelper().softDelete(table: 'Kelompok_produk', uuid: uuid);
+    print('respon softdeleter kategori ---->');
+    print(produk);
+    if (produk == 1) {
+      await Get.find<CentralKategoriProdukController>()
+          .fetchKategoriProdukLocal(id_toko: id_toko);
+      Get.back();
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'berhasil dihapus'));
+    } else {
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal edit data local'));
+    }
+  }
+
   deleteProduk({uuid}) async {
     print('delete produk local---------------------------------------->');
     Get.dialog(const showloading(), barrierDismissible: false);
@@ -312,6 +407,53 @@ class BaseMenuProdukController extends GetxController {
       Get.back();
       Get.showSnackbar(toast()
           .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
+    }
+  }
+
+  //TODO : SOFT DELETE EVERYTHING
+
+  deleteSubKategoriProdukv2(uuid) async {
+    print('-------------------edit  sub katproduk local---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var produk =
+        await DBHelper().softDelete(table: 'Sub_Kelompok_produk', uuid: uuid);
+    print('respon softdeleter Sub_Kelompok_produk ---->');
+    print(produk);
+    if (produk == 1) {
+      await Get.find<CentralKategoriProdukController>()
+          .fetchSubKategoriProdukLocal(id_toko: id_toko);
+      Get.back();
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'berhasil dihapus'));
+    } else {
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal edit data local'));
+    }
+  }
+
+  deleteProdukv2(uuid) async {
+    print('-------------------edit  produk local---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var produk = await DBHelper().softDeleteProduk(table: 'produk', uuid: uuid);
+    print('respon softdeleter produk ---->');
+    print(produk);
+    if (produk == 1) {
+      await Get.find<CentralProdukController>()
+          .fetchProdukLocal(id_toko: id_toko);
+      Get.back();
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'berhasil dihapus'));
+    } else {
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal edit data local'));
     }
   }
 

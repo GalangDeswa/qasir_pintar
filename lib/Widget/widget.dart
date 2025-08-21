@@ -1,7 +1,9 @@
 import 'dart:convert';
 
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
@@ -336,7 +338,7 @@ class AppbarCustomMain extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: AppColor.primary,
       actions: [
         Text(
-          'Qasir pintar',
+          'TubinMart',
           style: AppFont.AppBarTitle(),
         ),
       ],
@@ -489,7 +491,15 @@ class custom_list extends StatelessWidget {
       color: Colors.grey[300],
       child: Column(
         children: [
-          usingGambar == false ? _buildSimpleListTile() : _buildImageListTile(),
+          usingGambar == false
+              ? GestureDetector(
+                  onTap: () =>
+                      Get.toNamed(gestureroute, arguments: gestureArgument),
+                  child: _buildSimpleListTile())
+              : GestureDetector(
+                  onTap: () =>
+                      Get.toNamed(gestureroute, arguments: gestureArgument),
+                  child: _buildImageListTile()),
           const Divider(height: 0.5, color: Colors.black),
         ],
       ),
@@ -520,7 +530,7 @@ class custom_list extends StatelessWidget {
           ? Text(title, style: AppFont.regular_bold())
           : Text(
               title + '- Nonaktif',
-              style: TextStyle(color: AppColor.warning),
+              style: TextStyle(color: AppColor.warning, fontSize: 12),
             ),
       subtitle: subtitle,
       trailing: trailing,
@@ -538,7 +548,7 @@ class custom_list extends StatelessWidget {
           ? Text(title, style: AppFont.regular_bold())
           : Text(
               title + '- Nonaktif',
-              style: TextStyle(color: AppColor.warning),
+              style: TextStyle(color: AppColor.warning, fontSize: 12),
             ),
       subtitle: subtitle,
       trailing: trailing,
@@ -622,7 +632,15 @@ class custom_list_produk extends StatelessWidget {
       color: Colors.grey[300],
       child: Column(
         children: [
-          usingGambar == false ? _buildSimpleListTile() : _buildImageListTile(),
+          usingGambar == false
+              ? GestureDetector(
+                  onTap: () =>
+                      Get.toNamed(gestureroute, arguments: gestureArgument),
+                  child: _buildSimpleListTile())
+              : GestureDetector(
+                  onTap: () =>
+                      Get.toNamed(gestureroute, arguments: gestureArgument),
+                  child: _buildImageListTile()),
           const Divider(height: 0.5, color: Colors.black),
         ],
       ),
@@ -653,7 +671,7 @@ class custom_list_produk extends StatelessWidget {
           ? Text(title, style: AppFont.regular_bold())
           : Text(
               title + '- Nonaktif',
-              style: TextStyle(color: AppColor.warning),
+              style: TextStyle(color: AppColor.warning, fontSize: 12),
             ),
       subtitle: subtitle,
       trailing: trailing,
@@ -677,7 +695,7 @@ class custom_list_produk extends StatelessWidget {
           ? Text(title, style: AppFont.regular_bold())
           : Text(
               title + ' - Nonaktif',
-              style: TextStyle(color: AppColor.warning),
+              style: TextStyle(color: AppColor.warning, fontSize: 12),
             ),
       subtitle: subtitle,
       trailing: trailing,
@@ -804,5 +822,285 @@ class DashedBorderPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) {
     return false;
+  }
+}
+
+class customDropdownField extends StatelessWidget {
+  final String hintText;
+  final String? value;
+  final List<String> items;
+  final Function(String?) onChanged;
+  final String? Function(String?)? validator;
+
+  const customDropdownField({
+    super.key,
+    required this.hintText,
+    required this.items,
+    required this.onChanged,
+    required this.value,
+    this.validator,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: AppPading.customBottomPadding(),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          Expanded(
+            child: DropdownButtonFormField2<String>(
+              style: AppFont.regular(),
+              decoration: InputDecoration(
+                isDense: true,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              validator: validator,
+              isExpanded: true,
+              dropdownStyleData: DropdownStyleData(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(10),
+                  color: Colors.white,
+                ),
+              ),
+              hint: Text(hintText),
+              value: value,
+              items: items
+                  .map((x) => DropdownMenuItem(
+                        value: x,
+                        child: Text(x),
+                      ))
+                  .toList(),
+              onChanged: onChanged,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class customTextField extends StatelessWidget {
+  final TextEditingController controller;
+  final String labelText;
+  final TextInputType keyboardType;
+  final String? Function(String?)? validator;
+  final bool? readOnly;
+  final Function(String?)? onChanged;
+  final List<TextInputFormatter>? inputFormatters;
+
+  const customTextField({
+    super.key,
+    required this.controller,
+    required this.labelText,
+    this.keyboardType = TextInputType.text,
+    this.validator,
+    this.readOnly,
+    this.onChanged,
+    this.inputFormatters,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: AppPading.customBottomPadding(),
+      child: TextFormField(
+        style: AppFont.regular(),
+        inputFormatters: inputFormatters,
+        onChanged: onChanged,
+        readOnly: readOnly ?? false,
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: AppFont.regular(),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+        keyboardType: keyboardType,
+        validator: validator,
+      ),
+    );
+  }
+}
+
+class customDatesearch extends StatelessWidget {
+  final TextEditingController textController;
+  final List<DateTime?> dates;
+  final Function(List<DateTime?>) onDateChanged;
+  final String labelText;
+
+  final Function()? onOkTap;
+  final Function()? onReset;
+  final VoidCallback? onSortPressed;
+  final bool? sortValue;
+
+  const customDatesearch(
+      {super.key,
+      required this.textController,
+      required this.dates,
+      required this.onDateChanged,
+      this.labelText = "Pencarian",
+      this.onSortPressed,
+      this.onOkTap,
+      this.onReset,
+      this.sortValue});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
+      margin:
+          const EdgeInsets.only(bottom: 12), // ganti AppPading custom kalau ada
+      child: Row(
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(right: 10),
+            child: Icon(
+              FontAwesomeIcons.calendar,
+              size: 20,
+            ),
+          ),
+          Expanded(
+            child: TextFormField(
+              style: AppFont.regular(),
+              readOnly: true,
+              controller: textController,
+              decoration: InputDecoration(
+                  suffixIcon: textController.value.text.isEmpty
+                      ? SizedBox()
+                      : IconButton(
+                          onPressed: () {
+                            print('reset date filter');
+                            textController.clear();
+                            dates.clear();
+                            if (onReset != null) {
+                              onReset!(); // ✅ call the reset function dynamically
+                            }
+                          },
+                          icon: Icon(
+                            Icons.cancel,
+                            color: AppColor.warning,
+                          )),
+                  labelText: labelText,
+                  labelStyle: AppFont.regular()),
+              onTap: () {
+                FocusScope.of(context).unfocus();
+                Get.dialog(
+                  AlertDialog(
+                    surfaceTintColor: Colors.white,
+                    content: SizedBox(
+                      width: MediaQuery.of(context).size.width / 1.5,
+                      child: CalendarDatePicker2WithActionButtons(
+                        config: CalendarDatePicker2WithActionButtonsConfig(
+                          controlsTextStyle: const TextStyle(fontSize: 10),
+                          weekdayLabels: [
+                            'Min',
+                            'Sen',
+                            'Sel',
+                            'Rab',
+                            'Kam',
+                            'Jum',
+                            'Sab'
+                          ],
+                          weekdayLabelTextStyle: const TextStyle(fontSize: 10),
+                          firstDayOfWeek: 1,
+                          calendarType: CalendarDatePicker2Type.range,
+                          centerAlignModePicker: true,
+                        ),
+                        value: dates,
+                        onOkTapped: onOkTap,
+                        onCancelTapped: () {
+                          Get.back();
+                        },
+                        onValueChanged: onDateChanged,
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          IconButton(
+            onPressed: onSortPressed,
+            icon: sortValue == false
+                ? Icon(FontAwesomeIcons.arrowDownWideShort)
+                : Icon(FontAwesomeIcons.arrowDownShortWide),
+          )
+        ],
+      ),
+    );
+  }
+}
+
+class customSearch extends StatelessWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final Function(String)? onChanged;
+  final VoidCallback? onSortPressed;
+  final bool? sortValue;
+
+  const customSearch({
+    super.key,
+    required this.controller,
+    this.hintText = 'Pencarian',
+    this.onChanged,
+    this.onSortPressed,
+    this.sortValue,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 60,
+      padding: const EdgeInsets.all(15),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(right: 10),
+            child: Icon(
+              FontAwesomeIcons.magnifyingGlass,
+              size: 20,
+            ),
+          ),
+          Expanded(
+            child: TextField(
+              style: AppFont.regular(),
+              controller: controller,
+              onChanged: onChanged,
+              decoration: InputDecoration(
+                enabledBorder: UnderlineInputBorder(
+                  borderSide:
+                      BorderSide(color: Colors.grey), // warna garis normal
+                ),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide:
+                      BorderSide(color: Colors.blue), // warna garis saat fokus
+                ),
+
+                hintText: hintText,
+                border: InputBorder.none, // biar lebih clean
+              ),
+            ),
+          ),
+          IconButton(
+            onPressed: onSortPressed,
+            icon: sortValue == false
+                ? Icon(
+                    FontAwesomeIcons.arrowDownWideShort,
+                    size: 20,
+                  )
+                : Icon(
+                    FontAwesomeIcons.arrowDownShortWide,
+                    size: 20,
+                  ),
+          )
+        ],
+      ),
+    );
   }
 }

@@ -37,6 +37,23 @@ class BasemenuBinding extends Bindings {
     //Get.put(KasirController());
     Get.lazyPut<KasirController>(() => KasirController(), fenix: true);
     // Get.put(BasemenuController());
+    Get.lazyPut<CentralKategoriProdukController>(
+        () => CentralKategoriProdukController(),
+        fenix: true);
+    Get.lazyPut<CentralPajakController>(() => CentralPajakController(),
+        fenix: true);
+    Get.lazyPut<CentralUkuranProdukController>(
+        () => CentralUkuranProdukController(),
+        fenix: true);
+    Get.lazyPut<CentralPromoController>(() => CentralPromoController(),
+        fenix: true);
+    Get.lazyPut<CentralPelangganController>(() => CentralPelangganController(),
+        fenix: true);
+    Get.lazyPut<CentralHistoryController>(() => CentralHistoryController(),
+        fenix: true);
+    Get.lazyPut<CentralPenerimaanController>(
+        () => CentralPenerimaanController(),
+        fenix: true);
 
     Get.lazyPut<PengaturanController>(() => PengaturanController());
     Get.lazyPut<UserController>(() => UserController());

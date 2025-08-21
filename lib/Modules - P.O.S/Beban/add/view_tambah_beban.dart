@@ -110,7 +110,7 @@ class TambahBeban extends GetView<TambahBebanController> {
                         keyboardType: TextInputType.name,
                         validator: (value) {
                           if (value!.isEmpty) {
-                            return 'kode promo harus diisi';
+                            return 'Nama Beban harus diisi';
                           }
                           return null;
                         },
@@ -219,7 +219,7 @@ class TambahBeban extends GetView<TambahBebanController> {
                                                           7 -
                                                       10,
                                               controlsTextStyle: TextStyle(
-                                                fontSize: 12,
+                                                fontSize: 10,
                                                 // Adjust font size
                                                 fontWeight: FontWeight.bold,
                                                 // Make it bold
@@ -229,7 +229,7 @@ class TambahBeban extends GetView<TambahBebanController> {
 
                                               // Adjust day width based on screen width
                                               weekdayLabelTextStyle:
-                                                  TextStyle(fontSize: 12),
+                                                  TextStyle(fontSize: 10),
                                               weekdayLabels: [
                                                 'Ming',
                                                 'Sen',
@@ -240,6 +240,7 @@ class TambahBeban extends GetView<TambahBebanController> {
                                                 'Sab',
                                               ],
                                               firstDayOfWeek: 1,
+
                                               calendarType:
                                                   CalendarDatePicker2Type
                                                       .single,

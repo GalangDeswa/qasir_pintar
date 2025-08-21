@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:meta/meta.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 
 import '../../Database/DB_helper.dart';
 import '../../Widget/widget.dart';
@@ -39,6 +40,27 @@ class PromoController extends GetxController {
       Get.back();
       Get.showSnackbar(
           toast().bottom_snackbar_error('Error', 'gagal menghapus'));
+    }
+  }
+
+  deletePromov2(uuid) async {
+    print('-------------------soft delete  promo local---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var beban = await DBHelper().softDelete(table: 'promo', uuid: uuid);
+    print('respon softdeleter beban ---->');
+    print(beban);
+    if (beban == 1) {
+      await Get.find<CentralPromoController>().fetchPromo(id_toko: id_toko);
+      Get.back();
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'berhasil dihapus'));
+    } else {
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal edit data local'));
     }
   }
 

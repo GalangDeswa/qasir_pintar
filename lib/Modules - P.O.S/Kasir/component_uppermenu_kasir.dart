@@ -15,6 +15,7 @@ class UpperMenuKasir extends GetView<KasirController> {
   @override
   Widget build(BuildContext context) {
     var con = Get.find<CentralProdukController>();
+    var conpaket = Get.find<CentralPaketController>();
     return Column(
       children: [
         Container(
@@ -29,19 +30,28 @@ class UpperMenuKasir extends GetView<KasirController> {
                   padding: const EdgeInsets.only(left: 20, top: 20),
                   child: SizedBox(
                     height: 40,
-                    child: TextField(
-                      onChanged: (val) {
-                        print(val);
-                        con.searchProdukLocal(id_toko: controller.id_toko);
-                      },
-                      controller: con.searchproduk.value,
-                      decoration: InputDecoration(
-                          contentPadding: EdgeInsets.symmetric(horizontal: 10),
-                          hintText: 'Pencarian',
-                          hintStyle: AppFont.regular(),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10))),
-                    ),
+                    child: Obx(() {
+                      return TextField(
+                        onChanged: (val) {
+                          print(val);
+                          if (controller.indexdisplay.value == 0) {
+                            con.searchProdukLocal(
+                                id_toko: con.id_toko, search: val);
+                          } else {
+                            conpaket.searchPaketLocal(
+                                id_toko: con.id_toko, search: val);
+                          }
+                        },
+                        controller: con.searchproduk.value,
+                        decoration: InputDecoration(
+                            contentPadding:
+                                EdgeInsets.symmetric(horizontal: 10),
+                            hintText: 'Pencarian',
+                            hintStyle: AppFont.regular(),
+                            border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10))),
+                      );
+                    }),
                   ),
                 ),
               ),
@@ -196,9 +206,10 @@ class UpperMenuKasir extends GetView<KasirController> {
           ),
         ),
         Container(
-          margin: EdgeInsets.only(top: 15),
+          margin: EdgeInsets.only(top: 10),
           width: Get.width,
           padding: EdgeInsets.all(10),
+          //TODO : UI IMPROVEMENT
           color: Colors.cyan.withValues(alpha: 0.25),
           height: Get.height / 14,
           child: Obx(() {
@@ -208,6 +219,12 @@ class UpperMenuKasir extends GetView<KasirController> {
                   selectedIndex: controller.indexdisplay.value),
               onSelected: (string, index, bool) {
                 controller.indexdisplay.value = index;
+                con.searchproduk.value.clear();
+                if (controller.indexdisplay.value == 0) {
+                  con.fetchProdukLocal(id_toko: con.id_toko, isAktif: true);
+                } else {
+                  conpaket.fetchPaketLocal(id_toko: con.id_toko, isAktif: true);
+                }
                 print(controller.indexdisplay.value);
               },
               buttons: [

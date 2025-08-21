@@ -82,6 +82,29 @@ class PelangganController extends GetxController {
     // }
   }
 
+  deletePelangganv2(uuid) async {
+    print(
+        '-------------------soft delete  pelanggan local---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var beban = await DBHelper().softDelete(table: 'pelanggan', uuid: uuid);
+    print('respon softdeleter pelanggan ---->');
+    print(beban);
+    if (beban == 1) {
+      await Get.find<CentralPelangganController>()
+          .fetchPelangganLocal(id_toko: id_toko);
+      Get.back();
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'berhasil dibatalkan'));
+    } else {
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal edit data local'));
+    }
+  }
+
   bool isBase64Svg(String base64) {
     try {
       // Decode the base64 string to UTF-8

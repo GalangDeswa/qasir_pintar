@@ -68,14 +68,14 @@ class RingkasanPenjualanController extends GetxController {
     (
       SELECT COALESCE(SUM(b.jumlah_beban), 0)
       FROM beban b
-      WHERE b.id_toko = "$idToko"
+      WHERE b.id_toko = "$idToko" AND b.aktif = 1
         AND DATE(b.tanggal_beban) BETWEEN "$fromStr" AND "$toStr"
     ) AS total_jumlah_beban,
 
     (
       SELECT COUNT(DISTINCT b.uuid)
       FROM beban b
-      WHERE b.id_toko = "$idToko"
+      WHERE b.id_toko = "$idToko" AND b.aktif = 1
         AND DATE(b.tanggal_beban) BETWEEN "$fromStr" AND "$toStr"
     ) AS total_beban
 
@@ -189,7 +189,7 @@ class RingkasanPenjualanController extends GetxController {
 
                     pw.Center(
                       child: pw.Text(
-                        '<-------------------------------- qasir pintar -------------------------------->',
+                        '<-------------------------------- TubinMart -------------------------------->',
                         style:
                             pw.TextStyle(fontSize: 8, color: PdfColors.grey500),
                       ),

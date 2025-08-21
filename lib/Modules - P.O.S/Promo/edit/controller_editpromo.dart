@@ -15,6 +15,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:qasir_pintar/Config/config.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../Controllers/CentralController.dart';
 import '../../../Database/DB_helper.dart';
 import '../../../Widget/widget.dart';
 import '../../Pelanggan/List kategori pelanggan/model_kategoriPelanggan.dart';
@@ -41,6 +42,7 @@ class EditPromoController extends GetxController {
       opsidiskon[0];
       selecteddiskon.value = 'Rp.';
     }
+    isAktif.value = data.aktif == 1 ? true : false;
   }
 
   DataPromo data = Get.arguments;
@@ -139,7 +141,7 @@ class EditPromoController extends GetxController {
 
   var kategoripelangganList = <DataKategoriPelanggan>[].obs;
   var kategorivalue;
-
+  var isAktif = true.obs;
   var usertemp = <DataUser>[].obs;
 
   var tanggal = TextEditingController().obs;
@@ -196,14 +198,8 @@ class EditPromoController extends GetxController {
     }
   }
 
-  Map<String, dynamic> dataedit({
-    nama,
-    diskonnominal,
-    diskonpersen,
-    keterangan,
-    date1,
-    date2,
-  }) {
+  Map<String, dynamic> dataedit(
+      {nama, diskonnominal, diskonpersen, keterangan, date1, date2, aktif}) {
     var map = <String, dynamic>{};
 
     map['nama_promo'] = nama;
@@ -212,6 +208,7 @@ class EditPromoController extends GetxController {
     map['tgl_mulai'] = date1;
     map['tgl_selesai'] = date2;
     map['keterangan'] = keterangan;
+    map['aktif'] = aktif;
 
     return map;
   }
@@ -224,17 +221,19 @@ class EditPromoController extends GetxController {
     var query = await DBHelper().UPDATE(
         table: 'promo',
         data: dataedit(
-            keterangan: keterangan.value.text,
-            nama: nama.value.text,
-            date1: date1,
-            date2: date2,
-            diskonnominal: diskonnominal.value,
-            diskonpersen: diskonpersen.value),
+          keterangan: keterangan.value.text,
+          nama: nama.value.text,
+          date1: date1,
+          date2: date2,
+          diskonnominal: diskonnominal.value,
+          diskonpersen: diskonpersen.value,
+          aktif: isAktif.value == true ? 1 : 0,
+        ),
         id: data.uuid);
 
     print(query);
     if (query == 1) {
-      await Get.find<PromoController>().fetchPromo(id_toko: id_toko);
+      await Get.find<CentralPromoController>().fetchPromo(id_toko: id_toko);
       Get.back(closeOverlays: true);
       Get.showSnackbar(
           toast().bottom_snackbar_success('sukses', 'Promo berhasil diedit'));

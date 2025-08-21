@@ -101,7 +101,7 @@ class DetailStockController extends GetxController {
               pw.Spacer(),
               pw.Center(
                 child: pw.Text(
-                    '<----------------------------------- qasir pintar ----------------------------------->',
+                    '<----------------------------------- TubinMart ----------------------------------->',
                     style: const pw.TextStyle(fontSize: 8)),
               )
             ],

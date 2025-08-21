@@ -310,6 +310,56 @@ class DBHelper {
     }
   }
 
+  softDeleteProduk({
+    required String table,
+    required String uuid,
+    String idField = 'uuid',
+  }) async {
+    try {
+      var dbClient = await db;
+      var query = await dbClient!.update(
+        table,
+        {'tampilkan_di_produk': 0},
+        where: '$idField = ?',
+        whereArgs: [uuid],
+      );
+      return query;
+    } catch (e, stackTrace) {
+      print('---------------------------errorr-----------');
+      print(e);
+      print(stackTrace);
+      // Get.back(closeOverlays: true);
+      Get.showSnackbar(toast().bottom_snackbar_error('Error', e.toString()));
+      //   return {'result': null, 'error': e}; // Return result and no error
+      return null;
+    }
+  }
+
+  softDeletePaketProduk({
+    required String table,
+    required String uuid,
+    String idField = 'uuid',
+  }) async {
+    try {
+      var dbClient = await db;
+      var query = await dbClient!.update(
+        table,
+        {'tampilkan_di_paket': 0},
+        where: '$idField = ?',
+        whereArgs: [uuid],
+      );
+      return query;
+    } catch (e, stackTrace) {
+      print('---------------------------errorr-----------');
+      print(e);
+      print(stackTrace);
+      // Get.back(closeOverlays: true);
+      Get.showSnackbar(toast().bottom_snackbar_error('Error', e.toString()));
+      //   return {'result': null, 'error': e}; // Return result and no error
+      return null;
+    }
+  }
+
   DELETEDETAILPAKET({required String table, id}) async {
     try {
       var dbClient = await db;

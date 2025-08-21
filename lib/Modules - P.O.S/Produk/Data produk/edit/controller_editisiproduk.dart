@@ -53,7 +53,10 @@ class EditIsiProdukController extends GetxController {
     hargaJualPelanggan.value.text = NumberFormat('#,###')
             .format(double.parse(data.harga_jual_pelanggan.toString())) ??
         '';
-    infostock.value.text = data.info_stok_habis?.toString() ?? '0';
+    stockAwal.value.text = data.stockawal?.toString() ?? '0';
+    minimumStock.value.text = data.info_stok_habis?.toString() ?? '0';
+    hitungStok.value = data.hitung_stok == 1 ? true : false;
+
     berat.value.text =
         NumberFormat('#,###').format(double.parse(data.berat.toString())) ?? '';
     volumePanjang.value.text = NumberFormat('#,###')
@@ -81,7 +84,9 @@ class EditIsiProdukController extends GetxController {
         ? true
         : false;
     diskonvalue.value = data.diskon ?? 0.0;
-    diskon.value.text = data.diskon.toString() ?? 'qwe';
+    diskon.value.text =
+        NumberFormat('#,###').format(double.parse(data.diskon.toString())) ??
+            '0.0';
     print('diskon-->');
     print(data.diskon);
     showdiskon.value = data.diskon != 0.0 ? true : false;
@@ -140,6 +145,17 @@ class EditIsiProdukController extends GetxController {
 
   var jenisproduklist = ['Produk jadi', 'Bahan baku'].obs;
   var jenisvalue;
+  Map<String, dynamic> dataeditstock({stockawal}) {
+    var map = <String, dynamic>{};
+    map['stok'] = stockawal;
+    return map;
+  }
+
+  Map<String, dynamic> dataeditstockHPP({HPP}) {
+    var map = <String, dynamic>{};
+    map['hpp'] = HPP;
+    return map;
+  }
 
   Map<String, dynamic> dataeditproduk({
     id_kelompok_produk,
@@ -166,6 +182,7 @@ class EditIsiProdukController extends GetxController {
     id_gambar,
     jenis_produk,
     diskon,
+    stock_awal,
   }) {
     var map = <String, dynamic>{};
 
@@ -186,6 +203,7 @@ class EditIsiProdukController extends GetxController {
     map['harga_jual_eceran'] = harga_jual_eceran;
     map['harga_jual_pelanggan'] = harga_jual_pelanggan;
     map['pajak'] = pajak;
+    map['stock_awal'] = stock_awal;
     map['info_stok_habis'] = info_stok_habis;
     map['ukuran'] = ukuran;
     map['berat'] = berat;
@@ -249,7 +267,8 @@ class EditIsiProdukController extends GetxController {
   var satuanUtama = TextEditingController().obs;
   var isiDalamSatuan = TextEditingController().obs;
   var pajak = TextEditingController().obs;
-  var infostock = TextEditingController().obs;
+  var minimumStock = TextEditingController().obs;
+  var stockAwal = TextEditingController().obs;
   var warna = TextEditingController().obs;
   var ukuran = TextEditingController().obs;
   var berat = TextEditingController().obs;
@@ -778,6 +797,8 @@ class EditIsiProdukController extends GetxController {
           serial_key: serialKey.value.text,
           imei: imei.value.text,
           hitung_stok: hitungStok.value == true ? 1 : 0,
+          stock_awal: int.parse(stockAwal.value.text),
+          info_stok_habis: int.parse(minimumStock.value.text),
           tampilkan_di_produk: tampilkanDiProduk.value == true ? 1 : 0,
           harga_beli: double.parse(hargaBeli.value.text.replaceAll(',', '')),
           hpp: double.parse(hpp.value.text.replaceAll(',', '')),
@@ -787,10 +808,9 @@ class EditIsiProdukController extends GetxController {
               double.parse(hargaJualEceran.value.text.replaceAll(',', '')),
           harga_jual_pelanggan:
               double.parse(hargaJualPelanggan.value.text.replaceAll(',', '')),
-          pajak: pajakdisplay == true ? pajakValue : null,
+          pajak: pajakdisplay.value == true ? pajakValue : null,
           jenis_produk: jenisvalue,
-          info_stok_habis: int.parse(infostock.value.text),
-          ukuran: ukurandisplay == true ? ukuranValue : null,
+          ukuran: ukurandisplay.value == true ? ukuranValue : null,
           berat: double.parse(berat.value.text.replaceAll(',', '')),
           volume_panjang:
               double.parse(volumePanjang.value.text.replaceAll(',', '')),
@@ -807,6 +827,24 @@ class EditIsiProdukController extends GetxController {
                   100),
         ));
     if (produk == 1) {
+      print('update HPP stock ---->');
+      await DBHelper().UPDATEQTY(
+          table: 'stock_produk',
+          id: data.uuid!,
+          data: dataeditstockHPP(
+              HPP: double.parse(hpp.value.text.replaceAll(',', ''))));
+      if (hitungStok.value == true) {
+        print('update stock ---->');
+        await DBHelper().incrementQty(
+            table: 'stock_produk',
+            id_produk: data.uuid!,
+            increment: int.parse(stockAwal.value.text));
+      } else {
+        await DBHelper().UPDATEQTY(
+            table: 'stock_produk',
+            id: data.uuid!,
+            data: dataeditstock(stockawal: 0));
+      }
       await Get.find<CentralProdukController>()
           .fetchProdukLocal(id_toko: id_toko);
       Get.back();

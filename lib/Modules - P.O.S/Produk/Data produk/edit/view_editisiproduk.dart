@@ -728,6 +728,10 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                           value: controller.showdiskon.value,
                           onChanged: (value) {
                             controller.showdiskon.value = value;
+                            controller.diskon.value.text = '0';
+                            controller.diskonvalue.value = 0.0;
+                            controller.selecteddiskon.value =
+                                controller.opsidiskon[0];
                           },
                         ),
                       ],
@@ -737,18 +741,6 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
 
                 Obx(
                   () {
-                    // Update text field when radio changes
-                    final isNominal = controller.selecteddiskon.value ==
-                        controller.opsidiskon[0];
-                    final currentValue = isNominal
-                        ? controller.diskonvalue.value.toStringAsFixed(0)
-                        : controller.diskonvalue.value.toStringAsFixed(0);
-
-                    // Update controller text when value changes
-                    if (controller.diskon.value.text != currentValue) {
-                      controller.diskon.value.text = currentValue;
-                    }
-
                     return controller.showdiskon.value == false
                         ? Container()
                         : Padding(
@@ -757,57 +749,71 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Expanded(
-                                  child: TextFormField(
-                                    controller: controller.diskon.value,
-                                    decoration: InputDecoration(
-                                      prefixIcon: isNominal
-                                          ? const Icon(Icons.money)
-                                          : const Icon(Icons.percent),
-                                      labelText: 'Nilai Diskon',
-                                      border: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(10),
+                                  child: Obx(() {
+                                    return TextFormField(
+                                      inputFormatters: [ThousandsFormatter()],
+                                      controller: controller.diskon.value,
+                                      decoration: InputDecoration(
+                                        prefixIcon:
+                                            controller.selecteddiskon.value ==
+                                                    controller.opsidiskon[0]
+                                                ? const Icon(Icons.money)
+                                                : const Icon(Icons.percent),
+                                        labelText: 'Nilai Diskon',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
                                       ),
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty)
-                                        return 'Diskon harus diisi';
-                                      final parsed = double.tryParse(value);
-                                      if (parsed == null)
-                                        return 'Masukkan angka valid';
-                                      if (isNominal && parsed <= 0)
-                                        return 'Nominal harus > 0';
-                                      if (!isNominal &&
-                                          (parsed <= 0 || parsed > 100)) {
-                                        return 'Persen harus 1-100';
-                                      }
-                                      return null;
-                                    },
-                                    onChanged: (value) {
-                                      final parsed = double.tryParse(value);
-                                      if (parsed == null) return;
+                                      keyboardType: TextInputType.number,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty)
+                                          return 'Diskon harus diisi';
+                                        final parsed = double.tryParse(
+                                            value.replaceAll(
+                                                RegExp(r'[^0-9.]'), ''));
+                                        if (parsed == null)
+                                          return 'Masukkan angka valid';
+                                        if (controller.selecteddiskon.value ==
+                                                controller.opsidiskon[0] &&
+                                            parsed <= 0) {
+                                          return 'Nominal harus > 0';
+                                        }
+                                        if (controller.selecteddiskon.value !=
+                                                controller.opsidiskon[0] &&
+                                            (parsed <= 0 || parsed > 100)) {
+                                          return 'Persen harus 1-100';
+                                        }
+                                        return null;
+                                      },
+                                      onChanged: (value) {
+                                        final cleanValue = value.replaceAll(
+                                            RegExp(r'[^0-9.]'), '');
+                                        final parsed =
+                                            double.tryParse(cleanValue);
+                                        if (parsed == null) return;
 
-                                      if (isNominal) {
-                                        controller.diskonvalue.value = parsed;
-                                      } else {
-                                        controller.diskonvalue.value = parsed;
-                                      }
-                                    },
-                                  ),
+                                        if (controller.selecteddiskon.value ==
+                                            controller.opsidiskon[0]) {
+                                          controller.diskonvalue.value = parsed;
+                                        } else {
+                                          controller.diskonvalue.value = parsed;
+                                        }
+                                      },
+                                    );
+                                  }),
                                 ),
                                 Expanded(
-                                  child: Obx(
-                                    () => Row(
+                                  child: Obx(() {
+                                    return Row(
                                       children: [
                                         Expanded(
                                           child: RadioMenuButton(
                                             value: controller.opsidiskon[0],
                                             groupValue:
                                                 controller.selecteddiskon.value,
-                                            onChanged: (x) {
-                                              controller.selecteddiskon.value =
-                                                  x!;
-                                            },
+                                            onChanged: (x) => controller
+                                                .selecteddiskon.value = x!,
                                             child: const Text('Rp.'),
                                           ),
                                         ),
@@ -816,16 +822,14 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                                             value: controller.opsidiskon[1],
                                             groupValue:
                                                 controller.selecteddiskon.value,
-                                            onChanged: (x) {
-                                              controller.selecteddiskon.value =
-                                                  x!;
-                                            },
+                                            onChanged: (x) => controller
+                                                .selecteddiskon.value = x!,
                                             child: const Text('%'),
                                           ),
                                         ),
                                       ],
-                                    ),
-                                  ),
+                                    );
+                                  }),
                                 ),
                               ],
                             ),
@@ -847,6 +851,8 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                           value: controller.pajakdisplay.value,
                           onChanged: (value) {
                             controller.pajakdisplay.value = value;
+                            controller.pajak.value.text = '';
+                            controller.pajakValue = null;
                           },
                         ),
                       ],
@@ -949,6 +955,8 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                           value: controller.hitungStok.value,
                           onChanged: (value) {
                             controller.hitungStok.value = value;
+                            controller.stockAwal.value.text = '0';
+                            controller.minimumStock.value.text = '0';
                           },
                         ),
                       ],
@@ -960,7 +968,30 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                       ? Padding(
                           padding: AppPading.customBottomPadding(),
                           child: TextFormField(
-                            controller: controller.infostock.value,
+                            controller: controller.stockAwal.value,
+                            decoration: InputDecoration(
+                              labelText: 'Stock awal',
+                              labelStyle: AppFont.regular(),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            keyboardType: TextInputType.number,
+                            // validator: (value) {
+                            //            if (value!.isEmpty) {
+                            //              return 'Pajak harus diisi';
+                            //            }
+                            //            return null;
+                            //          },
+                          ))
+                      : Container();
+                }),
+                Obx(() {
+                  return controller.hitungStok.value == true
+                      ? Padding(
+                          padding: AppPading.customBottomPadding(),
+                          child: TextFormField(
+                            controller: controller.minimumStock.value,
                             decoration: InputDecoration(
                               labelText: 'Minimum Stock',
                               border: OutlineInputBorder(
@@ -992,6 +1023,8 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                           value: controller.ukurandisplay.value,
                           onChanged: (value) {
                             controller.ukurandisplay.value = value;
+                            controller.ukuran.value.text = '';
+                            controller.ukuranValue = null;
                           },
                         ),
                       ],
@@ -1073,6 +1106,10 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                           value: controller.dimensi.value,
                           onChanged: (value) {
                             controller.dimensi.value = value;
+                            controller.berat.value.text = '0';
+                            controller.volumePanjang.value.text = '0';
+                            controller.volumeLebar.value.text = '0';
+                            controller.volumeTinggi.value.text = '0';
                           },
                         ),
                       ],
@@ -1080,7 +1117,7 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                   );
                 }),
                 Obx(() {
-                  return controller.dimensi == true
+                  return controller.dimensi.value == true
                       ? Padding(
                           padding: AppPading.customBottomPadding(),
                           child: TextFormField(
@@ -1103,7 +1140,7 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                       : Container();
                 }),
                 Obx(() {
-                  return controller.dimensi == true
+                  return controller.dimensi.value == true
                       ? Padding(
                           padding: AppPading.customBottomPadding(),
                           child: TextFormField(
@@ -1126,7 +1163,7 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                       : Container();
                 }),
                 Obx(() {
-                  return controller.dimensi == true
+                  return controller.dimensi.value == true
                       ? Padding(
                           padding: AppPading.customBottomPadding(),
                           child: TextFormField(
@@ -1149,7 +1186,7 @@ class EditIsiProduk extends GetView<EditIsiProdukController> {
                       : Container();
                 }),
                 Obx(() {
-                  return controller.dimensi == true
+                  return controller.dimensi.value == true
                       ? Padding(
                           padding: AppPading.customBottomPadding(),
                           child: TextFormField(

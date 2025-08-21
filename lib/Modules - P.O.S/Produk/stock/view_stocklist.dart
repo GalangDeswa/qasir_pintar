@@ -26,11 +26,16 @@ class StockList extends GetView<BasemenuStockController> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(right: 10),
-                child: Icon(Icons.sort),
+                child: Icon(
+                  Icons.numbers,
+                  size: 20,
+                ),
               ),
               Expanded(
                 child: Obx(() {
                   return TextField(
+                    style: AppFont.regular(),
+                    keyboardType: TextInputType.number,
                     onChanged: (val) async {
                       if (controller.filterstock.value.text.isEmpty) {
                         await con.fetchProdukLocal(id_toko: controller.id_toko);
@@ -41,7 +46,7 @@ class StockList extends GetView<BasemenuStockController> {
                       print(controller.filterstock.value.text);
                     },
                     controller: controller.filterstock.value,
-                    decoration: InputDecoration(hintText: 'Filter'),
+                    decoration: InputDecoration(hintText: 'Jumlah stock'),
                   );
                 }),
               ),
@@ -60,7 +65,10 @@ class StockList extends GetView<BasemenuStockController> {
                                           controller.filterstock.value.text),
                                       filter: "<");
                                 },
-                                icon: Icon(FontAwesomeIcons.lessThan)),
+                                icon: Icon(
+                                  FontAwesomeIcons.lessThan,
+                                  size: 20,
+                                )),
                           ),
                           IconButton(
                               onPressed: () {
@@ -70,7 +78,7 @@ class StockList extends GetView<BasemenuStockController> {
                                         controller.filterstock.value.text),
                                     filter: "=");
                               },
-                              icon: Icon(FontAwesomeIcons.equals)),
+                              icon: Icon(FontAwesomeIcons.equals, size: 20)),
                           IconButton(
                               onPressed: () {
                                 con.filterStock(
@@ -79,7 +87,8 @@ class StockList extends GetView<BasemenuStockController> {
                                         controller.filterstock.value.text),
                                     filter: ">");
                               },
-                              icon: Icon(FontAwesomeIcons.greaterThan)),
+                              icon:
+                                  Icon(FontAwesomeIcons.greaterThan, size: 20)),
                         ],
                       );
               })

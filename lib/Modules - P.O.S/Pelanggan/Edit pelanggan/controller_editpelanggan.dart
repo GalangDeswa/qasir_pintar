@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Pelanggan/List%20Pelanggan/model_pelanggan.dart';
 
 import '../../../Database/DB_helper.dart';
@@ -332,7 +333,7 @@ class EditPelangganController extends GetxController {
     print(query);
     if (query == 1) {
       //print('edit user local berhasil------------------------------------->');
-      await Get.find<PelangganController>()
+      await Get.find<CentralPelangganController>()
           .fetchPelangganLocal(id_toko: id_toko);
       Get.back(closeOverlays: true);
       Get.showSnackbar(toast()

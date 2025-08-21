@@ -11,7 +11,7 @@ class LoginController extends GetxController {
   var current = 0.obs;
   var currenttext = 0.obs;
   final List<String> imgList = [
-    'assets/icons/splash.png',
+    'assets/icons/splashv2.png',
     'assets/images/intro2.png',
     'assets/images/intro3.png',
   ].obs;

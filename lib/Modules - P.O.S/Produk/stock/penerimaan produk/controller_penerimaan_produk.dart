@@ -34,8 +34,9 @@ class PenerimaanProdukController extends GetxController {
   Future<void> onInit() async {
     // TODO: implement onInit
     super.onInit();
-    await Get.find<CentralSupplierController>()
-        .fetchSupplierLocal(id_toko: id_toko);
+    print('init penerimaan controller --->');
+    // await Get.find<CentralSupplierController>()
+    //     .fetchSupplierLocal(id_toko: id_toko);
     await Get.find<CentralProdukController>()
         .fetchProdukLocal(id_toko: id_toko);
   }
@@ -85,8 +86,10 @@ class PenerimaanProdukController extends GetxController {
     }
   }
 
-  popaddprodukv2() {
+  popaddprodukv2() async {
     var con = Get.find<CentralProdukController>();
+    await con.fetchProdukLocal(
+        id_toko: id_toko, isAktif: true, hitungStock: true);
     Get.dialog(SheetViewport(
         child: Sheet(
       scrollConfiguration: SheetScrollConfiguration(),
@@ -221,54 +224,31 @@ class PenerimaanProdukController extends GetxController {
                                           children: [
                                             Expanded(
                                               child: ListTile(
-                                                  // leading: ClipOval(
-                                                  //   child: customer[index]
-                                                  //                   .gambar_produk_utama !=
-                                                  //               '' &&
-                                                  //           customer[index]
-                                                  //                   .gambar_produk_utama !=
-                                                  //               null
-                                                  //       ? isBase64Svg(customer[
-                                                  //                   index]
-                                                  //               .gambar_produk_utama!)
-                                                  //           ? SvgPicture.memory(
-                                                  //               base64Decode(customer[
-                                                  //                       index]
-                                                  //                   .gambar_produk_utama!),
-                                                  //               width: 30,
-                                                  //               height: 40,
-                                                  //               fit: BoxFit
-                                                  //                   .cover,
-                                                  //             )
-                                                  //           : Image.memory(
-                                                  //               base64Decode(customer[
-                                                  //                       index]
-                                                  //                   .gambar_produk_utama!),
-                                                  //               width: 30,
-                                                  //               height: 40,
-                                                  //               fit: BoxFit
-                                                  //                   .cover,
-                                                  //             )
-                                                  //       : Image.asset(
-                                                  //           AppString
-                                                  //               .defaultImg,
-                                                  //           width: 30,
-                                                  //           height: 40,
-                                                  //           fit: BoxFit.cover,
-                                                  //         ),
-                                                  // ),
                                                   title: Text(
                                                     customer[index]
                                                             .nama_produk ??
                                                         'default nama',
-                                                    style: AppFont.regular(),
+                                                    style:
+                                                        AppFont.regular_bold(),
                                                   ),
-                                                  subtitle: Text(
-                                                    'Rp. ' +
-                                                        AppFormat().numFormat(
-                                                            customer[index]
-                                                                .harga_beli),
-                                                    style: AppFont.small(),
+                                                  subtitle: Column(
+                                                    crossAxisAlignment:
+                                                        CrossAxisAlignment
+                                                            .start,
+                                                    children: [
+                                                      Text(
+                                                        'Harga beli',
+                                                        style: AppFont.small(),
+                                                      ),
+                                                      Text(
+                                                        'Rp. ' +
+                                                            AppFormat().numFormat(
+                                                                customer[index]
+                                                                    .harga_beli),
+                                                        style: AppFont
+                                                            .regular_bold(),
+                                                      ),
+                                                    ],
                                                   )),
                                             ),
                                             button_solid_custom(
@@ -276,10 +256,10 @@ class PenerimaanProdukController extends GetxController {
                                                   popaddqty(customer[index]);
                                                 },
                                                 child: Text(
-                                                  '+ kelipatan',
+                                                  '+ qty',
                                                   style: AppFont.small_white(),
                                                 ),
-                                                width: 100)
+                                                width: 80)
                                           ],
                                         ),
                                         Container(
@@ -356,7 +336,7 @@ class PenerimaanProdukController extends GetxController {
   }
 
   popAddSupplier() {
-    Get.put(CentralSupplierController());
+    // Get.put(CentralSupplierController());
 
     Get.dialog(SheetViewport(
         child: Sheet(

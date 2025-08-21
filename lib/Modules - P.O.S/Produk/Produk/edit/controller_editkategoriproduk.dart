@@ -11,6 +11,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/Produk/model_kategoriproduk.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/controller_basemenuproduk.dart';
 import 'package:uuid/uuid.dart';
@@ -92,8 +93,10 @@ class EditKategoriProdukController extends GetxController {
     print(query);
     if (query == 1) {
       //print('edit user local berhasil------------------------------------->');
-      await Get.find<BaseMenuProdukController>()
+      await Get.find<CentralKategoriProdukController>()
           .fetchKategoriProdukLocal(id_toko: id_toko);
+      await Get.find<CentralProdukController>()
+          .fetchProdukLocal(id_toko: id_toko);
       Get.back(closeOverlays: true);
       Get.showSnackbar(toast()
           .bottom_snackbar_success('sukses', 'kategori berhasil diedit'));

@@ -260,7 +260,7 @@ ORDER BY tanggal DESC;
           pw.Spacer(),
           pw.Center(
             child: pw.Text(
-              '<-------------------------------- qasir pintar -------------------------------->',
+              '<-------------------------------- TubinMart -------------------------------->',
               style: pw.TextStyle(fontSize: 8, color: PdfColors.grey500),
             ),
           ),

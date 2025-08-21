@@ -263,7 +263,7 @@ class PrintController extends GetxController {
           width: 6,
           styles: const PosStyles(align: PosAlign.right)),
     ]);
-    bytes += generator.text('<-- QASIR PINTAR -->',
+    bytes += generator.text('<-- TubinMart -->',
         linesAfter: 1, styles: PosStyles(align: PosAlign.center));
 
     // 4) Footer message, centered

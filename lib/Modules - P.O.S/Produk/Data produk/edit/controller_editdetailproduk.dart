@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:meta/meta.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/Data%20produk/model_produk.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/controller_basemenuproduk.dart';
 
@@ -75,10 +76,9 @@ class EditDetailProdukController extends GetxController {
     print(query);
     if (query == 1) {
       //print('edit user local berhasil------------------------------------->');
-      await Get.find<BaseMenuProdukController>()
+      await Get.find<CentralPajakController>()
           .fetchPajakLocal(id_toko: id_toko);
-      await Get.find<BaseMenuProdukController>()
-          .fetchProdukLocal(id_toko: id_toko);
+
       Get.back(closeOverlays: true);
       Get.showSnackbar(
           toast().bottom_snackbar_success('sukses', 'berhasil diedit'));
@@ -104,10 +104,9 @@ class EditDetailProdukController extends GetxController {
     print(query);
     if (query == 1) {
       //print('edit user local berhasil------------------------------------->');
-      await Get.find<BaseMenuProdukController>()
+      await Get.find<CentralUkuranProdukController>()
           .fetchUkuranLocal(id_toko: id_toko);
-      await Get.find<BaseMenuProdukController>()
-          .fetchProdukLocal(id_toko: id_toko);
+
       Get.back(closeOverlays: true);
       Get.showSnackbar(
           toast().bottom_snackbar_success('sukses', 'berhasil diedit'));

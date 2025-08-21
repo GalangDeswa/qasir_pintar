@@ -10,6 +10,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:uuid/uuid.dart';
 
 import '../../../Database/DB_helper.dart';
@@ -58,7 +59,8 @@ class EditSupplierController extends GetxController {
     print(query);
     if (query == 1) {
       //print('edit user local berhasil------------------------------------->');
-      await Get.find<SupplierController>().fetchSupplierLocal(id_toko: id_toko);
+      await Get.find<CentralSupplierController>()
+          .fetchSupplierLocal(id_toko: id_toko);
       Get.back(closeOverlays: true);
       Get.showSnackbar(toast()
           .bottom_snackbar_success('sukses', 'Supplier berhasil diedit'));

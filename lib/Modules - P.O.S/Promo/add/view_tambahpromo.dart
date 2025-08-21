@@ -2,6 +2,7 @@ import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pattern_formatter/numeric_formatter.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Promo/add/controller_tambahpromo.dart';
 
 import '../../../Config/config.dart';
@@ -47,114 +48,104 @@ class TambahPromo extends GetView<TambahPromoController> {
                       ),
                     );
                   }),
-                  Obx(
-                    () {
-                      // Update text field when radio changes
-                      final isNominal = controller.selecteddiskon.value ==
-                          controller.opsidiskon[0];
-                      final currentValue = isNominal
-                          ? controller.diskonnominal.value.toStringAsFixed(0)
-                          : controller.diskonpersen.value.toStringAsFixed(0);
+                  Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Obx(() {
+                            return TextFormField(
+                              inputFormatters: [ThousandsFormatter()],
+                              controller: controller.promovalue.value,
+                              decoration: InputDecoration(
+                                prefixIcon: controller.selecteddiskon.value ==
+                                        controller.opsidiskon[0]
+                                    ? const Icon(Icons.money)
+                                    : const Icon(Icons.percent),
+                                labelText: 'Nilai Promo',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value == null || value.isEmpty)
+                                  return 'Diskon harus diisi';
+                                final parsed = double.tryParse(
+                                    value.replaceAll(RegExp(r'[^0-9.]'), ''));
+                                if (parsed == null)
+                                  return 'Masukkan angka valid';
+                                if (controller.selecteddiskon.value ==
+                                        controller.opsidiskon[0] &&
+                                    parsed <= 0) {
+                                  return 'Nominal harus > 0';
+                                }
+                                if (controller.selecteddiskon.value !=
+                                        controller.opsidiskon[0] &&
+                                    (parsed <= 0 || parsed > 100)) {
+                                  return 'Persen harus 1-100';
+                                }
+                                return null;
+                              },
+                              onChanged: (value) {
+                                final cleanValue =
+                                    value.replaceAll(RegExp(r'[^0-9.]'), '');
+                                final parsed = double.tryParse(cleanValue);
+                                if (parsed == null) return;
 
-                      // Update controller text when value changes
-                      if (controller.promovalue.value.text != currentValue) {
-                        controller.promovalue.value.text = currentValue;
-                      }
-
-                      return Padding(
-                        padding: AppPading.customBottomPadding(),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: controller.promovalue.value,
-                                decoration: InputDecoration(
-                                  prefixIcon: isNominal
-                                      ? const Icon(Icons.money)
-                                      : const Icon(Icons.percent),
-                                  labelText: 'Nilai Promo',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                                if (controller.selecteddiskon.value ==
+                                    controller.opsidiskon[0]) {
+                                  controller.diskonpersen.value = 0.0;
+                                  controller.diskonnominal.value = parsed;
+                                  print('nominal');
+                                  print('nominal --> ' +
+                                      controller.diskonnominal.value
+                                          .toString() +
+                                      'persen --> ' +
+                                      controller.diskonpersen.value.toString());
+                                } else {
+                                  controller.diskonnominal.value = 0.0;
+                                  controller.diskonpersen.value = parsed;
+                                  print('persen');
+                                  print('nominal --> ' +
+                                      controller.diskonnominal.value
+                                          .toString() +
+                                      'persen --> ' +
+                                      controller.diskonpersen.value.toString());
+                                }
+                              },
+                            );
+                          }),
+                        ),
+                        Expanded(
+                          child: Obx(() {
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: RadioMenuButton(
+                                    value: controller.opsidiskon[0],
+                                    groupValue: controller.selecteddiskon.value,
+                                    onChanged: (x) =>
+                                        controller.selecteddiskon.value = x!,
+                                    child: const Text('Rp.'),
                                   ),
                                 ),
-                                keyboardType: TextInputType.number,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty)
-                                    return 'Diskon harus diisi';
-                                  final parsed = double.tryParse(value);
-                                  if (parsed == null)
-                                    return 'Masukkan angka valid';
-                                  if (isNominal && parsed <= 0)
-                                    return 'Nominal harus > 0';
-                                  if (!isNominal &&
-                                      (parsed <= 0 || parsed > 100)) {
-                                    return 'Persen harus 1-100';
-                                  }
-                                  return null;
-                                },
-                                onChanged: (value) {
-                                  final parsed = double.tryParse(value);
-                                  if (parsed == null) return;
-
-                                  if (isNominal) {
-                                    controller.diskonpersen.value = 0.0;
-                                    controller.diskonnominal.value = parsed;
-                                    print('nominal');
-                                    print('nominal --> ' +
-                                        controller.diskonnominal.value
-                                            .toString() +
-                                        'persen --> ' +
-                                        controller.diskonpersen.value
-                                            .toString());
-                                  } else {
-                                    controller.diskonnominal.value = 0.0;
-                                    controller.diskonpersen.value = parsed;
-                                    print('persen');
-                                    print('nominal --> ' +
-                                        controller.diskonnominal.value
-                                            .toString() +
-                                        'persen --> ' +
-                                        controller.diskonpersen.value
-                                            .toString());
-                                  }
-                                },
-                              ),
-                            ),
-                            Expanded(
-                              child: Obx(
-                                () => Row(
-                                  children: [
-                                    Expanded(
-                                      child: RadioMenuButton(
-                                        value: controller.opsidiskon[0],
-                                        groupValue:
-                                            controller.selecteddiskon.value,
-                                        onChanged: (x) {
-                                          controller.selecteddiskon.value = x!;
-                                        },
-                                        child: const Text('Rp.'),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: RadioMenuButton(
-                                        value: controller.opsidiskon[1],
-                                        groupValue:
-                                            controller.selecteddiskon.value,
-                                        onChanged: (x) {
-                                          controller.selecteddiskon.value = x!;
-                                        },
-                                        child: const Text('%'),
-                                      ),
-                                    ),
-                                  ],
+                                Expanded(
+                                  child: RadioMenuButton(
+                                    value: controller.opsidiskon[1],
+                                    groupValue: controller.selecteddiskon.value,
+                                    onChanged: (x) =>
+                                        controller.selecteddiskon.value = x!,
+                                    child: const Text('%'),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                              ],
+                            );
+                          }),
                         ),
-                      );
-                    },
+                      ],
+                    ),
                   ),
                   Obx(() {
                     return Container(
@@ -172,15 +163,19 @@ class TambahPromo extends GetView<TambahPromoController> {
                               child: CalendarDatePicker2WithActionButtons(
                                   config:
                                       CalendarDatePicker2WithActionButtonsConfig(
+                                    controlsTextStyle:
+                                        const TextStyle(fontSize: 10),
                                     weekdayLabels: [
-                                      'Minggu',
-                                      'Senin',
-                                      'Selasa',
-                                      'Rabu',
-                                      'Kamis',
-                                      'Jumat',
-                                      'Sabtu',
+                                      'Min',
+                                      'Sen',
+                                      'Sel',
+                                      'Rab',
+                                      'Kam',
+                                      'Jum',
+                                      'Sab',
                                     ],
+                                    weekdayLabelTextStyle:
+                                        const TextStyle(fontSize: 10),
                                     firstDayOfWeek: 1,
                                     calendarType: CalendarDatePicker2Type.range,
                                     centerAlignModePicker: true,
@@ -200,9 +195,8 @@ class TambahPromo extends GetView<TambahPromoController> {
                                             controller.dateformat.format(end!));
 
                                     controller.date1 =
-                                        controller.dateformat.format(start);
-                                    controller.date2 =
-                                        controller.dateformat.format(end);
+                                        AppFormat().dateISO(start);
+                                    controller.date2 = AppFormat().dateISO(end);
                                     print(controller.date1);
                                     print(controller.date2);
                                   }),

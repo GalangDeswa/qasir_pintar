@@ -272,6 +272,8 @@ class DrawerBase extends GetView<BasemenuController> {
                         Get.toNamed('/basemenupelanggan');
                       },
                     ),
+
+                    //TODO: check sistem pos
                     _buildDrawerItem(
                       icon: FontAwesomeIcons.boxesPacking,
                       title: 'Supplier',

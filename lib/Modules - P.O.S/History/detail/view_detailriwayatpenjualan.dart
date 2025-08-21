@@ -28,6 +28,21 @@ class DetailHistoryPenjualan extends GetView<DetailHistoryPenjualanController> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  controller.data.reversal == 0
+                      ? Container()
+                      : Center(
+                          child: Container(
+                            padding: EdgeInsets.all(10),
+                            margin: AppPading.customBottomPadding(),
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                color: AppColor.warning),
+                            child: Text(
+                              'Reversal',
+                              style: AppFont.regular_white_bold(fontSize: 18),
+                            ),
+                          ),
+                        ),
                   Padding(
                     padding: AppPading.customBottomPadding(),
                     child: Row(
@@ -54,7 +69,7 @@ class DetailHistoryPenjualan extends GetView<DetailHistoryPenjualanController> {
                           style: AppFont.regular(),
                         ),
                         Text(
-                          controller.data.namaKaryawan ?? '',
+                          controller.data.namaKaryawan ?? '-',
                           style: AppFont.regular_bold(),
                         )
                       ],
@@ -102,13 +117,23 @@ class DetailHistoryPenjualan extends GetView<DetailHistoryPenjualanController> {
                             ],
                           ),
                         ),
-                  button_border_custom(
-                      onPressed: () {
-                        //controller.reversal(controller.data.uuid);
-                        Popscreen().reversalpop(controller, controller.data);
-                      },
-                      child: Text('Reversal'),
-                      width: Get.width),
+                  controller.data.reversal == 0
+                      ? button_border_custom(
+                          onPressed: () {
+                            //controller.reversal(controller.data.uuid);
+                            Popscreen()
+                                .reversalpop(controller, controller.data);
+                          },
+                          child: Text('Reversal'),
+                          width: Get.width)
+                      : button_border_custom(
+                          onPressed: () {
+                            //controller.reversal(controller.data.uuid);
+                            Popscreen()
+                                .cancelreversalpop(controller, controller.data);
+                          },
+                          child: Text('Batalkan reversal'),
+                          width: Get.width),
                   Padding(
                     padding: AppPading.customBottomPadding(),
                     child: button_solid_custom(

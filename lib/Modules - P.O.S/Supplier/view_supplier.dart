@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Supplier/controller_supplier.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Supplier/model_supplier.dart';
 import 'package:qasir_pintar/Widget/widget.dart';
@@ -15,6 +16,7 @@ class Supplier extends GetView<SupplierController> {
 
   @override
   Widget build(BuildContext context) {
+    var con = Get.find<CentralSupplierController>();
     return CustomRole(
       allowedRoles: ['ADMIN', 'MANAGER'],
       child: Scaffold(
@@ -26,39 +28,18 @@ class Supplier extends GetView<SupplierController> {
           padding: AppPading.defaultBodyPadding(),
           child: Column(
             children: [
-              Container(
-                height: 60,
-                //color: Colors.red,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: Icon(Icons.maps_ugc_outlined),
-                    ),
-                    Expanded(
-                      child: TextField(
-                        controller: controller.search.value,
-                        onChanged: (val) async {
-                          await controller.serachSupplierLocal();
-                        },
-                        decoration: InputDecoration(hintText: 'Cari...'),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Icon(Icons.sort),
-                    )
-                  ],
-                ),
-              ),
-              // button_border_custom(
-              //     margin: EdgeInsets.all(15),
-              //     onPressed: () {
-              //       Get.toNamed('/tambahsupplier');
-              //     },
-              //     child: Text('Tambah Supplier'),
-              //     width: context.res_width),
+              Obx(() {
+                return customSearch(
+                  controller: con.search.value,
+                  sortValue: con.isAsc.value,
+                  onSortPressed: () {
+                    con.toggleSortSupplier();
+                  },
+                  onChanged: (x) {
+                    con.serachSupplierLocal(id_toko: con.id_toko, search: x);
+                  },
+                );
+              }),
               SizedBox(
                 height: 20,
               ),
@@ -88,59 +69,83 @@ class Supplier extends GetView<SupplierController> {
               ),
               Obx(() {
                 return Expanded(
-                  child: controller.supplierList.isNotEmpty
-                      ? ListView.builder(
-                          itemCount: controller.supplierList.length,
-                          itemBuilder: (context, index) {
-                            final supplier = controller.supplierList;
+                  child: con.supplierList.isNotEmpty
+                      ? Padding(
+                          padding: AppPading.customListPadding(),
+                          child: ListView.builder(
+                            itemCount: con.supplierList.length,
+                            itemBuilder: (context, index) {
+                              final supplier = con.supplierList;
 
-                            return custom_list(
-                              title: supplier[index].nama_supplier,
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    supplier[index].nohp.toString(),
-                                    style: AppFont.small(),
-                                  ),
-                                  Text(
-                                    supplier[index].alamat,
-                                    style: AppFont.small(),
-                                  )
-                                ],
-                              ),
-                              isDeleted:
-                                  supplier[index].aktif == 1 ? false : true,
-                              usingGambar: false,
-                              trailing: customDropdown(
-                                  onSelected: (value) {
-                                    switch (value) {
-                                      case 'Ubah':
-                                        Get.toNamed('/editsupplier',
-                                            arguments: supplier[index]);
-                                        break;
-                                      case 'Hapus':
-                                        Popscreen().deleteSupllier(
-                                            controller, supplier[index]);
-                                    }
-                                  },
-                                  dropdownColor: Colors.white, // Custom color
-                                  customButton: const Icon(Icons.menu),
-                                  items: [
-                                    {
-                                      'title': 'Ubah',
-                                      'icon': Icons.edit,
-                                      'color': AppColor.primary
-                                    },
-                                    {'divider': true},
-                                    {
-                                      'title': 'Hapus',
-                                      'icon': Icons.delete,
-                                      'color': AppColor.warning
-                                    },
-                                  ]),
-                            );
-                          },
+                              return custom_list(
+                                title: supplier[index].nama_supplier,
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      supplier[index].nohp.toString(),
+                                      style: AppFont.small(),
+                                    ),
+                                    Text(
+                                      supplier[index].alamat,
+                                      style: AppFont.small(),
+                                    )
+                                  ],
+                                ),
+                                isDeleted:
+                                    supplier[index].aktif == 1 ? false : true,
+                                usingGambar: false,
+                                trailing: supplier[index].aktif == 1
+                                    ? customDropdown(
+                                        onSelected: (value) {
+                                          switch (value) {
+                                            case 'Ubah':
+                                              Get.toNamed('/editsupplier',
+                                                  arguments: supplier[index]);
+                                              break;
+                                            case 'Hapus':
+                                              Popscreen().deleteSupllier(
+                                                  controller, supplier[index]);
+                                          }
+                                        },
+                                        dropdownColor:
+                                            Colors.white, // Custom color
+                                        customButton: const Icon(Icons.menu),
+                                        items: [
+                                            {
+                                              'title': 'Ubah',
+                                              'icon': Icons.edit,
+                                              'color': AppColor.primary
+                                            },
+                                            {'divider': true},
+                                            {
+                                              'title': 'Hapus',
+                                              'icon': Icons.delete,
+                                              'color': AppColor.warning
+                                            },
+                                          ])
+                                    : customDropdown(
+                                        onSelected: (value) {
+                                          switch (value) {
+                                            case 'Ubah':
+                                              Get.toNamed('/editsupplier',
+                                                  arguments: supplier[index]);
+                                              break;
+                                          }
+                                        },
+                                        dropdownColor:
+                                            Colors.white, // Custom color
+                                        customButton: const Icon(Icons.menu),
+                                        items: [
+                                            {
+                                              'title': 'Ubah',
+                                              'icon': Icons.edit,
+                                              'color': AppColor.primary
+                                            },
+                                          ]),
+                              );
+                            },
+                          ),
                         )
                       : EmptyData(),
                 );

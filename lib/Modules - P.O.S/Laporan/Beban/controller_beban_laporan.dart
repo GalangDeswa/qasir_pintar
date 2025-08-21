@@ -80,7 +80,7 @@ class BebanLaporanController extends GetxController {
       COALESCE(SUM(jumlah_beban), 0) AS total_amount
     FROM beban
     JOIN karyawan ON beban.id_karyawan = karyawan.uuid
-    WHERE beban.id_toko = "$idToko"
+    WHERE beban.id_toko = "$idToko" AND beban.aktif = 1
       AND DATE(tanggal_beban) BETWEEN "$fromStr" AND "$toStr"
     GROUP BY nama_beban, id_karyawan
     ORDER BY nama_beban, id_karyawan
@@ -224,7 +224,7 @@ class BebanLaporanController extends GetxController {
           pw.Spacer(),
           pw.Center(
             child: pw.Text(
-              '<-------------------------------- qasir pintar -------------------------------->',
+              '<-------------------------------- TubinMart -------------------------------->',
               style: pw.TextStyle(fontSize: 8, color: PdfColors.grey500),
             ),
           ),

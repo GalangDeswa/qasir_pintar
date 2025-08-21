@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/Produk/model_kategoriproduk.dart';
 
 import '../../../Widget/popscreen.dart';
@@ -19,41 +20,21 @@ class KelompokProduk extends GetView<BaseMenuProdukController> {
 
   @override
   Widget build(BuildContext context) {
+    var con = Get.find<CentralKategoriProdukController>();
     return Column(
       children: [
-        Container(
-          height: 60, padding: EdgeInsets.all(15),
-          //color: Colors.red,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Icon(FontAwesomeIcons.magnifyingGlass),
-              ),
-              Expanded(
-                child: TextField(
-                  onChanged: (val) {
-                    controller.serachKategoriProdukLocal();
-                  },
-                  controller: controller.search.value,
-                  decoration: InputDecoration(hintText: 'Cari...'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Icon(Icons.sort),
-              )
-            ],
-          ),
-        ),
-        // button_border_custom(
-        //     margin: EdgeInsets.all(15),
-        //     onPressed: () {
-        //       Get.toNamed('/tambahkategoriproduk');
-        //     },
-        //     child: Text('Tambah Kategori produk'),
-        //     width: context.res_width),
+        Obx(() {
+          return customSearch(
+            controller: con.searchKategori.value,
+            sortValue: con.isAsc.value,
+            onSortPressed: () {
+              con.toggleSortkategori();
+            },
+            onChanged: (x) {
+              con.serachKategoriProdukLocal(id_toko: con.id_toko, search: x);
+            },
+          );
+        }),
         Container(
           //height: 100,
           //color: Colors.blue,
@@ -71,47 +52,69 @@ class KelompokProduk extends GetView<BaseMenuProdukController> {
         ),
         Obx(() {
           return Expanded(
-            child: controller.kategoriProduk.isNotEmpty
-                ? ListView.builder(
-                    itemCount: controller.kategoriProduk.length,
-                    itemBuilder: (context, index) {
-                      final kategori = controller.kategoriProduk;
+            child: con.kategoriProduk.isNotEmpty
+                ? Padding(
+                    padding: AppPading.customListPadding(),
+                    child: ListView.builder(
+                      itemCount: con.kategoriProduk.length,
+                      itemBuilder: (context, index) {
+                        final kategori = con.kategoriProduk;
 
-                      return custom_list(
-                        controller: controller,
-                        usingGambar: true,
-                        isDeleted: kategori[index].aktif == 1 ? false : true,
-                        gambar: kategori[index].ikon,
-                        title: kategori[index].namakelompok,
-                        trailing: customDropdown(
-                            onSelected: (value) {
-                              switch (value) {
-                                case 'Ubah':
-                                  Get.toNamed('/editkategoriproduk',
-                                      arguments: kategori[index]);
-                                  break;
-                                case 'Hapus':
-                                  Popscreen().deleteKategoriProduk(
-                                      controller, kategori[index]);
-                              }
-                            },
-                            dropdownColor: Colors.white, // Custom color
-                            customButton: const Icon(Icons.menu),
-                            items: [
-                              {
-                                'title': 'Ubah',
-                                'icon': Icons.edit,
-                                'color': AppColor.primary
-                              },
-                              {'divider': true},
-                              {
-                                'title': 'Hapus',
-                                'icon': Icons.delete,
-                                'color': AppColor.warning
-                              },
-                            ]),
-                      );
-                    },
+                        return custom_list(
+                          controller: controller,
+                          usingGambar: true,
+                          isDeleted: kategori[index].aktif == 1 ? false : true,
+                          gambar: kategori[index].ikon,
+                          title: kategori[index].namakelompok,
+                          trailing: kategori[index].aktif == 1
+                              ? customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/editkategoriproduk',
+                                            arguments: kategori[index]);
+                                        break;
+                                      case 'Hapus':
+                                        Popscreen().deleteKategoriProduk(
+                                            controller, kategori[index]);
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                      {'divider': true},
+                                      {
+                                        'title': 'Hapus',
+                                        'icon': Icons.delete,
+                                        'color': AppColor.warning
+                                      },
+                                    ])
+                              : customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/editkategoriproduk',
+                                            arguments: kategori[index]);
+                                        break;
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                    ]),
+                        );
+                      },
+                    ),
                   )
                 : EmptyData(),
           );

@@ -69,19 +69,6 @@ class TambahSubKategori extends GetView<TambahSubKategoriController> {
                               },
                             ),
                           ),
-                          // Container(
-                          //     margin: EdgeInsets.only(left: 15),
-                          //     decoration: BoxDecoration(
-                          //         shape: BoxShape.circle,
-                          //         color: AppColor.primary),
-                          //     child: IconButton(
-                          //         onPressed: () {
-                          //           Get.toNamed('/tambahkategoriproduk');
-                          //         },
-                          //         icon: Icon(
-                          //           Icons.add,
-                          //           color: Colors.white,
-                          //         ))),
                         ],
                       ),
                     );
@@ -110,7 +97,7 @@ class TambahSubKategori extends GetView<TambahSubKategoriController> {
                       onPressed: () {
                         if (controller.registerKey.value.currentState!
                             .validate()) {
-                          controller.tambahSubKategoriPelangganLocal();
+                          controller.tambahSubKategoriProdukLocal();
                         }
                         //Get.toNamed('/setuptoko');
                         // Get.toNamed('/loginform');

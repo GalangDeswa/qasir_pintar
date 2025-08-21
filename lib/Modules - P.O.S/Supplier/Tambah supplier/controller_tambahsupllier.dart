@@ -14,6 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Supplier/controller_supplier.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Supplier/model_supplier.dart';
 import 'package:uuid/uuid.dart';
@@ -330,7 +331,8 @@ class TambahSupplierController extends GetxController {
             .DB());
 
     if (db != null) {
-      await Get.find<SupplierController>().fetchSupplierLocal(id_toko: id_toko);
+      await Get.find<CentralSupplierController>()
+          .fetchSupplierLocal(id_toko: id_toko);
       Get.back(closeOverlays: true);
       Get.showSnackbar(
           toast().bottom_snackbar_success('Sukses', 'Berhasil registrasi'));

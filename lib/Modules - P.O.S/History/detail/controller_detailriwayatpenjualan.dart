@@ -183,7 +183,48 @@ class DetailHistoryPenjualanController extends GetxController {
 
       // await Get.find<CentralPaketController>()
       //     .fetchPaketLocal(id_toko: id_toko);
-      await Get.find<HistoryPenjualanController>()
+      await Get.find<CentralHistoryController>()
+          .fetchRiwayatPenjualan(id_toko: id_toko);
+      await Get.find<CentralProdukController>()
+          .fetchProdukLocal(id_toko: id_toko);
+      await Get.find<CentralPaketController>()
+          .fetchPaketLocal(id_toko: id_toko);
+      Get.find<KasirController>().availStockMap.clear();
+      Get.back();
+      Get.back();
+      Get.back();
+
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'Berhasil dibatalkan'));
+    } else {
+      Get.back(closeOverlays: true);
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal reversal'));
+    }
+  }
+
+  cancelreversal(uuidpenjualan) async {
+    print('-------------------Reversal---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var paket = await DBHelper().UPDATE(
+        id: uuidpenjualan, table: 'penjualan', data: dataReversal(reversal: 0));
+    if (paket == 1) {
+      for (var detailitem in detailpenjualan) {
+        print('update stock produk reversal  -->');
+        print(detailitem.nama_produk);
+        print(detailitem.qty);
+        print(detailitem.uuid);
+        await DBHelper().decrementQty(
+            table: 'stock_produk',
+            id_produk: detailitem.idProduk.toString(),
+            decrement: detailitem.qty!);
+      }
+
+      // await Get.find<CentralPaketController>()
+      //     .fetchPaketLocal(id_toko: id_toko);
+      await Get.find<CentralHistoryController>()
           .fetchRiwayatPenjualan(id_toko: id_toko);
       await Get.find<CentralProdukController>()
           .fetchProdukLocal(id_toko: id_toko);
@@ -228,7 +269,7 @@ class DetailHistoryPenjualanController extends GetxController {
     printCon.printStrukHistory(
       penjualan: penjualanprint,
       items: daftarItem,
-      NamaToko: GetStorage().read('user_business_name') ?? 'QASIR PINTAR',
+      NamaToko: GetStorage().read('user_business_name') ?? 'TubinMart',
     );
   }
 

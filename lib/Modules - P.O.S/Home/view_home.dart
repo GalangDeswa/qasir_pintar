@@ -193,9 +193,15 @@ class HomeScreen extends GetView<BasemenuController> {
               crossAxisAlignment: CrossAxisAlignment.center,
               //mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(
-                  'Welcome',
-                  style: AppFont.regular_bold(fontSize: 20),
+                Container(
+                  padding: EdgeInsets.all(5),
+                  decoration: BoxDecoration(
+                      color: AppColor.primary,
+                      borderRadius: BorderRadius.circular(10)),
+                  child: Text(
+                    'Welcome',
+                    style: AppFont.regular_white_bold(fontSize: 20),
+                  ),
                 ),
                 Expanded(
                   child: Container(

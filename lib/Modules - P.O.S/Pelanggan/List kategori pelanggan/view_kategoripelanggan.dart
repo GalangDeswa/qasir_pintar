@@ -10,39 +10,28 @@ import 'package:qasir_pintar/Modules - P.O.S/Pelanggan/List%20kategori%20pelangg
 import 'package:qasir_pintar/Widget/popscreen.dart';
 import 'package:qasir_pintar/Widget/widget.dart';
 
+import '../../../Controllers/CentralController.dart';
+
 class KategoriPelanggan extends GetView<KategoriPelangganController> {
   const KategoriPelanggan({super.key});
 
   @override
   Widget build(BuildContext context) {
+    var con = Get.find<CentralPelangganController>();
     return Column(
       children: [
-        Container(
-          height: 60,
-          //color: Colors.red,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Icon(FontAwesomeIcons.magnifyingGlass),
-              ),
-              Expanded(
-                child: TextField(
-                  controller: controller.search.value,
-                  onChanged: (val) {
-                    controller.serachKategoriPelangganLocal();
-                  },
-                  decoration: InputDecoration(hintText: 'Pencarian'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Icon(Icons.sort),
-              )
-            ],
-          ),
-        ),
+        Obx(() {
+          return customSearch(
+            controller: con.katsearch.value,
+            sortValue: con.isAscKat.value,
+            onSortPressed: () {
+              con.toggleSortKategoriPelanggan();
+            },
+            onChanged: (x) {
+              con.serachKategoriPelangganLocal(id_toko: con.id_toko, search: x);
+            },
+          );
+        }),
         SizedBox(
           height: 20,
         ),
@@ -79,47 +68,69 @@ class KategoriPelanggan extends GetView<KategoriPelangganController> {
         ),
         Obx(() {
           return Expanded(
-            child: controller.kategoripelangganList.isNotEmpty
-                ? ListView.builder(
-                    itemCount: controller.kategoripelangganList.length,
-                    itemBuilder: (context, index) {
-                      final customer = controller.kategoripelangganList;
+            child: con.kategoripelangganList.isNotEmpty
+                ? Padding(
+                    padding: AppPading.customListPadding(),
+                    child: ListView.builder(
+                      itemCount: con.kategoripelangganList.length,
+                      itemBuilder: (context, index) {
+                        final customer = con.kategoripelangganList;
 
-                      return custom_list(
-                        controller: controller,
-                        title: customer[index].kategori,
-                        isDeleted: customer[index].status == 1 ? false : true,
-                        usingGambar: true,
-                        gambar: customer[index].ikon,
-                        trailing: customDropdown(
-                            onSelected: (value) {
-                              switch (value) {
-                                case 'Ubah':
-                                  Get.toNamed('/editkategoripelanggan',
-                                      arguments: customer[index]);
-                                  break;
-                                case 'Hapus':
-                                  Popscreen().deleteKategoriPelanggan(
-                                      controller, customer[index]);
-                              }
-                            },
-                            dropdownColor: Colors.white, // Custom color
-                            customButton: const Icon(Icons.menu),
-                            items: [
-                              {
-                                'title': 'Ubah',
-                                'icon': Icons.edit,
-                                'color': AppColor.primary
-                              },
-                              {'divider': true},
-                              {
-                                'title': 'Hapus',
-                                'icon': Icons.delete,
-                                'color': AppColor.warning
-                              },
-                            ]),
-                      );
-                    },
+                        return custom_list(
+                          controller: controller,
+                          title: customer[index].kategori,
+                          isDeleted: customer[index].status == 1 ? false : true,
+                          usingGambar: true,
+                          gambar: customer[index].ikon,
+                          trailing: customer[index].status == 1
+                              ? customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/editkategoripelanggan',
+                                            arguments: customer[index]);
+                                        break;
+                                      case 'Hapus':
+                                        Popscreen().deleteKategoriPelanggan(
+                                            controller, customer[index]);
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                      {'divider': true},
+                                      {
+                                        'title': 'Hapus',
+                                        'icon': Icons.delete,
+                                        'color': AppColor.warning
+                                      },
+                                    ])
+                              : customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/editkategoripelanggan',
+                                            arguments: customer[index]);
+                                        break;
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                    ]),
+                        );
+                      },
+                    ),
                   )
                 : EmptyData(),
           );

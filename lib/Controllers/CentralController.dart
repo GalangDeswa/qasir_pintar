@@ -43,7 +43,33 @@ class CentralProdukController extends GetxController {
   Future<void> onInit() async {
     // TODO: implement onInit
     super.onInit();
+    print('PRODUCT CENTRAL CONTROLLER INIT -->');
     await fetchProdukLocal(id_toko: id_toko);
+  }
+
+  RxBool isAsc = false.obs;
+
+  void sortProduk() {
+    // 1) Copy penjualan list
+    final List<DataProduk> data = [...produk];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAsc.value) {
+        return a.nama_produk!.compareTo(b.nama_produk!);
+      } else {
+        return b.nama_produk!.compareTo(a.nama_produk!);
+      }
+    });
+
+    // 3) Update penjualan list
+    produk.value = data;
+  }
+
+// Helper: toggle sort order
+  void toggleSortProduk() {
+    isAsc.value = !isAsc.value;
+    sortProduk();
   }
 
   var thumb = false.obs;
@@ -155,42 +181,6 @@ class CentralProdukController extends GetxController {
       Get.showSnackbar(toast()
           .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
     }
-
-    // var select = kategoripelangganList.where((x) => x.uuid == uuid).first;
-    // var delete = await DBHelper().UPDATE(
-    //   id: select.idLocal,
-    //   table: 'beban_local',
-    //   data: DataBeban(
-    //       aktif: 'N',
-    //       sync: 'N',
-    //       id: select.id,
-    //       idLocal: select.idLocal,
-    //       idToko: select.idToko,
-    //       jumlah: select.jumlah,
-    //       tgl: select.tgl,
-    //       keterangan: select.keterangan,
-    //       nama: select.nama,
-    //       idKtrBeban: select.idKtrBeban,
-    //       idUser: select.idUser,
-    //       namaKtrBeban: select.namaKtrBeban)
-    //       .toMapForDb(),
-    // );
-
-    // var query = await DBHelper().DELETE('produk_local', id);
-    // if (delete == 1) {
-    //   await fetchBebanlocal(id_toko);
-    //   await Get.find<dashboardController>().loadbebanhariini();
-    //   await Get.find<dashboardController>().loadpendapatanhariini();
-    //   await Get.find<dashboardController>().loadpendapatantotal();
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(
-    //       toast().bottom_snackbar_success('Sukses', 'Beban berhasil dihapus'));
-    //   print('deleted ' + id_local.toString());
-    // } else {
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(toast()
-    //       .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
-    // }
   }
 
   deleteProduk({uuid}) async {
@@ -333,11 +323,16 @@ WHERE
   }
 
   var isAscending = true.obs;
-  fetchProdukLocal({id_toko, bool ascending = true}) async {
+  fetchProdukLocal(
+      {id_toko,
+      bool ascending = true,
+      bool? isAktif,
+      bool? hitungStock}) async {
     print('-------------------fetch produk local---------------------');
+    String orderBy = ascending ? 'ASC' : 'DESC';
 
-    String orderBy = ascending ? 'ASC' : 'DESC'; // Determine order
-    List<Map<String, Object?>> query = await DBHelper().FETCH('''
+    // Base query
+    String sql = '''
   SELECT 
       produk.*, 
       kelompok_produk.Nama_Kelompok AS nama_kategori,
@@ -360,8 +355,23 @@ WHERE
      stock_produk ON produk.uuid = stock_produk.id_produk
   WHERE 
       produk.id_toko = "$id_toko"
-  ORDER BY produk.nama_produk $orderBy
-  ''');
+  ''';
+
+    // Add condition only if isAktif is provided
+    if (isAktif != null) {
+      print('product filter isAKtif  == TRUE');
+      sql += ' AND produk.tampilkan_di_produk = ${isAktif ? 1 : 0}';
+    }
+
+    if (hitungStock != null) {
+      sql += ' AND produk.hitung_stok = ${hitungStock ? 1 : 0}';
+    }
+
+    // Append ORDER BY at the very end
+    sql += ' ORDER BY produk.nama_produk $orderBy';
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH(sql);
+
     if (query.isNotEmpty) {
       List<DataProduk> data =
           query.map((e) => DataProduk.fromJsondb(e)).toList();
@@ -521,6 +531,30 @@ class CentralPaketController extends GetxController {
 
   var thumb = false.obs;
   var paketproduk = <DataPaketProduk>[].obs;
+  RxBool isAsc = false.obs;
+
+  void sortPaket() {
+    // 1) Copy penjualan list
+    final List<DataPaketProduk> data = [...paketproduk];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAsc.value) {
+        return a.nama_paket!.compareTo(b.nama_paket!);
+      } else {
+        return b.nama_paket!.compareTo(a.nama_paket!);
+      }
+    });
+
+    // 3) Update penjualan list
+    paketproduk.value = data;
+  }
+
+// Helper: toggle sort order
+  void toggleSortPaket() {
+    isAsc.value = !isAsc.value;
+    sortPaket();
+  }
 
   bool isBase64Svg(String base64) {
     try {
@@ -544,7 +578,7 @@ class CentralPaketController extends GetxController {
   var penerimaan = <DataPenerimaanProduk>[].obs;
 
   searchPaketLocal({id_toko, search}) async {
-    print('-------------------fetch produk local---------------------');
+    print('-------------------fetch paket local---------------------');
 
     List<Map<String, Object?>> query = await DBHelper().FETCH('''
     SELECT 
@@ -556,12 +590,12 @@ class CentralPaketController extends GetxController {
   LEFT JOIN 
      pajak_produk ON paket_produk.pajak = pajak_produk.uuid
   WHERE 
-      paket_produk.id_toko = "$id_toko" AND paket_produk.nama_paket LIKE "%${searchpaket.value.text}%"
+      paket_produk.id_toko = "$id_toko" AND paket_produk.nama_paket LIKE "%${search}%"
   ''');
     if (query.isNotEmpty) {
-      List<DataProduk> data =
-          query.map((e) => DataProduk.fromJsondb(e)).toList();
-      produk.value = data;
+      List<DataPaketProduk> data =
+          query.map((e) => DataPaketProduk.fromJsondb(e)).toList();
+      paketproduk.value = data;
       //logo.value = userList.value.first.logo!;
       return data;
     } else {
@@ -639,10 +673,9 @@ class CentralPaketController extends GetxController {
     }
   }
 
-  fetchPaketLocal({id_toko}) async {
+  fetchPaketLocal({id_toko, bool? isAktif}) async {
     print('-------------------fetch produk local---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper().FETCH('''
+    String sql = '''
   SELECT 
       paket_produk.*, 
       pajak_produk.nama_pajak AS nama_pajak,
@@ -654,7 +687,13 @@ class CentralPaketController extends GetxController {
   WHERE 
       paket_produk.id_toko = "$id_toko"
   
-  ''');
+  ''';
+    if (isAktif != null) {
+      print('paket filter isAKtif  == TRUE');
+      sql += ' AND paket_produk.tampilkan_di_paket = ${isAktif ? 1 : 0}';
+    }
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH(sql);
     if (query.isNotEmpty) {
       List<DataPaketProduk> data =
           query.map((e) => DataPaketProduk.fromJsondb(e)).toList();
@@ -754,7 +793,33 @@ class CentralSupplierController extends GetxController {
   Future<void> onInit() async {
     // TODO: implement onInit
     super.onInit();
+    print('init central supplier -->');
     await fetchSupplierLocal(id_toko: id_toko);
+  }
+
+  RxBool isAsc = false.obs;
+
+  void sortSupplier() {
+    // 1) Copy penjualan list
+    final List<DataSupplier> data = [...supplierList];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAsc.value) {
+        return a.nama_supplier!.compareTo(b.nama_supplier!);
+      } else {
+        return b.nama_supplier!.compareTo(a.nama_supplier!);
+      }
+    });
+
+    // 3) Update penjualan list
+    supplierList.value = data;
+  }
+
+// Helper: toggle sort order
+  void toggleSortSupplier() {
+    isAsc.value = !isAsc.value;
+    sortSupplier();
   }
 
   deleteSupplier({uuid}) async {
@@ -798,9 +863,9 @@ class CentralSupplierController extends GetxController {
   var suppliervalue;
   var search = TextEditingController().obs;
 
-  serachSupplierLocal() async {
+  serachSupplierLocal({id_toko, search}) async {
     List<Map<String, Object?>> query = await DBHelper().FETCH(
-        'SELECT * FROM Supplier WHERE id_toko = "$id_toko" AND Nama_Supplier LIKE "%${search.value.text}%" ');
+        'SELECT * FROM Supplier WHERE id_toko = "$id_toko" AND Nama_Supplier LIKE "%${search}%" ');
     List<DataSupplier> jenis = query.isNotEmpty
         ? query.map((e) => DataSupplier.fromJsondb(e)).toList()
         : [];
@@ -809,16 +874,27 @@ class CentralSupplierController extends GetxController {
     return jenis;
   }
 
-  fetchSupplierLocal({id_toko}) async {
-    print('-------------------fetch supplier local---------------------');
+//TODO : fix supplier is aktif tetap muncul
+  fetchSupplierLocal({id_toko, bool? isAktif}) async {
+    // supplierList.clear();
+    print(
+        '-------------------fetch supplier local pakai aktif---------------------');
 
-    List<Map<String, Object?>> query = await DBHelper()
-        .FETCH('SELECT * FROM Supplier WHERE id_toko = "$id_toko"');
+    String sql = 'SELECT * FROM Supplier WHERE id_toko = "$id_toko"';
+
+    if (isAktif != null) {
+      final aktifValue = isAktif ? 1 : 0;
+      sql += ' AND Aktif = $aktifValue';
+    }
+    print(sql);
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH(sql);
     if (query.isNotEmpty) {
       List<DataSupplier> data =
           query.map((e) => DataSupplier.fromJsondb(e)).toList();
+      //supplierList.value.clear();
       supplierList.value = data;
-      //logo.value = userList.value.first.logo!;
+      print(data);
       return data;
     } else {
       print('empty');
@@ -1147,7 +1223,33 @@ class CentralKaryawanController extends GetxController {
     // TODO: implement onInit
     super.onInit();
     await fetchKaryawanLocal(id_toko: id_toko);
+
     //role.value = '';
+  }
+
+  RxBool isAsc = false.obs;
+
+  void sortKaryawan() {
+    // 1) Copy penjualan list
+    final List<DataKaryawan> data = [...karyawanList];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAsc.value) {
+        return a.nama_karyawan!.compareTo(b.nama_karyawan!);
+      } else {
+        return b.nama_karyawan!.compareTo(a.nama_karyawan!);
+      }
+    });
+
+    // 3) Update penjualan list
+    karyawanList.value = data;
+  }
+
+// Helper: toggle sort order
+  void toggleSortKaryawan() {
+    isAsc.value = !isAsc.value;
+    sortKaryawan();
   }
 
   deleteKaryawan({uuid}) async {
@@ -1592,9 +1694,9 @@ class CentralKaryawanController extends GetxController {
     }
   }
 
-  searchKaryawanLocal() async {
+  searchKaryawanLocal({id_toko, search}) async {
     List<Map<String, Object?>> query = await DBHelper().FETCH(
-        'SELECT * FROM Karyawan WHERE id_toko = "$id_toko" AND Nama_Karyawan LIKE "%${search.value.text}%" ');
+        'SELECT * FROM Karyawan WHERE id_toko = "$id_toko" AND Nama_Karyawan LIKE "%${search}%" ');
     List<DataKaryawan> jenis = query.isNotEmpty
         ? query.map((e) => DataKaryawan.fromJsondb(e)).toList()
         : [];
@@ -1626,8 +1728,58 @@ class CentralPelangganController extends GetxController {
   Future<void> onInit() async {
     // TODO: implement onInit
     super.onInit();
+    print('on init central pelanggan controlelr');
     await fetchPelangganLocal(id_toko: id_toko);
     await fetchKategoriPelangganLocal(id_toko);
+  }
+
+  RxBool isAsc = false.obs;
+  RxBool isAscKat = false.obs;
+
+  void sortPelanggan() {
+    // 1) Copy penjualan list
+    final List<DataPelanggan> data = [...pelangganList];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAsc.value) {
+        return a.namaPelanggan!.compareTo(b.namaPelanggan!);
+      } else {
+        return b.namaPelanggan!.compareTo(a.namaPelanggan!);
+      }
+    });
+
+    // 3) Update penjualan list
+    pelangganList.value = data;
+  }
+
+// Helper: toggle sort order
+  void toggleSortPelanggan() {
+    isAsc.value = !isAsc.value;
+    sortPelanggan();
+  }
+
+  void sortKategoriPelanggan() {
+    // 1) Copy penjualan list
+    final List<DataKategoriPelanggan> data = [...kategoripelangganList];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAscKat.value) {
+        return a.kategori!.compareTo(b.kategori!);
+      } else {
+        return b.kategori!.compareTo(a.kategori!);
+      }
+    });
+
+    // 3) Update penjualan list
+    kategoripelangganList.value = data;
+  }
+
+// Helper: toggle sort order
+  void toggleSortKategoriPelanggan() {
+    isAscKat.value = !isAscKat.value;
+    sortKategoriPelanggan();
   }
 
   deletePelanggan({uuid}) async {
@@ -1706,8 +1858,9 @@ class CentralPelangganController extends GetxController {
   var id_toko = GetStorage().read('uuid');
   var pelangganList = <DataPelanggan>[].obs;
   var search = TextEditingController().obs;
+  var katsearch = TextEditingController().obs;
   var kategoripelangganList = <DataKategoriPelanggan>[].obs;
-  serachPelangganLocal() async {
+  serachPelangganLocal({id_toko, search}) async {
     List<Map<String, Object?>> query = await DBHelper().FETCH('''
     SELECT 
         pelanggan.*, 
@@ -1717,7 +1870,7 @@ class CentralPelangganController extends GetxController {
     LEFT JOIN 
         kategori_pelanggan ON pelanggan.ID_Kategori = kategori_pelanggan.uuid 
     WHERE 
-        pelanggan.id_toko = "$id_toko" AND pelanggan.nama_pelanggan LIKE "%${search.value.text}%"
+        pelanggan.id_toko = "$id_toko" AND pelanggan.nama_pelanggan LIKE "%${search}%"
   ''');
     List<DataPelanggan> jenis = query.isNotEmpty
         ? query.map((e) => DataPelanggan.fromJsondb(e)).toList()
@@ -1727,11 +1880,22 @@ class CentralPelangganController extends GetxController {
     return jenis;
   }
 
-  fetchPelangganLocal({id_toko}) async {
+  serachKategoriPelangganLocal({id_toko, search}) async {
+    List<Map<String, Object?>> query = await DBHelper().FETCH('''
+    SELECT * FROM kategori_pelanggan WHERE id_toko = "$id_toko" AND kategori LIKE "%${search}%"
+  ''');
+    List<DataKategoriPelanggan> jenis = query.isNotEmpty
+        ? query.map((e) => DataKategoriPelanggan.fromJsondb(e)).toList()
+        : [];
+    kategoripelangganList.value = jenis;
+
+    return jenis;
+  }
+
+  fetchPelangganLocal({id_toko, bool? isAktif}) async {
     print(
         '-------------------fetch pelanggan local CENTRAL CONTROLLER---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper().FETCH('''
+    String sql = '''
     SELECT 
         pelanggan.*, 
         kategori_pelanggan.kategori AS kategori_nama
@@ -1741,7 +1905,14 @@ class CentralPelangganController extends GetxController {
         kategori_pelanggan ON pelanggan.ID_Kategori = kategori_pelanggan.uuid 
     WHERE 
         pelanggan.id_toko = "$id_toko"
-  ''');
+  ''';
+    if (isAktif != null) {
+      sql += ' AND pelanggan.aktif = ${isAktif ? 1 : 0}';
+    }
+
+    print(sql);
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH(sql);
     if (query.isNotEmpty) {
       List<DataPelanggan> data =
           query.map((e) => DataPelanggan.fromJsondb(e)).toList();
@@ -1779,17 +1950,26 @@ class CentralPelangganController extends GetxController {
     }
   }
 
-  fetchKategoriPelangganLocal(id_toko) async {
+  //TODO : CHECK fecth if aktif di dropdown
+
+  fetchKategoriPelangganLocal(String id_toko, {bool? isAktif}) async {
     print(
         '-------------------fetch kategori pelanggan local---------------------');
 
-    List<Map<String, Object?>> query = await DBHelper()
-        .FETCH('SELECT * FROM kategori_pelanggan WHERE id_toko = "$id_toko"');
+    // Base query
+    String sql = 'SELECT * FROM kategori_pelanggan WHERE id_toko = "$id_toko"';
+
+    // Add condition only if isAktif is provided
+    if (isAktif != null) {
+      sql += ' AND aktif = ${isAktif ? 1 : 0}';
+    }
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH(sql);
+
     if (query.isNotEmpty) {
       List<DataKategoriPelanggan> data =
           query.map((e) => DataKategoriPelanggan.fromJsondb(e)).toList();
       kategoripelangganList.value = data;
-      //logo.value = userList.value.first.logo!;
       return data;
     } else {
       print('empty');
@@ -1808,6 +1988,29 @@ class CentralPajakController extends GetxController {
 
   var thumb = false.obs;
   var paketproduk = <DataPaketProduk>[].obs;
+  RxBool isAsc = false.obs;
+  void sortPajak() {
+    // 1) Copy penjualan list
+    final List<DataPajakProduk> data = [...pajakList];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAsc.value) {
+        return a.nama_pajak!.compareTo(b.nama_pajak!);
+      } else {
+        return b.nama_pajak!.compareTo(a.nama_pajak!);
+      }
+    });
+
+    // 3) Update penjualan list
+    pajakList.value = data;
+  }
+
+// Helper: toggle sort order
+  void toggleSortPajak() {
+    isAsc.value = !isAsc.value;
+    sortPajak();
+  }
 
   deletepajak({uuid}) async {
     print('delete pajak local---------------------------------------->');
@@ -2112,13 +2315,13 @@ class CentralPajakController extends GetxController {
   var search = TextEditingController().obs;
   var searchproduk = TextEditingController().obs;
   var subsearch = TextEditingController().obs;
-  serachKategoriProdukLocal() async {
+  searchPajakLocal({id_toko, search}) async {
     List<Map<String, Object?>> query = await DBHelper().FETCH(
-        'SELECT * FROM Kelompok_produk WHERE id_toko = "$id_toko" AND Nama_Kelompok LIKE "%${search.value.text}%" ');
-    List<DataKategoriProduk> jenis = query.isNotEmpty
-        ? query.map((e) => DataKategoriProduk.fromJsondb(e)).toList()
+        'SELECT * FROM pajak_produk WHERE id_toko = "$id_toko" AND nama_pajak LIKE "%${search}%" ');
+    List<DataPajakProduk> jenis = query.isNotEmpty
+        ? query.map((e) => DataPajakProduk.fromJsondb(e)).toList()
         : [];
-    kategoriProduk.value = jenis;
+    pajakList.value = jenis;
 
     return jenis;
   }
@@ -2337,323 +2540,204 @@ class CentralHistoryController extends GetxController {
   Future<void> onInit() async {
     // TODO: implement onInit
     super.onInit();
+    print('central history init -->');
     await fetchRiwayatPenjualan(id_toko: id_toko);
   }
 
   var thumb = false.obs;
   var paketproduk = <DataPaketProduk>[].obs;
   var penjualan = <DataPenjualan>[].obs;
+  List<DateTime?> dates = [];
+  var pickdate = TextEditingController().obs;
+  final dateformat = DateFormat('dd-MM-yyyy');
+  var date1;
+  var date2;
 
-  fetchRiwayatPenjualan({id_toko}) async {
-    print('-------------------fetch produk local---------------------');
+  var groupedPenjualan = <DataPenjualanByDate>[].obs;
 
-    List<Map<String, Object?>> query = await DBHelper()
-        .FETCH('SELECT * FROM penjualan WHERE id_toko = "$id_toko"');
+  fetchRiwayatPenjualanByTanggal({
+    required String id_toko,
+    required String startDate, // format: "2025-08-01"
+    required String endDate, // format: "2025-08-31"
+  }) async {
+    penjualan.value = [];
+    groupedPenjualan.value = [];
+
+    print(
+        '-------------------fetch history central local---------------------');
+
+    String sql = '''
+    SELECT penjualan.*,
+           pelanggan.nama_pelanggan as nama_pelanggan,
+           promo.nama_promo as nama_promo,
+           Karyawan.Nama_Karyawan as nama_karyawan
+    FROM penjualan
+    LEFT JOIN pelanggan ON penjualan.id_pelanggan = pelanggan.uuid
+    LEFT JOIN promo ON penjualan.kode_promo = promo.uuid
+    LEFT JOIN Karyawan ON penjualan.id_karyawan = Karyawan.uuid
+    WHERE penjualan.id_toko = "$id_toko"
+      AND DATE(penjualan.tanggal) BETWEEN DATE("$startDate") AND DATE("$endDate")
+    ORDER BY penjualan.id DESC
+  ''';
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH(sql);
+
     if (query.isNotEmpty) {
       List<DataPenjualan> data =
           query.map((e) => DataPenjualan.fromJsondb(e)).toList();
+      print(data);
       penjualan.value = data;
-      //logo.value = userList.value.first.logo!;
-      return data;
+
+      // Convert each DataPenjualan → PenjualanItem
+      final List<PenjualanItem> items =
+          data.map((dp) => PenjualanItem.fromDataPenjualan(dp)).toList();
+
+      // Group by tanggal
+      final Map<String, List<PenjualanItem>> tempMap = {};
+      for (final item in items) {
+        tempMap.putIfAbsent(item.tanggal, () => []).add(item);
+
+        // Build grouped data
+        final List<DataPenjualanByDate> groups = [];
+        tempMap.forEach((date, listForThisDate) {
+          listForThisDate.sort((a, b) => a.noFaktur.compareTo(b.noFaktur));
+
+          final double dailyTotal = listForThisDate.fold<double>(
+            0.0,
+            (sum, item) => item.reversal == 1 ? sum : sum + item.totalBayar,
+          );
+
+          groups.add(DataPenjualanByDate(
+            date: date,
+            totalForDate: dailyTotal.toInt(),
+            items: listForThisDate,
+          ));
+        });
+
+        groups.sort((a, b) => b.date.compareTo(a.date));
+        groupedPenjualan.value = groups;
+      }
+
+      Get.back();
+      // Get.back();
+    } else {
+      print('empty');
+      Get.back();
+      return [];
+    }
+  }
+
+  // Toggle for ascending/descending
+  RxBool isAsc = false.obs; // default: descending
+
+  void sortAndGroupPenjualan() {
+    // 1) Copy penjualan list
+    final List<DataPenjualan> data = [...penjualan];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAsc.value) {
+        return a.tanggal!.compareTo(b.tanggal!);
+      } else {
+        return b.tanggal!.compareTo(a.tanggal!);
+      }
+    });
+
+    // 3) Update penjualan list
+    penjualan.value = data;
+
+    // 4) Rebuild groupedPenjualan
+    final List<PenjualanItem> items =
+        data.map((dp) => PenjualanItem.fromDataPenjualan(dp)).toList();
+
+    final Map<String, List<PenjualanItem>> tempMap = {};
+    for (final item in items) {
+      tempMap.putIfAbsent(item.tanggal, () => []).add(item);
+    }
+
+    final List<DataPenjualanByDate> groups = [];
+    tempMap.forEach((date, listForThisDate) {
+      // Sort inside each date group by noFaktur
+      listForThisDate.sort((a, b) => a.noFaktur.compareTo(b.noFaktur));
+
+      // Compute daily total
+      final double dailyTotal = listForThisDate.fold<double>(
+        0.0,
+        (sum, item) => item.reversal == 1 ? sum : sum + item.totalBayar,
+      );
+
+      groups.add(DataPenjualanByDate(
+        date: date,
+        totalForDate: dailyTotal.toInt(),
+        items: listForThisDate,
+      ));
+    });
+
+    // 5) Sort groups by date according to toggle
+    groups.sort((a, b) {
+      if (isAsc.value) {
+        return a.date.compareTo(b.date);
+      } else {
+        return b.date.compareTo(a.date);
+      }
+    });
+
+    // 6) Update groupedPenjualan
+    groupedPenjualan.value = groups;
+  }
+
+// Helper: toggle sort order
+  void toggleSortPenjualan() {
+    isAsc.value = !isAsc.value;
+    sortAndGroupPenjualan();
+  }
+
+  fetchRiwayatPenjualan({id_toko}) async {
+    print(
+        '-------------------fetch history central local---------------------');
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH(
+        'SELECT penjualan.*,pelanggan.nama_pelanggan as nama_pelanggan,promo.nama_promo as nama_promo,Karyawan.Nama_Karyawan as nama_karyawan FROM penjualan LEFT JOIN pelanggan ON penjualan.id_pelanggan = pelanggan.uuid LEFT JOIN promo ON penjualan.kode_promo = promo.uuid LEFT JOIN Karyawan ON penjualan.id_karyawan = Karyawan.uuid WHERE penjualan.id_toko = "$id_toko" ORDER BY penjualan.id DESC');
+    if (query.isNotEmpty) {
+      List<DataPenjualan> data =
+          query.map((e) => DataPenjualan.fromJsondb(e)).toList();
+      print(data);
+      penjualan.value = data;
+      // 3) Convert each DataPenjualan → PenjualanItem
+      final List<PenjualanItem> items =
+          data.map((dp) => PenjualanItem.fromDataPenjualan(dp)).toList();
+      // 4) Group by tanggal (String key)
+      final Map<String, List<PenjualanItem>> tempMap = {};
+      for (final item in items) {
+        tempMap.putIfAbsent(item.tanggal, () => []).add(item);
+        // 5) Build a List<PenjualanByDate> from that map
+        final List<DataPenjualanByDate> groups = [];
+        tempMap.forEach((date, listForThisDate) {
+          // Sort the transactions however you like. Since there is no “waktu,”
+          // we can just leave them in insertion order, or sort by noFaktur:
+          listForThisDate.sort((a, b) => a.noFaktur.compareTo(b.noFaktur));
+
+          // Compute daily total:
+          final double dailyTotal = listForThisDate.fold<double>(
+            0.0,
+            (sum, item) => item.reversal == 1 ? sum : sum + item.totalBayar,
+          );
+
+          groups.add(DataPenjualanByDate(
+            date: date,
+            totalForDate: dailyTotal.toInt(),
+            items: listForThisDate,
+          ));
+        });
+
+        // 6) Sort the date‐groups descending, so the newest date appears first
+        groups.sort((a, b) => b.date.compareTo(a.date));
+
+        groupedPenjualan.value = groups;
+      }
     } else {
       print('empty');
       return null;
-    }
-  }
-
-  deletepajak({uuid}) async {
-    print('delete pajak local---------------------------------------->');
-    Get.dialog(const showloading(), barrierDismissible: false);
-    var delete = await DBHelper().DELETE(table: 'pajak_produk', id: uuid);
-    if (delete == 1) {
-      final index = pajakList.indexWhere((k) => k.uuid == uuid);
-      if (index != -1) {
-        pajakList.removeAt(index);
-      }
-      await fetchPajakLocal(id_toko: id_toko);
-      await fetchProdukLocal(id_toko: id_toko);
-      Get.back();
-      Get.back();
-      Get.showSnackbar(
-          toast().bottom_snackbar_success('Sukses', 'berhasil dihapus'));
-      print('deleted ' + uuid.toString());
-    } else {
-      Get.back();
-      Get.showSnackbar(
-          toast().bottom_snackbar_error('Error', 'gagal menghapus'));
-    }
-
-    // var select = kategoripelangganList.where((x) => x.uuid == uuid).first;
-    // var delete = await DBHelper().UPDATE(
-    //   id: select.idLocal,
-    //   table: 'beban_local',
-    //   data: DataBeban(
-    //       aktif: 'N',
-    //       sync: 'N',
-    //       id: select.id,
-    //       idLocal: select.idLocal,
-    //       idToko: select.idToko,
-    //       jumlah: select.jumlah,
-    //       tgl: select.tgl,
-    //       keterangan: select.keterangan,
-    //       nama: select.nama,
-    //       idKtrBeban: select.idKtrBeban,
-    //       idUser: select.idUser,
-    //       namaKtrBeban: select.namaKtrBeban)
-    //       .toMapForDb(),
-    // );
-
-    // var query = await DBHelper().DELETE('produk_local', id);
-    // if (delete == 1) {
-    //   await fetchBebanlocal(id_toko);
-    //   await Get.find<dashboardController>().loadbebanhariini();
-    //   await Get.find<dashboardController>().loadpendapatanhariini();
-    //   await Get.find<dashboardController>().loadpendapatantotal();
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(
-    //       toast().bottom_snackbar_success('Sukses', 'Beban berhasil dihapus'));
-    //   print('deleted ' + id_local.toString());
-    // } else {
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(toast()
-    //       .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
-    // }
-  }
-
-  deletepaket({uuid}) async {
-    print('delete paket local---------------------------------------->');
-    Get.dialog(const showloading(), barrierDismissible: false);
-    var delete = await DBHelper().DELETE(table: 'paket_produk', id: uuid);
-    if (delete == 1) {
-      final index = paketproduk.indexWhere((k) => k.uuid == uuid);
-      if (index != -1) {
-        paketproduk.removeAt(index);
-      }
-      await fetchPaketLocal(id_toko: id_toko);
-      Get.back();
-      Get.back();
-      Get.showSnackbar(
-          toast().bottom_snackbar_success('Sukses', 'berhasil dihapus'));
-      print('deleted ' + uuid.toString());
-    } else {
-      Get.back();
-      Get.showSnackbar(
-          toast().bottom_snackbar_error('Error', 'gagal menghapus'));
-    }
-
-    // var select = kategoripelangganList.where((x) => x.uuid == uuid).first;
-    // var delete = await DBHelper().UPDATE(
-    //   id: select.idLocal,
-    //   table: 'beban_local',
-    //   data: DataBeban(
-    //       aktif: 'N',
-    //       sync: 'N',
-    //       id: select.id,
-    //       idLocal: select.idLocal,
-    //       idToko: select.idToko,
-    //       jumlah: select.jumlah,
-    //       tgl: select.tgl,
-    //       keterangan: select.keterangan,
-    //       nama: select.nama,
-    //       idKtrBeban: select.idKtrBeban,
-    //       idUser: select.idUser,
-    //       namaKtrBeban: select.namaKtrBeban)
-    //       .toMapForDb(),
-    // );
-
-    // var query = await DBHelper().DELETE('produk_local', id);
-    // if (delete == 1) {
-    //   await fetchBebanlocal(id_toko);
-    //   await Get.find<dashboardController>().loadbebanhariini();
-    //   await Get.find<dashboardController>().loadpendapatanhariini();
-    //   await Get.find<dashboardController>().loadpendapatantotal();
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(
-    //       toast().bottom_snackbar_success('Sukses', 'Beban berhasil dihapus'));
-    //   print('deleted ' + id_local.toString());
-    // } else {
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(toast()
-    //       .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
-    // }
-  }
-
-  deleteukuran({uuid}) async {
-    print('delete pajak local---------------------------------------->');
-    Get.dialog(const showloading(), barrierDismissible: false);
-    var delete = await DBHelper().DELETE(table: 'ukuran_produk', id: uuid);
-    if (delete == 1) {
-      final index = ukuranList.indexWhere((k) => k.uuid == uuid);
-      if (index != -1) {
-        ukuranList.removeAt(index);
-      }
-      await fetchUkuranLocal(id_toko: id_toko);
-      await fetchProdukLocal(id_toko: id_toko);
-      Get.back();
-      Get.back();
-      Get.showSnackbar(
-          toast().bottom_snackbar_success('Sukses', 'berhasil dihapus'));
-      print('deleted ' + uuid.toString());
-    } else {
-      Get.back();
-      Get.showSnackbar(
-          toast().bottom_snackbar_error('Error', 'gagal menghapus'));
-    }
-
-    // var select = kategoripelangganList.where((x) => x.uuid == uuid).first;
-    // var delete = await DBHelper().UPDATE(
-    //   id: select.idLocal,
-    //   table: 'beban_local',
-    //   data: DataBeban(
-    //       aktif: 'N',
-    //       sync: 'N',
-    //       id: select.id,
-    //       idLocal: select.idLocal,
-    //       idToko: select.idToko,
-    //       jumlah: select.jumlah,
-    //       tgl: select.tgl,
-    //       keterangan: select.keterangan,
-    //       nama: select.nama,
-    //       idKtrBeban: select.idKtrBeban,
-    //       idUser: select.idUser,
-    //       namaKtrBeban: select.namaKtrBeban)
-    //       .toMapForDb(),
-    // );
-
-    // var query = await DBHelper().DELETE('produk_local', id);
-    // if (delete == 1) {
-    //   await fetchBebanlocal(id_toko);
-    //   await Get.find<dashboardController>().loadbebanhariini();
-    //   await Get.find<dashboardController>().loadpendapatanhariini();
-    //   await Get.find<dashboardController>().loadpendapatantotal();
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(
-    //       toast().bottom_snackbar_success('Sukses', 'Beban berhasil dihapus'));
-    //   print('deleted ' + id_local.toString());
-    // } else {
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(toast()
-    //       .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
-    // }
-  }
-
-  deleteKategoriProduk({uuid}) async {
-    print(
-        'delete kategori produk local---------------------------------------->');
-    Get.dialog(const showloading(), barrierDismissible: false);
-    var delete = await DBHelper().DELETE(table: 'Kelompok_produk', id: uuid);
-    if (delete == 1) {
-      final index = kategoriProduk.indexWhere((k) => k.uuid == uuid);
-      if (index != -1) {
-        kategoriProduk.removeAt(index);
-      }
-      await fetchKategoriProdukLocal(id_toko: id_toko);
-      Get.back();
-      Get.back();
-      Get.showSnackbar(toast()
-          .bottom_snackbar_success('Sukses', 'kategori berhasil dihapus'));
-      print('deleted ' + uuid.toString());
-    } else {
-      Get.back();
-      Get.showSnackbar(toast()
-          .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
-    }
-
-    // var select = kategoripelangganList.where((x) => x.uuid == uuid).first;
-    // var delete = await DBHelper().UPDATE(
-    //   id: select.idLocal,
-    //   table: 'beban_local',
-    //   data: DataBeban(
-    //       aktif: 'N',
-    //       sync: 'N',
-    //       id: select.id,
-    //       idLocal: select.idLocal,
-    //       idToko: select.idToko,
-    //       jumlah: select.jumlah,
-    //       tgl: select.tgl,
-    //       keterangan: select.keterangan,
-    //       nama: select.nama,
-    //       idKtrBeban: select.idKtrBeban,
-    //       idUser: select.idUser,
-    //       namaKtrBeban: select.namaKtrBeban)
-    //       .toMapForDb(),
-    // );
-
-    // var query = await DBHelper().DELETE('produk_local', id);
-    // if (delete == 1) {
-    //   await fetchBebanlocal(id_toko);
-    //   await Get.find<dashboardController>().loadbebanhariini();
-    //   await Get.find<dashboardController>().loadpendapatanhariini();
-    //   await Get.find<dashboardController>().loadpendapatantotal();
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(
-    //       toast().bottom_snackbar_success('Sukses', 'Beban berhasil dihapus'));
-    //   print('deleted ' + id_local.toString());
-    // } else {
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(toast()
-    //       .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
-    // }
-  }
-
-  deleteProduk({uuid}) async {
-    print('delete produk local---------------------------------------->');
-    Get.dialog(const showloading(), barrierDismissible: false);
-    var delete = await DBHelper().DELETE(table: 'produk', id: uuid);
-
-    if (delete == 1) {
-      final index = produk.indexWhere((k) => k.uuid == uuid);
-      if (index != -1) {
-        produk.removeAt(index);
-      }
-
-      await fetchProdukLocal(id_toko: id_toko);
-      Get.back();
-      Get.back();
-      Get.showSnackbar(
-          toast().bottom_snackbar_success('Sukses', 'berhasil dihapus'));
-      print('deleted ' + uuid.toString());
-    } else {
-      print('delete error-------------------');
-      print(delete);
-      Get.back();
-      Get.showSnackbar(toast().bottom_snackbar_error('Error', 'Gagal'));
-    }
-  }
-
-  deleteSubKategoriProduk({uuid}) async {
-    print(
-        'delete kategori produk local---------------------------------------->');
-    Get.dialog(const showloading(), barrierDismissible: false);
-    var delete =
-        await DBHelper().DELETE(table: 'Sub_Kelompok_produk', id: uuid);
-    if (delete == 1) {
-      final index = subKategoriProduk.indexWhere((k) => k.uuid == uuid);
-      if (index != -1) {
-        subKategoriProduk.removeAt(index);
-      }
-      await fetchSubKategoriProdukLocal(id_toko: id_toko);
-      Get.back();
-      Get.back();
-      Get.showSnackbar(toast()
-          .bottom_snackbar_success('Sukses', 'kategori berhasil dihapus'));
-      print('deleted ' + uuid.toString());
-    } else {
-      Get.back();
-      Get.showSnackbar(toast()
-          .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
-    }
-  }
-
-  bool isBase64Svg(String base64) {
-    try {
-      // Decode the base64 string to UTF-8
-      final String decoded = utf8.decode(base64Decode(base64));
-      // Check if the decoded string contains '<svg'
-      return decoded.contains('<svg');
-    } catch (e) {
-      // If decoding fails, it's not an SVG
-      return false;
     }
   }
 
@@ -2664,224 +2748,6 @@ class CentralHistoryController extends GetxController {
   var search = TextEditingController().obs;
   var searchproduk = TextEditingController().obs;
   var subsearch = TextEditingController().obs;
-  serachKategoriProdukLocal() async {
-    List<Map<String, Object?>> query = await DBHelper().FETCH(
-        'SELECT * FROM Kelompok_produk WHERE id_toko = "$id_toko" AND Nama_Kelompok LIKE "%${search.value.text}%" ');
-    List<DataKategoriProduk> jenis = query.isNotEmpty
-        ? query.map((e) => DataKategoriProduk.fromJsondb(e)).toList()
-        : [];
-    kategoriProduk.value = jenis;
-
-    return jenis;
-  }
-
-  serachSubKategoriProdukLocal() async {
-    List<Map<String, Object?>> query = await DBHelper().FETCH('''
-   SELECT 
-    Sub_Kelompok_produk.*, 
-    Kelompok_produk.Nama_Kelompok AS kategori_nama
-FROM 
-    Sub_Kelompok_produk 
-LEFT JOIN 
-    Kelompok_produk ON Sub_Kelompok_produk.ID_Kelompok_Produk = Kelompok_produk.uuid 
-WHERE 
-    Sub_Kelompok_produk.id_toko = "$id_toko" 
-    AND Sub_Kelompok_produk.Nama_Sub_Kelompok LIKE "%${subsearch.value.text}%"
-  ''');
-    List<DataSubKategoriProduk> jenis = query.isNotEmpty
-        ? query.map((e) => DataSubKategoriProduk.fromJsondb(e)).toList()
-        : [];
-    subKategoriProduk.value = jenis;
-
-    return jenis;
-  }
-
-  searchProdukLocal({id_toko, search}) async {
-    print('-------------------fetch produk local---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper().FETCH('''
-    SELECT 
-        produk.*, 
-        kelompok_produk.Nama_Kelompok AS nama_kategori,
-        Sub_kelompok_produk.Nama_Sub_Kelompok AS nama_subkategori,
-        pajak_produk.nama_pajak AS nama_pajak,
-        ukuran_produk.ukuran as nama_ukuran
-    FROM 
-        produk 
-    LEFT JOIN 
-       Kelompok_produk ON produk.id_kelompok_produk = Kelompok_produk.uuid
-    LEFT JOIN 
-       Sub_kelompok_produk ON produk.id_sub_kelompok_produk = Sub_kelompok_produk.uuid
-    LEFT JOIN 
-       pajak_produk ON produk.pajak = pajak_produk.uuid
-    LEFT JOIN 
-       ukuran_produk ON produk.ukuran = ukuran_produk.uuid
-    WHERE 
-        produk.id_toko = "$id_toko" AND produk.nama_produk LIKE "%${searchproduk.value.text}%"
-  ''');
-    if (query.isNotEmpty) {
-      List<DataProduk> data =
-          query.map((e) => DataProduk.fromJsondb(e)).toList();
-      produk.value = data;
-      //logo.value = userList.value.first.logo!;
-      return data;
-    } else {
-      print('empty');
-      return null;
-    }
-  }
-
-  var isAscending = true.obs;
-  fetchProdukLocal({id_toko, bool ascending = true}) async {
-    print('-------------------fetch produk local---------------------');
-
-    String orderBy = ascending ? 'ASC' : 'DESC'; // Determine order
-    List<Map<String, Object?>> query = await DBHelper().FETCH('''
-  SELECT 
-      produk.*, 
-      kelompok_produk.Nama_Kelompok AS nama_kategori,
-      Sub_kelompok_produk.Nama_Sub_Kelompok AS nama_subkategori,
-      pajak_produk.nama_pajak AS nama_pajak,
-      pajak_produk.nominal_pajak AS nominal_pajak,
-      stock_produk.stok AS qty,
-      ukuran_produk.ukuran as nama_ukuran
-  FROM 
-      produk 
-  LEFT JOIN 
-     Kelompok_produk ON produk.id_kelompok_produk = Kelompok_produk.uuid
-  LEFT JOIN 
-     Sub_kelompok_produk ON produk.id_sub_kelompok_produk = Sub_kelompok_produk.uuid
-  LEFT JOIN 
-     pajak_produk ON produk.pajak = pajak_produk.uuid
-  LEFT JOIN 
-     ukuran_produk ON produk.ukuran = ukuran_produk.uuid
-  LEFT JOIN 
-     stock_produk ON produk.uuid = stock_produk.id_produk
-  WHERE 
-      produk.id_toko = "$id_toko"
-  ORDER BY produk.nama_produk $orderBy
-  ''');
-    if (query.isNotEmpty) {
-      List<DataProduk> data =
-          query.map((e) => DataProduk.fromJsondb(e)).toList();
-      produk.value = data;
-      print('qty---------->');
-      print(data[0].qty);
-      return data;
-    } else {
-      print('empty');
-      return null;
-    }
-  }
-
-  fetchPaketLocal({id_toko}) async {
-    print('-------------------fetch produk local---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper().FETCH('''
-  SELECT 
-      paket_produk.*, 
-      pajak_produk.nama_pajak AS nama_pajak,
-      pajak_produk.nominal_pajak AS nominal_pajak
-  FROM 
-      paket_produk 
-  LEFT JOIN 
-     pajak_produk ON paket_produk.pajak = pajak_produk.uuid
-  WHERE 
-      paket_produk.id_toko = "$id_toko"
-  
-  ''');
-    if (query.isNotEmpty) {
-      List<DataPaketProduk> data =
-          query.map((e) => DataPaketProduk.fromJsondb(e)).toList();
-      paketproduk.value = data;
-      return data;
-    } else {
-      print('empty');
-      return null;
-    }
-  }
-
-  var pajakValue;
-  var pajakList = <DataPajakProduk>[].obs;
-
-  var ukuranValue;
-  var ukuranList = <DataUkuranProduk>[].obs;
-  fetchPajakLocal({id_toko}) async {
-    print('-------------------fetch produk local---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper()
-        .FETCH('SELECT * FROM pajak_produk WHERE id_toko = "$id_toko"');
-    if (query.isNotEmpty) {
-      List<DataPajakProduk> data =
-          query.map((e) => DataPajakProduk.fromJsondb(e)).toList();
-      pajakList.value = data;
-      //logo.value = userList.value.first.logo!;
-      return data;
-    } else {
-      print('empty');
-      return null;
-    }
-  }
-
-  fetchUkuranLocal({id_toko}) async {
-    print('-------------------fetch produk local---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper()
-        .FETCH('SELECT * FROM ukuran_produk WHERE id_toko = "$id_toko"');
-    if (query.isNotEmpty) {
-      List<DataUkuranProduk> data =
-          query.map((e) => DataUkuranProduk.fromJsondb(e)).toList();
-      ukuranList.value = data;
-      //logo.value = userList.value.first.logo!;
-      return data;
-    } else {
-      print('empty');
-      return null;
-    }
-  }
-
-  fetchKategoriProdukLocal({id_toko}) async {
-    print('-------------------fetch pelanggan local---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper()
-        .FETCH('SELECT * FROM Kelompok_produk WHERE id_toko = "$id_toko"');
-    if (query.isNotEmpty) {
-      List<DataKategoriProduk> data =
-          query.map((e) => DataKategoriProduk.fromJsondb(e)).toList();
-      kategoriProduk.value = data;
-      //logo.value = userList.value.first.logo!;
-      return data;
-    } else {
-      print('empty');
-      return null;
-    }
-  }
-
-  fetchSubKategoriProdukLocal({id_toko}) async {
-    print('-------------------fetch pelanggan local---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper().FETCH('''
-    SELECT 
-        Sub_Kelompok_produk.*, 
-        kelompok_produk.Nama_Kelompok AS kategori_nama
-    FROM 
-        Sub_Kelompok_produk 
-    LEFT JOIN 
-       Kelompok_produk ON Sub_Kelompok_produk.ID_Kelompok_Produk = Kelompok_produk.uuid 
-    WHERE 
-         Sub_Kelompok_produk.id_toko = "$id_toko"
-  ''');
-    if (query.isNotEmpty) {
-      List<DataSubKategoriProduk> data =
-          query.map((e) => DataSubKategoriProduk.fromJsondb(e)).toList();
-      subKategoriProduk.value = data;
-      //logo.value = userList.value.first.logo!;
-      return data;
-    } else {
-      print('empty');
-      return null;
-    }
-  }
 }
 
 class CentralPromoController extends GetxController {
@@ -2889,6 +2755,90 @@ class CentralPromoController extends GetxController {
   void onInit() {
     // TODO: implement onInit
     super.onInit();
+    fetchPromo(id_toko: id_toko);
+  }
+
+  RxBool isAsc = false.obs;
+  void sortPromo() {
+    // 1) Copy penjualan list
+    final List<DataPromo> data = [...promo];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAsc.value) {
+        return a.namaPromo!.compareTo(b.namaPromo!);
+      } else {
+        return b.namaPromo!.compareTo(a.namaPromo!);
+      }
+    });
+
+    // 3) Update penjualan list
+    promo.value = data;
+  }
+
+// Helper: toggle sort order
+  void toggleSortPromo() {
+    isAsc.value = !isAsc.value;
+    sortPromo();
+  }
+
+  var search = TextEditingController().obs;
+  var searchproduk = TextEditingController().obs;
+  var promo = <DataPromo>[].obs;
+  var id_toko = box.read('uuid', fallback: 'null');
+  fetchPromo({id_toko}) async {
+    print('-------------------fetch produk local---------------------');
+
+    List<Map<String, Object?>> query = await DBHelper()
+        .FETCH('SELECT * FROM promo WHERE id_toko = "$id_toko"');
+    if (query.isNotEmpty) {
+      List<DataPromo> data = query.map((e) => DataPromo.fromJsondb(e)).toList();
+      promo.value = data;
+      //logo.value = userList.value.first.logo!;
+      return data;
+    } else {
+      print('empty');
+      return [];
+    }
+  }
+
+  fetchPromoKasir({id_toko}) async {
+    print('-------------------fetch promo local---------------------');
+
+    // Get today's date in YYYY-MM-DD format
+    final today = DateTime.now();
+    final todayStr = "${today.year.toString().padLeft(4, '0')}-"
+        "${today.month.toString().padLeft(2, '0')}-"
+        "${today.day.toString().padLeft(2, '0')}";
+
+    // Query: promo not expired (end_date >= today)
+    String sql = '''
+    SELECT * FROM promo 
+    WHERE id_toko = "$id_toko" 
+    AND tgl_selesai >= "$todayStr"
+  ''';
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH(sql);
+
+    if (query.isNotEmpty) {
+      List<DataPromo> data = query.map((e) => DataPromo.fromJsondb(e)).toList();
+      promo.value = data;
+      return data;
+    } else {
+      print('empty');
+      return [];
+    }
+  }
+
+  searchPromoLocal({id_toko, search}) async {
+    List<Map<String, Object?>> query = await DBHelper().FETCH(
+        'SELECT * FROM promo WHERE id_toko = "$id_toko" AND promo.nama_promo LIKE "%${search}%" ');
+    List<DataPromo> jenis = query.isNotEmpty
+        ? query.map((e) => DataPromo.fromJsondb(e)).toList()
+        : [];
+    promo.value = jenis;
+
+    return jenis;
   }
 }
 
@@ -2952,162 +2902,38 @@ class CentralPenerimaanController extends GetxController {
     await fetchPenerimaanLocal(id_toko: id_toko);
   }
 
+  List<DateTime?> dates = [];
+  var pickdate = TextEditingController().obs;
+  final dateformat = DateFormat('dd-MM-yyyy');
+  var date1;
+  var date2;
+
+  RxBool isAsc = false.obs;
+  void sortPenerimaan() {
+    // 1) Copy penjualan list
+    final List<DataPenerimaanProduk> data = [...penerimaan];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAsc.value) {
+        return a.tanggal!.compareTo(b.tanggal!);
+      } else {
+        return b.tanggal!.compareTo(a.tanggal!);
+      }
+    });
+
+    // 3) Update penjualan list
+    penerimaan.value = data;
+  }
+
+// Helper: toggle sort order
+  void toggleSortPenerimaan() {
+    isAsc.value = !isAsc.value;
+    sortPenerimaan();
+  }
+
   var thumb = false.obs;
   var paketproduk = <DataPaketProduk>[].obs;
-
-  deletepajak({uuid}) async {
-    print('delete pajak local---------------------------------------->');
-    Get.dialog(const showloading(), barrierDismissible: false);
-    var delete = await DBHelper().DELETE(table: 'pajak_produk', id: uuid);
-    if (delete == 1) {
-      final index = pajakList.indexWhere((k) => k.uuid == uuid);
-      if (index != -1) {
-        pajakList.removeAt(index);
-      }
-      await fetchPajakLocal(id_toko: id_toko);
-      await fetchProdukLocal(id_toko: id_toko);
-      Get.back();
-      Get.back();
-      Get.showSnackbar(
-          toast().bottom_snackbar_success('Sukses', 'berhasil dihapus'));
-      print('deleted ' + uuid.toString());
-    } else {
-      Get.back();
-      Get.showSnackbar(
-          toast().bottom_snackbar_error('Error', 'gagal menghapus'));
-    }
-  }
-
-  deleteukuran({uuid}) async {
-    print('delete pajak local---------------------------------------->');
-    Get.dialog(const showloading(), barrierDismissible: false);
-    var delete = await DBHelper().DELETE(table: 'ukuran_produk', id: uuid);
-    if (delete == 1) {
-      final index = ukuranList.indexWhere((k) => k.uuid == uuid);
-      if (index != -1) {
-        ukuranList.removeAt(index);
-      }
-      await fetchUkuranLocal(id_toko: id_toko);
-      await fetchProdukLocal(id_toko: id_toko);
-      Get.back();
-      Get.back();
-      Get.showSnackbar(
-          toast().bottom_snackbar_success('Sukses', 'berhasil dihapus'));
-      print('deleted ' + uuid.toString());
-    } else {
-      Get.back();
-      Get.showSnackbar(
-          toast().bottom_snackbar_error('Error', 'gagal menghapus'));
-    }
-  }
-
-  deleteKategoriProduk({uuid}) async {
-    print(
-        'delete kategori produk local---------------------------------------->');
-    Get.dialog(const showloading(), barrierDismissible: false);
-    var delete = await DBHelper().DELETE(table: 'Kelompok_produk', id: uuid);
-    if (delete == 1) {
-      final index = kategoriProduk.indexWhere((k) => k.uuid == uuid);
-      if (index != -1) {
-        kategoriProduk.removeAt(index);
-      }
-      await fetchKategoriProdukLocal(id_toko: id_toko);
-      Get.back();
-      Get.back();
-      Get.showSnackbar(toast()
-          .bottom_snackbar_success('Sukses', 'kategori berhasil dihapus'));
-      print('deleted ' + uuid.toString());
-    } else {
-      Get.back();
-      Get.showSnackbar(toast()
-          .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
-    }
-
-    // var select = kategoripelangganList.where((x) => x.uuid == uuid).first;
-    // var delete = await DBHelper().UPDATE(
-    //   id: select.idLocal,
-    //   table: 'beban_local',
-    //   data: DataBeban(
-    //       aktif: 'N',
-    //       sync: 'N',
-    //       id: select.id,
-    //       idLocal: select.idLocal,
-    //       idToko: select.idToko,
-    //       jumlah: select.jumlah,
-    //       tgl: select.tgl,
-    //       keterangan: select.keterangan,
-    //       nama: select.nama,
-    //       idKtrBeban: select.idKtrBeban,
-    //       idUser: select.idUser,
-    //       namaKtrBeban: select.namaKtrBeban)
-    //       .toMapForDb(),
-    // );
-
-    // var query = await DBHelper().DELETE('produk_local', id);
-    // if (delete == 1) {
-    //   await fetchBebanlocal(id_toko);
-    //   await Get.find<dashboardController>().loadbebanhariini();
-    //   await Get.find<dashboardController>().loadpendapatanhariini();
-    //   await Get.find<dashboardController>().loadpendapatantotal();
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(
-    //       toast().bottom_snackbar_success('Sukses', 'Beban berhasil dihapus'));
-    //   print('deleted ' + id_local.toString());
-    // } else {
-    //   Get.back(closeOverlays: true);
-    //   Get.showSnackbar(toast()
-    //       .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
-    // }
-  }
-
-  deleteProduk({uuid}) async {
-    print('delete produk local---------------------------------------->');
-    Get.dialog(const showloading(), barrierDismissible: false);
-    var delete = await DBHelper().DELETE(table: 'produk', id: uuid);
-
-    if (delete == 1) {
-      final index = produk.indexWhere((k) => k.uuid == uuid);
-      if (index != -1) {
-        produk.removeAt(index);
-      }
-
-      await fetchProdukLocal(id_toko: id_toko);
-      Get.back();
-      Get.back();
-      Get.showSnackbar(
-          toast().bottom_snackbar_success('Sukses', 'berhasil dihapus'));
-      print('deleted ' + uuid.toString());
-    } else {
-      print('delete error-------------------');
-      print(delete);
-      Get.back();
-      Get.showSnackbar(toast().bottom_snackbar_error('Error', 'Gagal'));
-    }
-  }
-
-  deleteSubKategoriProduk({uuid}) async {
-    print(
-        'delete kategori produk local---------------------------------------->');
-    Get.dialog(const showloading(), barrierDismissible: false);
-    var delete =
-        await DBHelper().DELETE(table: 'Sub_Kelompok_produk', id: uuid);
-    if (delete == 1) {
-      final index = subKategoriProduk.indexWhere((k) => k.uuid == uuid);
-      if (index != -1) {
-        subKategoriProduk.removeAt(index);
-      }
-      await fetchSubKategoriProdukLocal(id_toko: id_toko);
-      Get.back();
-      Get.back();
-      Get.showSnackbar(toast()
-          .bottom_snackbar_success('Sukses', 'kategori berhasil dihapus'));
-      print('deleted ' + uuid.toString());
-    } else {
-      Get.back();
-      Get.showSnackbar(toast()
-          .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
-    }
-  }
 
   bool isBase64Svg(String base64) {
     try {
@@ -3129,113 +2955,44 @@ class CentralPenerimaanController extends GetxController {
   var searchproduk = TextEditingController().obs;
   var subsearch = TextEditingController().obs;
   var penerimaan = <DataPenerimaanProduk>[].obs;
-  serachKategoriProdukLocal() async {
-    List<Map<String, Object?>> query = await DBHelper().FETCH(
-        'SELECT * FROM Kelompok_produk WHERE id_toko = "$id_toko" AND Nama_Kelompok LIKE "%${search.value.text}%" ');
-    List<DataKategoriProduk> jenis = query.isNotEmpty
-        ? query.map((e) => DataKategoriProduk.fromJsondb(e)).toList()
-        : [];
-    kategoriProduk.value = jenis;
 
-    return jenis;
-  }
+  searchPenerimaanByDateLocal(
+      {required String id_toko,
+      required String startDate,
+      required String endDate,
+      bool ascending = true}) async {
+    print('-------------------search penerimaan by date---------------------');
+    penerimaan.value = [];
 
-  serachSubKategoriProdukLocal() async {
-    List<Map<String, Object?>> query = await DBHelper().FETCH('''
-   SELECT 
-    Sub_Kelompok_produk.*, 
-    Kelompok_produk.Nama_Kelompok AS kategori_nama
-FROM 
-    Sub_Kelompok_produk 
-LEFT JOIN 
-    Kelompok_produk ON Sub_Kelompok_produk.ID_Kelompok_Produk = Kelompok_produk.uuid 
-WHERE 
-    Sub_Kelompok_produk.id_toko = "$id_toko" 
-    AND Sub_Kelompok_produk.Nama_Sub_Kelompok LIKE "%${subsearch.value.text}%"
-  ''');
-    List<DataSubKategoriProduk> jenis = query.isNotEmpty
-        ? query.map((e) => DataSubKategoriProduk.fromJsondb(e)).toList()
-        : [];
-    subKategoriProduk.value = jenis;
-
-    return jenis;
-  }
-
-  searchProdukLocal({id_toko, search}) async {
-    print('-------------------fetch produk local---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper().FETCH('''
-    SELECT 
-        produk.*, 
-        kelompok_produk.Nama_Kelompok AS nama_kategori,
-        Sub_kelompok_produk.Nama_Sub_Kelompok AS nama_subkategori,
-        pajak_produk.nama_pajak AS nama_pajak,
-        ukuran_produk.ukuran as nama_ukuran
-    FROM 
-        produk 
-    LEFT JOIN 
-       Kelompok_produk ON produk.id_kelompok_produk = Kelompok_produk.uuid
-    LEFT JOIN 
-       Sub_kelompok_produk ON produk.id_sub_kelompok_produk = Sub_kelompok_produk.uuid
-    LEFT JOIN 
-       pajak_produk ON produk.pajak = pajak_produk.uuid
-    LEFT JOIN 
-       ukuran_produk ON produk.ukuran = ukuran_produk.uuid
-    WHERE 
-        produk.id_toko = "$id_toko" AND produk.nama_produk LIKE "%${searchproduk.value.text}%"
-  ''');
-    if (query.isNotEmpty) {
-      List<DataProduk> data =
-          query.map((e) => DataProduk.fromJsondb(e)).toList();
-      produk.value = data;
-      //logo.value = userList.value.first.logo!;
-      return data;
-    } else {
-      print('empty');
-      return null;
-    }
-  }
-
-  var isAscending = true.obs;
-  fetchProdukLocal({id_toko, bool ascending = true}) async {
-    print('-------------------fetch produk local---------------------');
-
-    String orderBy = ascending ? 'ASC' : 'DESC'; // Determine order
     List<Map<String, Object?>> query = await DBHelper().FETCH('''
   SELECT 
-      produk.*, 
-      kelompok_produk.Nama_Kelompok AS nama_kategori,
-      Sub_kelompok_produk.Nama_Sub_Kelompok AS nama_subkategori,
-      pajak_produk.nama_pajak AS nama_pajak,
-      pajak_produk.nominal_pajak AS nominal_pajak,
-      stock_produk.stok AS qty,
-      ukuran_produk.ukuran as nama_ukuran
+      penerimaan_produk.*, 
+      supplier.nama_supplier AS nama_supplier
   FROM 
-      produk 
+      penerimaan_produk 
   LEFT JOIN 
-     Kelompok_produk ON produk.id_kelompok_produk = Kelompok_produk.uuid
-  LEFT JOIN 
-     Sub_kelompok_produk ON produk.id_sub_kelompok_produk = Sub_kelompok_produk.uuid
-  LEFT JOIN 
-     pajak_produk ON produk.pajak = pajak_produk.uuid
-  LEFT JOIN 
-     ukuran_produk ON produk.ukuran = ukuran_produk.uuid
-  LEFT JOIN 
-     stock_produk ON produk.uuid = stock_produk.id_produk
+      supplier ON penerimaan_produk.id_supplier = supplier.uuid
   WHERE 
-      produk.id_toko = "$id_toko"
-  ORDER BY produk.nama_produk $orderBy
+      penerimaan_produk.id_toko = "$id_toko"
+      AND DATE(penerimaan_produk.tanggal) BETWEEN "$startDate" AND "$endDate"
   ''');
+
     if (query.isNotEmpty) {
-      List<DataProduk> data =
-          query.map((e) => DataProduk.fromJsondb(e)).toList();
-      produk.value = data;
-      print('qty---------->');
-      print(data[0].qty);
+      List<DataPenerimaanProduk> data =
+          query.map((e) => DataPenerimaanProduk.fromJsondb(e)).toList();
+      penerimaan.value = data;
+      data.forEach(
+        (element) {
+          print(element.tanggal);
+        },
+      );
+      Get.back();
+
       return data;
     } else {
-      print('empty');
-      return null;
+      Get.back();
+      print('No results found between $startDate and $endDate');
+      return [];
     }
   }
 
@@ -3258,115 +3015,6 @@ WHERE
       List<DataPenerimaanProduk> data =
           query.map((e) => DataPenerimaanProduk.fromJsondb(e)).toList();
       penerimaan.value = data;
-      return data;
-    } else {
-      print('empty');
-      return null;
-    }
-  }
-
-  fetchPaketLocal({id_toko}) async {
-    print('-------------------fetch produk local---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper().FETCH('''
-  SELECT 
-      paket_produk.*, 
-      pajak_produk.nama_pajak AS nama_pajak,
-      pajak_produk.nominal_pajak AS nominal_pajak
-  FROM 
-      paket_produk 
-  LEFT JOIN 
-     pajak_produk ON paket_produk.pajak = pajak_produk.uuid
-  WHERE 
-      paket_produk.id_toko = "$id_toko"
-  
-  ''');
-    if (query.isNotEmpty) {
-      List<DataPaketProduk> data =
-          query.map((e) => DataPaketProduk.fromJsondb(e)).toList();
-      paketproduk.value = data;
-      return data;
-    } else {
-      print('empty');
-      return null;
-    }
-  }
-
-  var pajakValue;
-  var pajakList = <DataPajakProduk>[].obs;
-
-  var ukuranValue;
-  var ukuranList = <DataUkuranProduk>[].obs;
-  fetchPajakLocal({id_toko}) async {
-    print('-------------------fetch produk local---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper()
-        .FETCH('SELECT * FROM pajak_produk WHERE id_toko = "$id_toko"');
-    if (query.isNotEmpty) {
-      List<DataPajakProduk> data =
-          query.map((e) => DataPajakProduk.fromJsondb(e)).toList();
-      pajakList.value = data;
-      //logo.value = userList.value.first.logo!;
-      return data;
-    } else {
-      print('empty');
-      return null;
-    }
-  }
-
-  fetchUkuranLocal({id_toko}) async {
-    print('-------------------fetch produk local---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper()
-        .FETCH('SELECT * FROM ukuran_produk WHERE id_toko = "$id_toko"');
-    if (query.isNotEmpty) {
-      List<DataUkuranProduk> data =
-          query.map((e) => DataUkuranProduk.fromJsondb(e)).toList();
-      ukuranList.value = data;
-      //logo.value = userList.value.first.logo!;
-      return data;
-    } else {
-      print('empty');
-      return null;
-    }
-  }
-
-  fetchKategoriProdukLocal({id_toko}) async {
-    print('-------------------fetch pelanggan local---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper()
-        .FETCH('SELECT * FROM Kelompok_produk WHERE id_toko = "$id_toko"');
-    if (query.isNotEmpty) {
-      List<DataKategoriProduk> data =
-          query.map((e) => DataKategoriProduk.fromJsondb(e)).toList();
-      kategoriProduk.value = data;
-      //logo.value = userList.value.first.logo!;
-      return data;
-    } else {
-      print('empty');
-      return null;
-    }
-  }
-
-  fetchSubKategoriProdukLocal({id_toko}) async {
-    print('-------------------fetch pelanggan local---------------------');
-
-    List<Map<String, Object?>> query = await DBHelper().FETCH('''
-    SELECT 
-        Sub_Kelompok_produk.*, 
-        kelompok_produk.Nama_Kelompok AS kategori_nama
-    FROM 
-        Sub_Kelompok_produk 
-    LEFT JOIN 
-       Kelompok_produk ON Sub_Kelompok_produk.ID_Kelompok_Produk = Kelompok_produk.uuid 
-    WHERE 
-         Sub_Kelompok_produk.id_toko = "$id_toko"
-  ''');
-    if (query.isNotEmpty) {
-      List<DataSubKategoriProduk> data =
-          query.map((e) => DataSubKategoriProduk.fromJsondb(e)).toList();
-      subKategoriProduk.value = data;
-      //logo.value = userList.value.first.logo!;
       return data;
     } else {
       print('empty');
@@ -3784,6 +3432,12 @@ class CentralBebanController extends GetxController {
   }
 
   var id_toko;
+  RxBool isAsc = false.obs;
+  List<DateTime?> dates = [];
+  var pickdate = TextEditingController().obs;
+  final dateformat = DateFormat('dd-MM-yyyy');
+  var date1;
+  var date2;
 
   var listBeban = <DataBeban>[].obs;
   var listBebanRutin = <DataBeban>[].obs;
@@ -3791,6 +3445,69 @@ class CentralBebanController extends GetxController {
   var search = TextEditingController().obs;
   var searchproduk = TextEditingController().obs;
   var subsearch = TextEditingController().obs;
+
+  void sortBeban() {
+    // 1) Copy penjualan list
+    final List<DataBeban> data = [...listBeban];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAsc.value) {
+        return a.tanggalBeban!.compareTo(b.tanggalBeban!);
+      } else {
+        return b.tanggalBeban!.compareTo(a.tanggalBeban!);
+      }
+    });
+
+    // 3) Update penjualan list
+    listBeban.value = data;
+  }
+
+// Helper: toggle sort order
+  void toggleSortBeban() {
+    isAsc.value = !isAsc.value;
+    sortBeban();
+  }
+
+  searchBebanByTanggal({
+    required String id_toko,
+    required String startDate, // format: "2025-08-01"
+    required String endDate,
+  }) async {
+    listBeban.value = [];
+    print('-------------------fetch beban by tgl CENTRAL---------------------');
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH('''
+    SELECT 
+        beban.*, 
+        kategori_beban.nama_kategori_beban AS kategori_beban,
+        karyawan.nama_karyawan as nama_karyawan
+    FROM 
+        beban 
+    LEFT JOIN 
+       kategori_beban ON beban.id_kategori_beban = kategori_beban.uuid 
+    LEFT JOIN 
+       karyawan ON beban.id_karyawan = karyawan.uuid 
+    WHERE 
+         beban.id_toko = "$id_toko" AND DATE(beban.tanggal_beban) BETWEEN DATE("$startDate") AND DATE("$endDate")
+    ORDER BY 
+        beban.id DESC
+  ''');
+    if (query.isNotEmpty) {
+      List<DataBeban> data = query.map((e) => DataBeban.fromJsondb(e)).toList();
+      listBeban.value = data;
+      print('id_toko con');
+      print(id_toko);
+      Get.back();
+      return data;
+    } else {
+      print('empty');
+      print('id_toko con');
+      print(id_toko);
+      Get.back();
+      return null;
+    }
+  }
 
   fetchBeban() async {
     print('-------------------fetch pelanggan CENTRAL---------------------');
@@ -3838,7 +3555,7 @@ class CentralBebanController extends GetxController {
     LEFT JOIN 
        kategori_beban ON beban.id_kategori_beban = kategori_beban.uuid 
     WHERE 
-         beban.id_toko = "$id_toko"
+         beban.id_toko = "$id_toko" AND beban.aktif = 1
     ORDER BY 
         beban.id DESC
   ''');
@@ -3869,7 +3586,7 @@ class CentralBebanController extends GetxController {
         '-------------------fetch kategori beban CENTRAL---------------------');
 
     List<Map<String, Object?>> query = await DBHelper()
-        .FETCH('SELECT * FROM kategori_beban WHERE id_toko = "$id_toko"');
+        .FETCH('SELECT * FROM kategori_beban WHERE id_toko = "$id_toko" ');
     if (query.isNotEmpty) {
       List<DataKategoriBeban> data =
           query.map((e) => DataKategoriBeban.fromJsondb(e)).toList();
@@ -3882,6 +3599,215 @@ class CentralBebanController extends GetxController {
       print('empty');
       print('id_toko con');
       print(id_toko);
+      return null;
+    }
+  }
+}
+
+class CentralKategoriProdukController extends GetxController {
+  @override
+  void onInit() {
+    // TODO: implement onInit
+    super.onInit();
+    id_toko = box.read('uuid', fallback: 'null');
+    fetchKategoriProdukLocal(id_toko: id_toko);
+    fetchSubKategoriProdukLocal(id_toko: id_toko);
+  }
+
+  RxBool isAsc = false.obs;
+
+  void sortKategori() {
+    // 1) Copy penjualan list
+    final List<DataKategoriProduk> data = [...kategoriProduk];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAsc.value) {
+        return a.namakelompok!.compareTo(b.namakelompok!);
+      } else {
+        return b.namakelompok!.compareTo(a.namakelompok!);
+      }
+    });
+
+    // 3) Update penjualan list
+    kategoriProduk.value = data;
+  }
+
+// Helper: toggle sort order
+  void toggleSortkategori() {
+    isAsc.value = !isAsc.value;
+    sortKategori();
+  }
+
+  void sortSubKategori() {
+    // 1) Copy penjualan list
+    final List<DataSubKategoriProduk> data = [...subKategoriProduk];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAsc.value) {
+        return a.namaSubkelompok!.compareTo(b.namaSubkelompok!);
+      } else {
+        return b.namaSubkelompok!.compareTo(a.namaSubkelompok!);
+      }
+    });
+
+    // 3) Update penjualan list
+    subKategoriProduk.value = data;
+  }
+
+// Helper: toggle sort order
+  void toggleSortSubkategori() {
+    isAsc.value = !isAsc.value;
+    sortSubKategori();
+  }
+
+  serachKategoriProdukLocal({id_toko, search}) async {
+    List<Map<String, Object?>> query = await DBHelper().FETCH(
+        'SELECT * FROM Kelompok_produk WHERE id_toko = "$id_toko" AND Nama_Kelompok LIKE "%${search}%" ');
+    List<DataKategoriProduk> jenis = query.isNotEmpty
+        ? query.map((e) => DataKategoriProduk.fromJsondb(e)).toList()
+        : [];
+    kategoriProduk.value = jenis;
+
+    return jenis;
+  }
+
+  serachSubKategoriProdukLocal({id_toko, search}) async {
+    List<Map<String, Object?>> query = await DBHelper().FETCH('''
+   SELECT 
+    Sub_Kelompok_produk.*, 
+    Kelompok_produk.Nama_Kelompok AS kategori_nama
+FROM 
+    Sub_Kelompok_produk 
+LEFT JOIN 
+    Kelompok_produk ON Sub_Kelompok_produk.ID_Kelompok_Produk = Kelompok_produk.uuid 
+WHERE 
+    Sub_Kelompok_produk.id_toko = "$id_toko" 
+    AND Sub_Kelompok_produk.Nama_Sub_Kelompok LIKE "%${search}%"
+  ''');
+    List<DataSubKategoriProduk> jenis = query.isNotEmpty
+        ? query.map((e) => DataSubKategoriProduk.fromJsondb(e)).toList()
+        : [];
+    subKategoriProduk.value = jenis;
+
+    return jenis;
+  }
+
+  var kategoriProduk = <DataKategoriProduk>[].obs;
+  var id_toko;
+  var subKategoriProduk = <DataSubKategoriProduk>[].obs;
+  var searchKategori = TextEditingController().obs;
+
+  var subsearch = TextEditingController().obs;
+
+  fetchKategoriProdukLocal({id_toko}) async {
+    print(
+        '-------------------fetch kategori central local---------------------');
+
+    List<Map<String, Object?>> query = await DBHelper()
+        .FETCH('SELECT * FROM Kelompok_produk WHERE id_toko = "$id_toko"');
+    if (query.isNotEmpty) {
+      List<DataKategoriProduk> data =
+          query.map((e) => DataKategoriProduk.fromJsondb(e)).toList();
+      kategoriProduk.value = data;
+      //logo.value = userList.value.first.logo!;
+      return data;
+    } else {
+      print('empty');
+      return null;
+    }
+  }
+
+  fetchSubKategoriProdukLocal({id_toko}) async {
+    print('-------------------fetch pelanggan local---------------------');
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH('''
+    SELECT 
+        Sub_Kelompok_produk.*, 
+        kelompok_produk.Nama_Kelompok AS kategori_nama
+    FROM 
+        Sub_Kelompok_produk 
+    LEFT JOIN 
+       Kelompok_produk ON Sub_Kelompok_produk.ID_Kelompok_Produk = Kelompok_produk.uuid 
+    WHERE 
+         Sub_Kelompok_produk.id_toko = "$id_toko"
+  ''');
+    if (query.isNotEmpty) {
+      List<DataSubKategoriProduk> data =
+          query.map((e) => DataSubKategoriProduk.fromJsondb(e)).toList();
+      subKategoriProduk.value = data;
+      //logo.value = userList.value.first.logo!;
+      return data;
+    } else {
+      print('empty');
+      return null;
+    }
+  }
+}
+
+class CentralUkuranProdukController extends GetxController {
+  @override
+  void onInit() {
+    // TODO: implement onInit
+    super.onInit();
+    id_toko = box.read('uuid', fallback: 'null');
+    fetchUkuranLocal(id_toko: id_toko);
+  }
+
+  var id_toko;
+  RxBool isAsc = false.obs;
+  void sortUkuran() {
+    // 1) Copy penjualan list
+    final List<DataUkuranProduk> data = [...ukuranList];
+
+    // 2) Sort penjualan by date
+    data.sort((a, b) {
+      if (isAsc.value) {
+        return a.ukuran!.compareTo(b.ukuran!);
+      } else {
+        return b.ukuran!.compareTo(a.ukuran!);
+      }
+    });
+
+    // 3) Update penjualan list
+    ukuranList.value = data;
+  }
+
+// Helper: toggle sort order
+  void toggleSortUkuran() {
+    isAsc.value = !isAsc.value;
+    sortUkuran();
+  }
+
+  var search = TextEditingController().obs;
+  var ukuranValue;
+  var ukuranList = <DataUkuranProduk>[].obs;
+
+  searchUkuranLocal({id_toko, search}) async {
+    List<Map<String, Object?>> query = await DBHelper().FETCH(
+        'SELECT * FROM ukuran_produk WHERE id_toko = "$id_toko" AND ukuran LIKE "%${search}%" ');
+    List<DataUkuranProduk> jenis = query.isNotEmpty
+        ? query.map((e) => DataUkuranProduk.fromJsondb(e)).toList()
+        : [];
+    ukuranList.value = jenis;
+
+    return jenis;
+  }
+
+  fetchUkuranLocal({id_toko}) async {
+    print('-------------------fetch ukuran produk local---------------------');
+
+    List<Map<String, Object?>> query = await DBHelper()
+        .FETCH('SELECT * FROM ukuran_produk WHERE id_toko = "$id_toko"');
+    if (query.isNotEmpty) {
+      List<DataUkuranProduk> data =
+          query.map((e) => DataUkuranProduk.fromJsondb(e)).toList();
+      ukuranList.value = data;
+      //logo.value = userList.value.first.logo!;
+      return data;
+    } else {
+      print('empty');
       return null;
     }
   }

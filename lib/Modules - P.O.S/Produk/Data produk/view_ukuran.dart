@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 
 import '../../../Widget/popscreen.dart';
 import '../../../Widget/widget.dart';
@@ -12,34 +13,21 @@ class ViewUkuran extends GetView<BaseMenuProdukController> {
 
   @override
   Widget build(BuildContext context) {
+    var con = Get.find<CentralUkuranProdukController>();
     return Column(
       children: [
-        Container(
-          height: 60, padding: EdgeInsets.all(15),
-          //color: Colors.red,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Icon(FontAwesomeIcons.magnifyingGlass),
-              ),
-              Expanded(
-                child: TextField(
-                  controller: controller.subsearch.value,
-                  onChanged: (val) {
-                    controller.serachSubKategoriProdukLocal();
-                  },
-                  decoration: InputDecoration(hintText: 'Cari...'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Icon(Icons.sort),
-              )
-            ],
-          ),
-        ),
+        Obx(() {
+          return customSearch(
+            controller: con.search.value,
+            sortValue: con.isAsc.value,
+            onSortPressed: () {
+              con.toggleSortUkuran();
+            },
+            onChanged: (x) {
+              con.searchUkuranLocal(id_toko: con.id_toko, search: x);
+            },
+          );
+        }),
         SizedBox(
           height: 20,
         ),
@@ -63,46 +51,68 @@ class ViewUkuran extends GetView<BaseMenuProdukController> {
         ),
         Obx(() {
           return Expanded(
-            child: controller.ukuranList.isNotEmpty
-                ? ListView.builder(
-                    itemCount: controller.ukuranList.length,
-                    itemBuilder: (context, index) {
-                      final ukuran = controller.ukuranList;
+            child: con.ukuranList.isNotEmpty
+                ? Padding(
+                    padding: AppPading.customListPadding(),
+                    child: ListView.builder(
+                      itemCount: con.ukuranList.length,
+                      itemBuilder: (context, index) {
+                        final ukuran = con.ukuranList;
 
-                      return custom_list(
-                        controller: controller,
-                        isDeleted: ukuran[index].aktif == 1 ? false : true,
-                        usingGambar: false,
-                        title: ukuran[index].ukuran,
-                        trailing: customDropdown(
-                            onSelected: (value) {
-                              switch (value) {
-                                case 'Ubah':
-                                  Get.toNamed('/editukuran',
-                                      arguments: ukuran[index]);
-                                  break;
-                                case 'Hapus':
-                                  Popscreen()
-                                      .deleteukuran(controller, ukuran[index]);
-                              }
-                            },
-                            dropdownColor: Colors.white, // Custom color
-                            customButton: const Icon(Icons.menu),
-                            items: [
-                              {
-                                'title': 'Ubah',
-                                'icon': Icons.edit,
-                                'color': AppColor.primary
-                              },
-                              {'divider': true},
-                              {
-                                'title': 'Hapus',
-                                'icon': Icons.delete,
-                                'color': AppColor.warning
-                              },
-                            ]),
-                      );
-                    },
+                        return custom_list(
+                          controller: controller,
+                          isDeleted: ukuran[index].aktif == 1 ? false : true,
+                          usingGambar: false,
+                          title: ukuran[index].ukuran,
+                          trailing: ukuran[index].aktif == 1
+                              ? customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/editukuran',
+                                            arguments: ukuran[index]);
+                                        break;
+                                      case 'Hapus':
+                                        Popscreen().deleteukuran(
+                                            controller, ukuran[index]);
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                      {'divider': true},
+                                      {
+                                        'title': 'Hapus',
+                                        'icon': Icons.delete,
+                                        'color': AppColor.warning
+                                      },
+                                    ])
+                              : customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/editukuran',
+                                            arguments: ukuran[index]);
+                                        break;
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                    ]),
+                        );
+                      },
+                    ),
                   )
                 : EmptyData(),
           );

@@ -45,9 +45,9 @@ class Basemenu extends GetView<BasemenuController> {
               // rightCornerRadius: 30,
               onTap: (index) {
                 controller.index.value = index;
-                if (index == 1) {
-                  Get.find<KasirController>().getKaryawan();
-                }
+                // if (index == 1) {
+                //   Get.find<KasirController>().getKaryawan();
+                // }
               }),
           body: Obx(() {
             return controller.views.elementAt(controller.index.value);

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:meta/meta.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Pelanggan/List%20kategori%20pelanggan/model_kategoriPelanggan.dart';
 
 import '../../../Database/DB_helper.dart';
@@ -43,6 +44,29 @@ class KategoriPelangganController extends GetxController {
       Get.back();
       Get.showSnackbar(toast()
           .bottom_snackbar_error('Error', 'gagal menghapus kategori beban'));
+    }
+  }
+
+  deleteKategoriPelangganv2(uuid) async {
+    print('-------------------sOft delete kat pelanggan---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var beban =
+        await DBHelper().softDelete(table: 'kategori_pelanggan', uuid: uuid);
+    print('respon softdeleter kat pelanggan ---->');
+    print(beban);
+    if (beban == 1) {
+      await Get.find<CentralPelangganController>()
+          .fetchKategoriPelangganLocal(id_toko);
+      Get.back();
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'berhasil dibatalkan'));
+    } else {
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal edit data local'));
     }
   }
 

@@ -17,32 +17,18 @@ class Pelanggan extends GetView<PelangganController> {
     var con = Get.find<CentralPelangganController>();
     return Column(
       children: [
-        Container(
-          height: 60,
-          //color: Colors.red,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Icon(FontAwesomeIcons.magnifyingGlass),
-              ),
-              Expanded(
-                child: TextField(
-                  controller: con.search.value,
-                  onChanged: (val) {
-                    con.serachPelangganLocal();
-                  },
-                  decoration: InputDecoration(hintText: 'Pencarian'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Icon(Icons.sort),
-              )
-            ],
-          ),
-        ),
+        Obx(() {
+          return customSearch(
+            controller: con.search.value,
+            sortValue: con.isAsc.value,
+            onSortPressed: () {
+              con.toggleSortPelanggan();
+            },
+            onChanged: (x) {
+              con.serachPelangganLocal(id_toko: con.id_toko, search: x);
+            },
+          );
+        }),
         SizedBox(
           height: 20,
         ),
@@ -80,69 +66,92 @@ class Pelanggan extends GetView<PelangganController> {
         Obx(() {
           return Expanded(
             child: con.pelangganList.isNotEmpty
-                ? ListView.builder(
-                    itemCount: con.pelangganList.length,
-                    itemBuilder: (context, index) {
-                      final customer = con.pelangganList;
+                ? Padding(
+                    padding: AppPading.customListPadding(),
+                    child: ListView.builder(
+                      itemCount: con.pelangganList.length,
+                      itemBuilder: (context, index) {
+                        final customer = con.pelangganList;
 
-                      return custom_list(
-                        gestureroute: '/detailpelanggan',
-                        gestureArgument: customer[index],
-                        isDeleted:
-                            customer[index].statusPelanggan == 1 ? false : true,
-                        trailing: customDropdown(
-                            onSelected: (value) {
-                              switch (value) {
-                                case 'Ubah':
-                                  Get.toNamed('/editpelanggan',
-                                      arguments: customer[index]);
-                                  break;
-                                case 'Hapus':
-                                  Popscreen().deletePelanggan(
-                                      controller, customer[index]);
-                              }
-                            },
-                            dropdownColor: Colors.white, // Custom color
-                            customButton: const Icon(Icons.menu),
-                            items: [
-                              {
-                                'title': 'Ubah',
-                                'icon': Icons.edit,
-                                'color': AppColor.primary
-                              },
-                              {'divider': true},
-                              {
-                                'title': 'Hapus',
-                                'icon': Icons.delete,
-                                'color': AppColor.warning
-                              },
-                            ]),
-                        usingGambar: true,
-                        gambar: customer[index].foto,
-                        title: customer[index].namaPelanggan,
-                        subtitle: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              customer[index].noHp!,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
+                        return custom_list(
+                          gestureroute: '/detailpelanggan',
+                          gestureArgument: customer[index],
+                          isDeleted: customer[index].statusPelanggan == 1
+                              ? false
+                              : true,
+                          trailing: customer[index].statusPelanggan == 1
+                              ? customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/editpelanggan',
+                                            arguments: customer[index]);
+                                        break;
+                                      case 'Hapus':
+                                        Popscreen().deletePelanggan(
+                                            controller, customer[index]);
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                      {'divider': true},
+                                      {
+                                        'title': 'Hapus',
+                                        'icon': Icons.delete,
+                                        'color': AppColor.warning
+                                      },
+                                    ])
+                              : customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/editpelanggan',
+                                            arguments: customer[index]);
+                                        break;
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                    ]),
+                          usingGambar: true,
+                          gambar: customer[index].foto,
+                          title: customer[index].namaPelanggan,
+                          subtitle: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                customer[index].noHp!,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                            Text(
-                              customer[index].kategoriNama!,
-                              style: TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
+                              Text(
+                                customer[index].kategoriNama!,
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          ],
-                        ),
-                        controller: controller,
-                      );
-                    },
+                            ],
+                          ),
+                          controller: controller,
+                        );
+                      },
+                    ),
                   )
                 : EmptyData(),
           );

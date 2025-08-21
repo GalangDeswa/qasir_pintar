@@ -81,14 +81,14 @@ class CustomRole extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // Defer popup until *after* this build frame completes:
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      // Only show once per mount — guard with a flag on your controller:
-      final ctrl = Get.find<CentralKaryawanController>();
-      if (!ctrl.roleSheetShown.value) {
-        ctrl.roleSheetShown.value = true;
-        ctrl.popLoginKaryawanv2(allowedRoles);
-      }
-    });
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   // Only show once per mount — guard with a flag on your controller:
+    //   final ctrl = Get.find<CentralKaryawanController>();
+    //   if (!ctrl.roleSheetShown.value) {
+    //     ctrl.roleSheetShown.value = true;
+    //     ctrl.popLoginKaryawanv2(allowedRoles);
+    //   }
+    // });
 
     return child;
   }

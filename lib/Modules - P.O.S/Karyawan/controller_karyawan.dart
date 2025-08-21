@@ -4,6 +4,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:meta/meta.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Karyawan/model_karyawan.dart';
 
 import '../../Database/DB_helper.dart';
@@ -39,6 +40,28 @@ class KaryawanController extends GetxController {
       Get.back();
       Get.showSnackbar(
           toast().bottom_snackbar_error('Error', 'gagal menghapus'));
+    }
+  }
+
+  deleteKaryawanv2(uuid) async {
+    print('-------------------edit  produk local---------------------');
+
+    Get.dialog(const showloading(), barrierDismissible: false);
+
+    var beban = await DBHelper().softDelete(table: 'Karyawan', uuid: uuid);
+    print('respon softdeleter karyawan ---->');
+    print(beban);
+    if (beban == 1) {
+      await Get.find<CentralKaryawanController>()
+          .fetchKaryawanLocal(id_toko: id_toko);
+      Get.back();
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('sukses', 'berhasil dibatalkan'));
+    } else {
+      Get.back();
+      Get.showSnackbar(
+          toast().bottom_snackbar_error('error', 'gagal edit data local'));
     }
   }
 

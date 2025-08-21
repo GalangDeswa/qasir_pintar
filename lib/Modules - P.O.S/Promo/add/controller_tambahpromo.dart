@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Promo/controller_promo.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Promo/model_promo.dart';
 import 'package:uuid/uuid.dart';
@@ -353,7 +354,7 @@ class TambahPromoController extends GetxController {
   }
 
   tambahPromo() async {
-    print('-------------------tambah pelanggan local---------------------');
+    print('-------------------tambah promo local---------------------');
 
     Get.dialog(showloading(), barrierDismissible: false);
     var uuid = Uuid().v4();
@@ -365,6 +366,8 @@ class TambahPromoController extends GetxController {
           aktif: 1,
           keterangan: keterangan.value.text,
           namaPromo: nama.value.text,
+          // promoNominal: diskonnominal.value,
+          // promoPersen: diskonpersen.value,
           promoNominal: diskonnominal.value,
           promoPersen: diskonpersen.value,
           tglMulai: date1,
@@ -372,7 +375,7 @@ class TambahPromoController extends GetxController {
         ).DB());
 
     if (db != null) {
-      await Get.find<PromoController>().fetchPromo(id_toko: id_toko);
+      await Get.find<CentralPromoController>().fetchPromo(id_toko: id_toko);
       Get.back(closeOverlays: true);
       Get.showSnackbar(toast().bottom_snackbar_success('Sukses', 'Berhasil'));
     } else {

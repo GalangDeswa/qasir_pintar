@@ -553,6 +553,125 @@ class EditPaketProduk extends GetView<EditPaketProdukController> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
+                          'Diskon',
+                          style: AppFont.regular(),
+                        ),
+                        Switch(
+                          value: controller.showdiskon.value,
+                          onChanged: (value) {
+                            controller.showdiskon.value = value;
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                }),
+
+                Obx(
+                  () {
+                    return controller.showdiskon.value == false
+                        ? Container()
+                        : Padding(
+                            padding: AppPading.customBottomPadding(),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(
+                                  child: Obx(() {
+                                    return TextFormField(
+                                      inputFormatters: [ThousandsFormatter()],
+                                      controller: controller.diskon.value,
+                                      decoration: InputDecoration(
+                                        prefixIcon:
+                                            controller.selecteddiskon.value ==
+                                                    controller.opsidiskon[0]
+                                                ? const Icon(Icons.money)
+                                                : const Icon(Icons.percent),
+                                        labelText: 'Nilai Diskon',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                      validator: (value) {
+                                        if (value == null || value.isEmpty)
+                                          return 'Diskon harus diisi';
+                                        final parsed = double.tryParse(
+                                            value.replaceAll(
+                                                RegExp(r'[^0-9.]'), ''));
+                                        if (parsed == null)
+                                          return 'Masukkan angka valid';
+                                        if (controller.selecteddiskon.value ==
+                                                controller.opsidiskon[0] &&
+                                            parsed <= 0) {
+                                          return 'Nominal harus > 0';
+                                        }
+                                        if (controller.selecteddiskon.value !=
+                                                controller.opsidiskon[0] &&
+                                            (parsed <= 0 || parsed > 100)) {
+                                          return 'Persen harus 1-100';
+                                        }
+                                        return null;
+                                      },
+                                      onChanged: (value) {
+                                        final cleanValue = value.replaceAll(
+                                            RegExp(r'[^0-9.]'), '');
+                                        final parsed =
+                                            double.tryParse(cleanValue);
+                                        if (parsed == null) return;
+
+                                        if (controller.selecteddiskon.value ==
+                                            controller.opsidiskon[0]) {
+                                          controller.diskonvalue.value = parsed;
+                                        } else {
+                                          controller.diskonvalue.value = parsed;
+                                        }
+                                      },
+                                    );
+                                  }),
+                                ),
+                                Expanded(
+                                  child: Obx(() {
+                                    return Row(
+                                      children: [
+                                        Expanded(
+                                          child: RadioMenuButton(
+                                            value: controller.opsidiskon[0],
+                                            groupValue:
+                                                controller.selecteddiskon.value,
+                                            onChanged: (x) => controller
+                                                .selecteddiskon.value = x!,
+                                            child: const Text('Rp.'),
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: RadioMenuButton(
+                                            value: controller.opsidiskon[1],
+                                            groupValue:
+                                                controller.selecteddiskon.value,
+                                            onChanged: (x) => controller
+                                                .selecteddiskon.value = x!,
+                                            child: const Text('%'),
+                                          ),
+                                        ),
+                                      ],
+                                    );
+                                  }),
+                                ),
+                              ],
+                            ),
+                          );
+                  },
+                ),
+
+                Obx(() {
+                  return Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
                           'Pajak ?',
                           style: AppFont.regular(),
                         ),

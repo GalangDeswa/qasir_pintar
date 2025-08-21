@@ -12,6 +12,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Pelanggan/List%20Pelanggan/controller_pelanggan.dart';
 import 'package:uuid/uuid.dart';
 
@@ -91,8 +92,10 @@ class EditKategoriPelangganController extends GetxController {
     print(query);
     if (query == 1) {
       //print('edit user local berhasil------------------------------------->');
-      await Get.find<KategoriPelangganController>()
+      await Get.find<CentralPelangganController>()
           .fetchKategoriPelangganLocal(uuid);
+      await Get.find<CentralPelangganController>()
+          .fetchPelangganLocal(id_toko: id_toko);
       await Get.find<PelangganController>()
           .fetchPelangganLocal(id_toko: id_toko);
       Get.back(closeOverlays: true);
@@ -104,6 +107,8 @@ class EditKategoriPelangganController extends GetxController {
           toast().bottom_snackbar_error('error', 'gagal edit data local'));
     }
   }
+
+  //TODO : check fetch yg aktif/non untuk droipdown
 
   var logo = ''.obs;
   DataKategoriPelanggan data = Get.arguments;

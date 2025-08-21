@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/Kategori/model_subkategoriproduk.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/controller_basemenuproduk.dart';
 
@@ -16,44 +17,24 @@ import '../Pelanggan/List Pelanggan/model_pelanggan.dart';
 
 class KategoriList extends GetView<BaseMenuProdukController> {
   const KategoriList({super.key});
-
+//TODO SOFt DELETE SUB KAT
   @override
   Widget build(BuildContext context) {
+    var con = Get.find<CentralKategoriProdukController>();
     return Column(
       children: [
-        Container(
-          height: 60, padding: EdgeInsets.all(15),
-          //color: Colors.red,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Icon(FontAwesomeIcons.magnifyingGlass),
-              ),
-              Expanded(
-                child: TextField(
-                  controller: controller.subsearch.value,
-                  onChanged: (val) {
-                    controller.serachSubKategoriProdukLocal();
-                  },
-                  decoration: InputDecoration(hintText: 'Cari...'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: Icon(Icons.sort),
-              )
-            ],
-          ),
-        ),
-        // button_border_custom(
-        //     margin: EdgeInsets.all(15),
-        //     onPressed: () {
-        //       Get.toNamed('/tambahsubkategori');
-        //     },
-        //     child: Text('Tambah sub kategori'),
-        //     width: context.res_width),
+        Obx(() {
+          return customSearch(
+            controller: con.subsearch.value,
+            sortValue: con.isAsc.value,
+            onSortPressed: () {
+              con.toggleSortSubkategori();
+            },
+            onChanged: (x) {
+              con.serachSubKategoriProdukLocal(id_toko: con.id_toko, search: x);
+            },
+          );
+        }),
         Container(
           //height: 100,
           //color: Colors.blue,
@@ -71,47 +52,70 @@ class KategoriList extends GetView<BaseMenuProdukController> {
         ),
         Obx(() {
           return Expanded(
-            child: controller.subKategoriProduk.isNotEmpty
-                ? ListView.builder(
-                    itemCount: controller.subKategoriProduk.length,
-                    itemBuilder: (context, index) {
-                      final subKategori = controller.subKategoriProduk;
+            child: con.subKategoriProduk.isNotEmpty
+                ? Padding(
+                    padding: AppPading.customListPadding(),
+                    child: ListView.builder(
+                      itemCount: con.subKategoriProduk.length,
+                      itemBuilder: (context, index) {
+                        final subKategori = con.subKategoriProduk;
 
-                      return custom_list(
-                        controller: controller,
-                        usingGambar: false,
-                        isDeleted: subKategori[index].aktif == 1 ? false : true,
-                        title: subKategori[index].namaSubkelompok,
-                        subtitle: Text(subKategori[index].namakategori),
-                        trailing: customDropdown(
-                            onSelected: (value) {
-                              switch (value) {
-                                case 'Ubah':
-                                  Get.toNamed('/editsubkategoriproduk',
-                                      arguments: subKategori[index]);
-                                  break;
-                                case 'Hapus':
-                                  Popscreen().deleteSubkategori(
-                                      controller, subKategori[index]);
-                              }
-                            },
-                            dropdownColor: Colors.white, // Custom color
-                            customButton: const Icon(Icons.menu),
-                            items: [
-                              {
-                                'title': 'Ubah',
-                                'icon': Icons.edit,
-                                'color': AppColor.primary
-                              },
-                              {'divider': true},
-                              {
-                                'title': 'Hapus',
-                                'icon': Icons.delete,
-                                'color': AppColor.warning
-                              },
-                            ]),
-                      );
-                    },
+                        return custom_list(
+                          controller: controller,
+                          usingGambar: false,
+                          isDeleted:
+                              subKategori[index].aktif == 1 ? false : true,
+                          title: subKategori[index].namaSubkelompok,
+                          subtitle: Text(subKategori[index].namakategori),
+                          trailing: subKategori[index].aktif == 1
+                              ? customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/editsubkategoriproduk',
+                                            arguments: subKategori[index]);
+                                        break;
+                                      case 'Hapus':
+                                        Popscreen().deleteSubkategori(
+                                            controller, subKategori[index]);
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                      {'divider': true},
+                                      {
+                                        'title': 'Hapus',
+                                        'icon': Icons.delete,
+                                        'color': AppColor.warning
+                                      },
+                                    ])
+                              : customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/editsubkategoriproduk',
+                                            arguments: subKategori[index]);
+                                        break;
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                    ]),
+                        );
+                      },
+                    ),
                   )
                 : EmptyData(),
           );

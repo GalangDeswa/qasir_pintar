@@ -171,15 +171,19 @@ class EditPromo extends GetView<EditPromoController> {
                               child: CalendarDatePicker2WithActionButtons(
                                   config:
                                       CalendarDatePicker2WithActionButtonsConfig(
+                                    controlsTextStyle:
+                                        const TextStyle(fontSize: 10),
                                     weekdayLabels: [
-                                      'Minggu',
-                                      'Senin',
-                                      'Selasa',
-                                      'Rabu',
-                                      'Kamis',
-                                      'Jumat',
-                                      'Sabtu',
+                                      'Min',
+                                      'Sen',
+                                      'Sel',
+                                      'Rab',
+                                      'Kam',
+                                      'Jum',
+                                      'Sab',
                                     ],
+                                    weekdayLabelTextStyle:
+                                        const TextStyle(fontSize: 10),
                                     firstDayOfWeek: 1,
                                     calendarType: CalendarDatePicker2Type.range,
                                     centerAlignModePicker: true,
@@ -247,6 +251,27 @@ class EditPromo extends GetView<EditPromoController> {
                         //   }
                         //   return null;
                         // },
+                      ),
+                    );
+                  }),
+                  Obx(() {
+                    return Padding(
+                      padding: AppPading.customBottomPadding(),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Aktif',
+                            style: AppFont.regular(),
+                          ),
+                          Switch(
+                            value: controller.isAktif.value,
+                            onChanged: (value) {
+                              controller.isAktif.value = value;
+                              print(controller.isAktif.value);
+                            },
+                          ),
+                        ],
                       ),
                     );
                   }),

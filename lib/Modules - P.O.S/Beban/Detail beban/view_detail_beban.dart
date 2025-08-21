@@ -40,6 +40,8 @@ class DetailBeban extends GetView<DetailBebanController> {
                       title: 'Tanggal',
                       value: controller.data.tanggalBeban ?? '-'),
                   Divider(height: 0, thickness: 0.5),
+                  _buildSwitchTile(
+                      title: 'Aktif', value: controller.data.aktif == 1),
                 ],
               ),
             ],

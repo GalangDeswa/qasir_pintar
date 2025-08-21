@@ -41,118 +41,153 @@ class ListProduk extends GetView<BaseMenuProdukController> {
         Obx(() {
           return Expanded(
             child: con.produk.isNotEmpty
-                ? ListView.builder(
-                    itemCount: con.produk.length,
-                    itemBuilder: (context, index) {
-                      final produk = con.produk;
+                ? Padding(
+                    padding: AppPading.customListPadding(),
+                    child: ListView.builder(
+                      itemCount: con.produk.length,
+                      itemBuilder: (context, index) {
+                        final produk = con.produk;
 
-                      return custom_list_produk(
-                        controller: con,
-                        gestureroute: '/isiproduk',
-                        gestureArgument: produk[index],
-                        isDeleted: produk[index].tampilkan_di_produk == 1
-                            ? false
-                            : true,
-                        usingGambar: true,
-                        title: produk[index].nama_produk!,
-                        gambar: produk[index].gambar_produk_utama,
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              produk[index].namaKategori!,
-                              style: AppFont.small(),
-                            ),
-                            produk[index].diskon != 0.0
-                                ? Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        'Rp. ' +
-                                            AppFormat().numFormat(
-                                              produk[index].harga_jual_eceran!,
-                                            ),
-                                        style: TextStyle(
-                                            decoration:
-                                                TextDecoration.lineThrough,
-                                            fontSize: 8),
-                                      ),
-                                      SizedBox(
-                                        width: 5,
-                                      ),
-                                      Row(
-                                        children: [
-                                          Text(
-                                            'Rp. ' +
-                                                AppFormat().numFormat(
-                                                  produk[index]
-                                                          .harga_jual_eceran! -
-                                                      produk[index].diskon!,
-                                                ),
-                                            style: AppFont.small(),
-                                          ),
-                                          Container(
-                                            padding: EdgeInsets.all(3),
-                                            margin: EdgeInsets.only(left: 5),
-                                            color: Colors.green,
-                                            child: Text(
-                                                (produk[index].diskon! /
-                                                            produk[index]
-                                                                .harga_jual_eceran! *
-                                                            100)
-                                                        .toStringAsFixed(0) +
-                                                    '%',
-                                                style: AppFont.small_white()),
-                                          )
-                                        ],
-                                      ),
-                                    ],
-                                  )
-                                : Text(
-                                    'Rp. ' +
-                                        AppFormat().numFormat(
-                                          produk[index].harga_jual_eceran!,
+                        return custom_list_produk(
+                          controller: con,
+                          gestureroute: '/isiproduk',
+                          gestureArgument: produk[index],
+                          isDeleted: produk[index].tampilkan_di_produk == 1
+                              ? false
+                              : true,
+                          usingGambar: true,
+                          title: produk[index].nama_produk!,
+                          gambar: produk[index].gambar_produk_utama,
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                produk[index].namaKategori!,
+                                style: AppFont.small(),
+                              ),
+                              produk[index].diskon != 0.0
+                                  ? Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Rp. ' +
+                                              AppFormat().numFormat(
+                                                produk[index]
+                                                    .harga_jual_eceran!,
+                                              ),
+                                          style: TextStyle(
+                                              decoration:
+                                                  TextDecoration.lineThrough,
+                                              fontSize: 8),
                                         ),
-                                    style: AppFont.small(),
-                                  ),
-                            Text(
-                              produk[index].hitung_stok == 1
-                                  ? 'Qty :' + produk[index].qty.toString()
-                                  : 'Nonstock',
-                              style: AppFont.small(),
-                            ),
-                          ],
-                        ),
-                        trailing: customDropdown(
-                            onSelected: (value) {
-                              switch (value) {
-                                case 'Ubah':
-                                  Get.toNamed('/editisiproduk',
-                                      arguments: produk[index]);
-                                  break;
-                                case 'Hapus':
-                                  Popscreen()
-                                      .deleteProduk(controller, produk[index]);
-                              }
-                            },
-                            dropdownColor: Colors.white, // Custom color
-                            customButton: const Icon(Icons.menu),
-                            items: [
-                              {
-                                'title': 'Ubah',
-                                'icon': Icons.edit,
-                                'color': AppColor.primary
-                              },
-                              {'divider': true},
-                              {
-                                'title': 'Hapus',
-                                'icon': Icons.delete,
-                                'color': AppColor.warning
-                              },
-                            ]),
-                      );
-                    },
+                                        SizedBox(
+                                          width: 5,
+                                        ),
+                                        Row(
+                                          children: [
+                                            Text(
+                                              'Rp. ' +
+                                                  AppFormat().numFormat(
+                                                    produk[index]
+                                                            .harga_jual_eceran! -
+                                                        produk[index].diskon!,
+                                                  ),
+                                              style: AppFont.small(),
+                                            ),
+                                            Container(
+                                              padding: EdgeInsets.all(3),
+                                              margin: EdgeInsets.only(left: 5),
+                                              decoration: BoxDecoration(
+                                                  color: Colors.green,
+                                                  borderRadius:
+                                                      BorderRadius.circular(3)),
+                                              child: Text(
+                                                  (produk[index].diskon! /
+                                                              produk[index]
+                                                                  .harga_jual_eceran! *
+                                                              100)
+                                                          .toStringAsFixed(0) +
+                                                      '%',
+                                                  style: AppFont.small_white()),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    )
+                                  : Text(
+                                      'Rp. ' +
+                                          AppFormat().numFormat(
+                                            produk[index].harga_jual_eceran!,
+                                          ),
+                                      style: AppFont.small(),
+                                    ),
+                              Text(
+                                produk[index].hitung_stok == 1
+                                    ? 'Qty :' + produk[index].qty.toString()
+                                    : 'Nonstock',
+                                style: AppFont.small(),
+                              ),
+                            ],
+                          ),
+                          trailing: produk[index].tampilkan_di_produk == 1
+                              ? customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/editisiproduk',
+                                            arguments: produk[index]);
+                                        break;
+                                      case 'Hapus':
+                                        Popscreen().deleteProduk(
+                                            controller, produk[index]);
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                      {'divider': true},
+                                      {
+                                        'title': 'Hapus',
+                                        'icon': Icons.delete,
+                                        'color': AppColor.warning
+                                      },
+                                    ])
+                              : customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/editisiproduk',
+                                            arguments: produk[index]);
+                                        break;
+                                      // case 'Hapus':
+                                      //   Popscreen()
+                                      //       .deleteProduk(controller, produk[index]);
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                      //{'divider': true},
+                                      // {
+                                      //   'title': 'Hapus',
+                                      //   'icon': Icons.delete,
+                                      //   'color': AppColor.warning
+                                      // },
+                                    ]),
+                        );
+                      },
+                    ),
                   )
                 : EmptyData(),
           );

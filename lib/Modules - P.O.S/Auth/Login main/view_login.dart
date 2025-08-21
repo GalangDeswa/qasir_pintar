@@ -41,7 +41,7 @@ class Login extends GetView<LoginController> {
                       children: [
                         Expanded(
                           child: Text(
-                            'qasir pintar',
+                            'TubinMart',
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,

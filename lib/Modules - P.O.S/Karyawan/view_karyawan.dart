@@ -30,39 +30,18 @@ class Karyawan extends GetView<KaryawanController> {
           padding: AppPading.defaultBodyPadding(),
           child: Column(
             children: [
-              Container(
-                height: 60,
-                //color: Colors.red,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: Icon(FontAwesomeIcons.magnifyingGlass),
-                    ),
-                    Expanded(
-                      child: TextField(
-                        controller: con.search.value,
-                        onChanged: (val) async {
-                          await con.searchKaryawanLocal();
-                        },
-                        decoration: InputDecoration(hintText: 'Pencarian'),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Icon(Icons.sort),
-                    )
-                  ],
-                ),
-              ),
-              // button_border_custom(
-              //     margin: EdgeInsets.all(15),
-              //     onPressed: () {
-              //       Get.toNamed('/tambahkaryawan');
-              //     },
-              //     child: Text('Tambah Karyawan'),
-              //     width: context.res_width),
+              Obx(() {
+                return customSearch(
+                  controller: con.search.value,
+                  sortValue: con.isAsc.value,
+                  onSortPressed: () {
+                    con.toggleSortKaryawan();
+                  },
+                  onChanged: (x) {
+                    con.searchKaryawanLocal(id_toko: con.id_toko, search: x);
+                  },
+                );
+              }),
               SizedBox(
                 height: 20,
               ),
@@ -93,64 +72,84 @@ class Karyawan extends GetView<KaryawanController> {
               Obx(() {
                 return Expanded(
                   child: con.karyawanList.isNotEmpty
-                      ? ListView.builder(
-                          itemCount: con.karyawanList.length,
-                          itemBuilder: (context, index) {
-                            final karyawan = con.karyawanList;
+                      ? Padding(
+                          padding: AppPading.customListPadding(),
+                          child: ListView.builder(
+                            itemCount: con.karyawanList.length,
+                            itemBuilder: (context, index) {
+                              final karyawan = con.karyawanList;
 
-                            return custom_list(
-                              gestureroute: '/detailkaryawan',
-                              gestureArgument: karyawan[index],
-                              isDeleted:
-                                  karyawan[index].aktif == 1 ? false : true,
-                              usingGambar: false,
-                              title: karyawan[index].nama_karyawan,
-                              subtitle: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      karyawan[index].email,
-                                      style: AppFont.regular(),
-                                    ),
-                                    Text(
-                                      karyawan[index].nohp,
-                                      style: AppFont.regular(),
-                                    ),
-                                    Text(
-                                      karyawan[index].role!,
-                                      style: AppFont.regular_bold(),
-                                    )
-                                  ]),
-                              //TODO : edit karyawan role, sistem login karyawan kasir
-                              trailing: customDropdown(
-                                  dropdownColor: Colors.white,
-                                  onSelected: (value) {
-                                    switch (value) {
-                                      case 'Ubah':
-                                        Get.toNamed('/editkaryawan',
-                                            arguments: karyawan[index]);
-                                        break;
-                                      case 'Hapus':
-                                        Popscreen().deleteKaryawan(
-                                            controller, karyawan[index]);
-                                    }
-                                  },
-                                  customButton: const Icon(Icons.menu),
-                                  items: [
-                                    {
-                                      'title': 'Ubah',
-                                      'icon': Icons.edit,
-                                      'color': AppColor.primary
-                                    },
-                                    {'divider': true},
-                                    {
-                                      'title': 'Hapus',
-                                      'icon': Icons.delete,
-                                      'color': AppColor.warning
-                                    },
-                                  ]),
-                            );
-                          },
+                              return custom_list(
+                                gestureroute: '/detailkaryawan',
+                                gestureArgument: karyawan[index],
+                                isDeleted:
+                                    karyawan[index].aktif == 1 ? false : true,
+                                usingGambar: false,
+                                title: karyawan[index].nama_karyawan! +
+                                    ' - ' +
+                                    karyawan[index].role!,
+                                subtitle: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        karyawan[index].email,
+                                        style: AppFont.regular(),
+                                      ),
+                                      Text(
+                                        karyawan[index].nohp,
+                                        style: AppFont.regular(),
+                                      ),
+                                    ]),
+                                trailing: karyawan[index].aktif == 1
+                                    ? customDropdown(
+                                        dropdownColor: Colors.white,
+                                        onSelected: (value) {
+                                          switch (value) {
+                                            case 'Ubah':
+                                              Get.toNamed('/editkaryawan',
+                                                  arguments: karyawan[index]);
+                                              break;
+                                            case 'Hapus':
+                                              Popscreen().deleteKaryawan(
+                                                  controller, karyawan[index]);
+                                          }
+                                        },
+                                        customButton: const Icon(Icons.menu),
+                                        items: [
+                                            {
+                                              'title': 'Ubah',
+                                              'icon': Icons.edit,
+                                              'color': AppColor.primary
+                                            },
+                                            {'divider': true},
+                                            {
+                                              'title': 'Hapus',
+                                              'icon': Icons.delete,
+                                              'color': AppColor.warning
+                                            },
+                                          ])
+                                    : customDropdown(
+                                        dropdownColor: Colors.white,
+                                        onSelected: (value) {
+                                          switch (value) {
+                                            case 'Ubah':
+                                              Get.toNamed('/editkaryawan',
+                                                  arguments: karyawan[index]);
+                                              break;
+                                          }
+                                        },
+                                        customButton: const Icon(Icons.menu),
+                                        items: [
+                                            {
+                                              'title': 'Ubah',
+                                              'icon': Icons.edit,
+                                              'color': AppColor.primary
+                                            },
+                                          ]),
+                              );
+                            },
+                          ),
                         )
                       : EmptyData(),
                 );

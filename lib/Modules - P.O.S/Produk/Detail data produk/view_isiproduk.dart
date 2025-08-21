@@ -183,7 +183,7 @@ class ViewIsiproduk extends GetView<IsiProdukController> {
                           ),
 
                     _buildSwitchTile(
-                        title: 'Tampilkan di Produk',
+                        title: 'Aktif',
                         value: controller.data.tampilkan_di_produk == 1),
                   ],
                 ),

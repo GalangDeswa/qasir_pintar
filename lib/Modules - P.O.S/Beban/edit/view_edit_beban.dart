@@ -346,6 +346,27 @@ class EditBeban extends GetView<EditBebanController> {
                       ),
                     );
                   }),
+                  Obx(() {
+                    return Padding(
+                      padding: AppPading.customBottomPadding(),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Aktif',
+                            style: AppFont.regular(),
+                          ),
+                          Switch(
+                            value: controller.isAktif.value,
+                            onChanged: (value) {
+                              controller.isAktif.value = value;
+                              print(controller.isAktif.value);
+                            },
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
                   button_solid_custom(
                       onPressed: () {
                         if (controller.registerKey.value.currentState!

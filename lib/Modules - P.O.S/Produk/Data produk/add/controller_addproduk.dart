@@ -23,6 +23,7 @@ import '../../../../Database/DB_helper.dart';
 import '../../../../Widget/widget.dart';
 import '../../../Karyawan/controller_karyawan.dart';
 import '../../../Karyawan/model_karyawan.dart';
+import '../../Paket produk/add/controller_addpaketproduk.dart';
 import '../../Produk/model_kategoriproduk.dart';
 import '../edit/controller_editisiproduk.dart';
 
@@ -550,11 +551,18 @@ class TambahProdukController extends GetxController {
 
     if (db != null) {
       print(db);
+      await Get.find<CentralPajakController>()
+          .fetchPajakLocal(id_toko: id_toko);
       await Get.find<BaseMenuProdukController>()
           .fetchPajakLocal(id_toko: id_toko);
       await fetchpajak(id_toko: id_toko);
 
       pajakValue = uuid;
+      print('pajak untuk paket --->L');
+      var conpaket = Get.find<TambahPaketProdukController>();
+      await conpaket.fetchpajak(id_toko: id_toko);
+      conpaket.pajakValue = uuid;
+      print(conpaket.pajakValue);
       Get.back(closeOverlays: true);
       Get.showSnackbar(toast().bottom_snackbar_success('Sukses', 'Berhasil'));
     } else {
@@ -980,7 +988,7 @@ class TambahProdukController extends GetxController {
         stockawal: stockawal.value.text.isNotEmpty
             ? int.parse(stockawal.value.text)
             : 0,
-        diskon: selecteddiskon.value == 'Rp.'
+        diskon: selecteddiskon.value == opsidiskon[0]
             ? diskonvalue.value
             : (double.parse(hargaJualEceran.value.text.replaceAll(',', '')) *
                 diskonvalue.value /
@@ -1099,7 +1107,7 @@ class TambahProdukController extends GetxController {
 
     if (db != null) {
       print(db);
-      await Get.find<BaseMenuProdukController>()
+      await Get.find<CentralUkuranProdukController>()
           .fetchUkuranLocal(id_toko: id_toko);
       fetchukuran(id_toko: id_toko);
       ukuranValue = uuid;

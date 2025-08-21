@@ -5,7 +5,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:meta/meta.dart';
 
 class SplashController extends GetxController {
-  final int minSplashMs = 2000;
+  final int minSplashMs = 3000;
   @override
   Future<void> onInit() async {
     // TODO: implement onInit
@@ -20,7 +20,8 @@ class SplashController extends GetxController {
   void onReady() {
     super.onReady();
 
-    startSplashTimerAndChecks();
+    //startSplashTimerAndChecks();
+    checkLogin();
   }
 
   void startSplashTimerAndChecks() {
@@ -38,6 +39,24 @@ class SplashController extends GetxController {
   }
 
   Future<void> checkLoginWork() async {
+    final box = GetStorage();
+    final hasSeenIntro = await box.read<bool>('intro');
+    final uuid = await box.read<String>('uuid');
+
+    if (hasSeenIntro != true) {
+      await box.write('intro', true);
+      Get.offNamed('/intro');
+      return;
+    }
+
+    if (uuid != null && uuid.isNotEmpty) {
+      Get.offNamed('/basemenu');
+    } else {
+      Get.offNamed('/login');
+    }
+  }
+
+  Future<void> checkLoginWorkv2() async {
     final box = GetStorage();
     final hasSeenIntro = await box.read<bool>('intro');
     final uuid = await box.read<String>('uuid');
@@ -98,13 +117,18 @@ class SplashController extends GetxController {
     print("LOGIN " + loginStatus.toString());
     if (check == null) {
       await GetStorage().write('intro', true);
-
-      Get.offAndToNamed('/intro');
+      Timer(const Duration(seconds: 3), () {
+        Get.offAndToNamed('/intro');
+      });
     } else {
       if (loginStatus != null) {
-        Get.offAndToNamed('/basemenu');
+        Timer(const Duration(seconds: 3), () {
+          Get.offAndToNamed('/basemenu');
+        });
       } else {
-        Get.offAndToNamed('/login');
+        Timer(const Duration(seconds: 3), () {
+          Get.offAndToNamed('/login');
+        });
       }
     }
   }

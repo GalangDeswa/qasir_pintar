@@ -47,6 +47,8 @@ class RingkasanPenjualan extends GetView<RingkasanPenjualanController> {
                                 'Sab',
                               ],
                               firstDayOfWeek: 1,
+                              weekdayLabelTextStyle: TextStyle(fontSize: 10),
+                              controlsTextStyle: TextStyle(fontSize: 10),
                               calendarType: CalendarDatePicker2Type.range,
                               centerAlignModePicker: true,
                             ),

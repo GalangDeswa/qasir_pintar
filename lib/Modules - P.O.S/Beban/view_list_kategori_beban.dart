@@ -34,62 +34,68 @@ class ListKategoriBeban extends GetView<BasemenuBebanController> {
         Obx(() {
           return Expanded(
             child: con.listKategoriBeban.isNotEmpty
-                ? ListView.builder(
-                    itemCount: con.listKategoriBeban.length,
-                    itemBuilder: (context, index) {
-                      final kategoriBeban = con.listKategoriBeban;
+                ? Padding(
+                    padding: AppPading.customListPadding(),
+                    child: ListView.builder(
+                      itemCount: con.listKategoriBeban.length,
+                      itemBuilder: (context, index) {
+                        final kategoriBeban = con.listKategoriBeban;
 
-                      return custom_list_produk(
-                        controller: con,
-
-                        gestureArgument: kategoriBeban[index],
-                        isDeleted:
-                            kategoriBeban[index].aktif == 1 ? false : true,
-                        usingGambar: false,
-                        title: kategoriBeban[index].namaKategoriBeban!,
-                        // subtitle: Column(
-                        //   crossAxisAlignment: CrossAxisAlignment.start,
-                        //   children: [
-                        //     Text(
-                        //       AppFormat().formatRupiah(
-                        //         kategoriBeban[index].!,
-                        //       ),
-                        //       style: AppFont.small(),
-                        //     ),
-                        //     Text(
-                        //       kategoriBeban[index].tanggalBeban!,
-                        //     )
-                        //   ],
-                        // ),
-                        trailing: customDropdown(
-                            onSelected: (value) {
-                              switch (value) {
-                                case 'Ubah':
-                                  Get.toNamed('/edit_kategori_beban',
-                                      arguments: kategoriBeban[index]);
-                                  break;
-                                case 'Hapus':
-                                  Popscreen().deleteKategroiBeban(
-                                      controller, kategoriBeban[index]);
-                              }
-                            },
-                            dropdownColor: Colors.white, // Custom color
-                            customButton: const Icon(Icons.menu),
-                            items: [
-                              {
-                                'title': 'Ubah',
-                                'icon': Icons.edit,
-                                'color': AppColor.primary
-                              },
-                              {'divider': true},
-                              {
-                                'title': 'Hapus',
-                                'icon': Icons.delete,
-                                'color': AppColor.warning
-                              },
-                            ]),
-                      );
-                    },
+                        return custom_list_produk(
+                          controller: con,
+                          isDeleted:
+                              kategoriBeban[index].aktif == 1 ? false : true,
+                          usingGambar: false,
+                          title: kategoriBeban[index].namaKategoriBeban!,
+                          trailing: kategoriBeban[index].aktif == 1
+                              ? customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/edit_kategori_beban',
+                                            arguments: kategoriBeban[index]);
+                                        break;
+                                      case 'Hapus':
+                                        Popscreen().deleteKategroiBeban(
+                                            controller, kategoriBeban[index]);
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                      {'divider': true},
+                                      {
+                                        'title': 'Hapus',
+                                        'icon': Icons.delete,
+                                        'color': AppColor.warning
+                                      },
+                                    ])
+                              : customDropdown(
+                                  onSelected: (value) {
+                                    switch (value) {
+                                      case 'Ubah':
+                                        Get.toNamed('/edit_kategori_beban',
+                                            arguments: kategoriBeban[index]);
+                                        break;
+                                    }
+                                  },
+                                  dropdownColor: Colors.white, // Custom color
+                                  customButton: const Icon(Icons.menu),
+                                  items: [
+                                      {
+                                        'title': 'Ubah',
+                                        'icon': Icons.edit,
+                                        'color': AppColor.primary
+                                      },
+                                    ]),
+                        );
+                      },
+                    ),
                   )
                 : EmptyData(),
           );

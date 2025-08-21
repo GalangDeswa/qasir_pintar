@@ -47,7 +47,10 @@ class BasemenuPelanggan extends GetView<BasemenuPelangganController> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                     child: Center(
-                      child: Icon(FontAwesomeIcons.user),
+                      child: Text(
+                        'Pelanggan',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ),
                 ),

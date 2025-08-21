@@ -7,6 +7,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/stock/controller_basemenustock.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/stock/model_penerimaan.dart';
 
@@ -17,99 +18,42 @@ class Listpenerimaan extends GetView<BasemenuStockController> {
 
   @override
   Widget build(BuildContext context) {
+    var con = Get.find<CentralPenerimaanController>();
     return Column(
       children: [
-        Container(
-          height: 60, padding: EdgeInsets.all(15),
-          //color: Colors.red,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(right: 10),
-                child: Icon(FontAwesomeIcons.magnifyingGlass),
-              ),
-              Expanded(
-                child: TextField(
-                  onChanged: (val) {
-                    // controller.serachKategoriProdukLocal();
-                  },
-                  controller: controller.search.value,
-                  decoration: InputDecoration(hintText: 'Pencarian'),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(left: 10),
-                child: IconButton(
-                    onPressed: () {
-                      Get.dialog(AlertDialog(
-                        surfaceTintColor: Colors.white,
-                        content: Container(
-                          width: context.res_width,
-                          //height: context.height_query / 1.5,
-                          child: CalendarDatePicker2WithActionButtons(
-                              config:
-                                  CalendarDatePicker2WithActionButtonsConfig(
-                                weekdayLabels: [
-                                  'Minggu',
-                                  'Senin',
-                                  'Selasa',
-                                  'Rabu',
-                                  'Kamis',
-                                  'Jumat',
-                                  'Sabtu',
-                                ],
-                                firstDayOfWeek: 1,
-                                weekdayLabelTextStyle: AppFont.small(),
-                                dayTextStyle: AppFont.small(),
-                                calendarType: CalendarDatePicker2Type.range,
-                                selectedDayTextStyle: AppFont.small(),
-                                selectedMonthTextStyle: AppFont.small(),
-                                selectedYearTextStyle: AppFont.small(),
-                                monthTextStyle: AppFont.small(),
-                                yearTextStyle: AppFont.small(),
-                                centerAlignModePicker: true,
-                              ),
-                              value: controller.dates,
-                              onOkTapped: () {
-                                controller.searchPenerimaanByDateLocal(
-                                    id_toko: controller.id_toko,
-                                    startDate: controller.date1,
-                                    endDate: controller.date2);
-                                Get.back();
-                                print('tgl-----------------------------');
-                              },
-                              onValueChanged: (dates) {
-                                var list = <String>[];
-                                var start = dates.first;
-                                final end = dates.last;
-                                controller.pickdate.value.text =
-                                    (controller.dateformat.format(start!) +
-                                        ' - ' +
-                                        controller.dateformat.format(end!));
+        Obx(() {
+          return customDatesearch(
+              onReset: () {
+                print('fetch ulang');
+                con.fetchPenerimaanLocal(id_toko: con.id_toko);
+              },
+              sortValue: con.isAsc.value,
+              onSortPressed: () {
+                con.toggleSortPenerimaan();
+              },
+              onOkTap: () {
+                print('custom dates');
+                con.searchPenerimaanByDateLocal(
+                    id_toko: con.id_toko,
+                    startDate: con.date1.toString(),
+                    endDate: con.date2.toString());
+              },
+              textController: con.pickdate.value,
+              dates: con.dates,
+              onDateChanged: (dates) {
+                var list = <String>[];
+                var start = dates.first;
+                final end = dates.last;
+                con.pickdate.value.text = (con.dateformat.format(start!) +
+                    ' - ' +
+                    con.dateformat.format(end!));
 
-                                controller.date1 =
-                                    controller.dateformat.format(start);
-                                controller.date2 =
-                                    controller.dateformat.format(end);
-                                print(controller.date1);
-                                print(controller.date2);
-                              }),
-                        ),
-                      ));
-                    },
-                    icon: Icon(Icons.calendar_month)),
-              )
-            ],
-          ),
-        ),
-        // button_border_custom(
-        //     margin: EdgeInsets.all(15),
-        //     onPressed: () {
-        //       Get.toNamed('/penerimaan_produk');
-        //     },
-        //     child: Text('Tambah Penerimaan'),
-        //     width: context.res_width),
+                con.date1 = start;
+                con.date2 = end;
+                print(con.date1);
+                print(con.date2);
+              });
+        }),
         SizedBox(
           height: 20,
         ),
@@ -130,62 +74,64 @@ class Listpenerimaan extends GetView<BasemenuStockController> {
         ),
         Obx(() {
           return Expanded(
-            child: controller.penerimaan.isNotEmpty ||
-                    controller.penerimaan != null
-                ? ListView.builder(
-                    itemCount: controller.penerimaan.length,
-                    itemBuilder: (context, index) {
-                      final penerimaan = controller.penerimaan;
+            child: con.penerimaan.isNotEmpty || con.penerimaan != null
+                ? Padding(
+                    padding: AppPading.customListPadding(),
+                    child: ListView.builder(
+                      itemCount: con.penerimaan.length,
+                      itemBuilder: (context, index) {
+                        final penerimaan = con.penerimaan;
 
-                      return custom_list(
-                        usingGambar: false,
-                        controller: controller,
-                        trailing: Text(
-                          'Total produk :' +
-                              penerimaan[index].jumlahQty.toString(),
-                          style: AppFont.small(),
-                        ),
-                        // trailing: customDropdown(
-                        //     onSelected: (value) {
-                        //       switch (value) {
-                        //         case 'Ubah':
-                        //           Get.toNamed('/editpaketproduk',
-                        //               arguments: penerimaan[index]);
-                        //           break;
-                        //         case 'Hapus':
-                        //           Popscreen().deletePaketProduk(
-                        //               controller, penerimaan[index]);
-                        //       }
-                        //     },
-                        //     dropdownColor: Colors.white, // Custom color
-                        //     customButton: const Icon(Icons.menu),
-                        //     items: [
-                        //       {
-                        //         'title': 'Ubah',
-                        //         'icon': Icons.edit,
-                        //         'color': AppColor.primary
-                        //       },
-                        //       {'divider': true},
-                        //       {
-                        //         'title': 'Hapus',
-                        //         'icon': Icons.delete,
-                        //         'color': AppColor.warning
-                        //       },
-                        //     ]),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              penerimaan[index].tanggal.toString(),
-                              style: AppFont.small(),
-                            ),
-                          ],
-                        ),
-                        title: penerimaan[index].nomorFaktur,
-                        gestureroute: '/detail_penerimaan_produk',
-                        gestureArgument: penerimaan[index],
-                      );
-                    },
+                        return custom_list(
+                          usingGambar: false,
+                          controller: controller,
+                          trailing: Text(
+                            'Total produk :' +
+                                penerimaan[index].jumlahQty.toString(),
+                            style: AppFont.small(),
+                          ),
+                          // trailing: customDropdown(
+                          //     onSelected: (value) {
+                          //       switch (value) {
+                          //         case 'Ubah':
+                          //           Get.toNamed('/editpaketproduk',
+                          //               arguments: penerimaan[index]);
+                          //           break;
+                          //         case 'Hapus':
+                          //           Popscreen().deletePaketProduk(
+                          //               controller, penerimaan[index]);
+                          //       }
+                          //     },
+                          //     dropdownColor: Colors.white, // Custom color
+                          //     customButton: const Icon(Icons.menu),
+                          //     items: [
+                          //       {
+                          //         'title': 'Ubah',
+                          //         'icon': Icons.edit,
+                          //         'color': AppColor.primary
+                          //       },
+                          //       {'divider': true},
+                          //       {
+                          //         'title': 'Hapus',
+                          //         'icon': Icons.delete,
+                          //         'color': AppColor.warning
+                          //       },
+                          //     ]),
+                          subtitle: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                penerimaan[index].tanggal.toString(),
+                                style: AppFont.small(),
+                              ),
+                            ],
+                          ),
+                          title: penerimaan[index].nomorFaktur,
+                          gestureroute: '/detail_penerimaan_produk',
+                          gestureArgument: penerimaan[index],
+                        );
+                      },
+                    ),
                   )
                 : EmptyData(),
           );

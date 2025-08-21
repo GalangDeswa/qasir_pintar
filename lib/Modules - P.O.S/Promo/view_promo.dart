@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Promo/controller_promo.dart';
 
 import '../../Middleware/customPageRole.dart';
@@ -15,6 +16,7 @@ class Promo extends GetView<PromoController> {
 
   @override
   Widget build(BuildContext context) {
+    var con = Get.find<CentralPromoController>();
     return CustomRole(
       allowedRoles: ['ADMIN', 'MANAGER'],
       child: Scaffold(
@@ -26,39 +28,18 @@ class Promo extends GetView<PromoController> {
           padding: AppPading.defaultBodyPadding(),
           child: Column(
             children: [
-              Container(
-                height: 60, padding: EdgeInsets.all(15),
-                //color: Colors.red,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(right: 10),
-                      child: Icon(FontAwesomeIcons.magnifyingGlass),
-                    ),
-                    Expanded(
-                      child: TextField(
-                        onChanged: (val) {
-                          controller.searchPromoLocal();
-                        },
-                        controller: controller.search.value,
-                        decoration: InputDecoration(hintText: 'Pencarian'),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Icon(Icons.sort),
-                    )
-                  ],
-                ),
-              ),
-              // button_border_custom(
-              //     margin: EdgeInsets.all(15),
-              //     onPressed: () {
-              //       Get.toNamed('/tambah_promo');
-              //     },
-              //     child: Text('Tambah promo'),
-              //     width: context.res_width),
+              Obx(() {
+                return customSearch(
+                  controller: con.search.value,
+                  sortValue: con.isAsc.value,
+                  onSortPressed: () {
+                    con.toggleSortPromo();
+                  },
+                  onChanged: (x) {
+                    con.searchPromoLocal(id_toko: con.id_toko, search: x);
+                  },
+                );
+              }),
               SizedBox(
                 height: 20,
               ),
@@ -78,72 +59,95 @@ class Promo extends GetView<PromoController> {
                 margin: EdgeInsets.only(bottom: 10),
               ),
               Obx(() {
-                //TODO : CHECK PROMO VALUE EMNG BISA 2 ang sm persen atau hanya 1
                 return Expanded(
-                  child: controller.promo.isNotEmpty
-                      ? ListView.builder(
-                          itemCount: controller.promo.length,
-                          itemBuilder: (context, index) {
-                            final promo = controller.promo;
+                  child: con.promo.isNotEmpty
+                      ? Padding(
+                          padding: AppPading.customListPadding(),
+                          child: ListView.builder(
+                            itemCount: con.promo.length,
+                            itemBuilder: (context, index) {
+                              final promo = con.promo;
 
-                            return custom_list(
-                              usingGambar: false,
-                              isDeleted: promo[index].aktif == 1 ? false : true,
-                              controller: controller,
-                              trailing: customDropdown(
-                                  onSelected: (value) {
-                                    switch (value) {
-                                      case 'Ubah':
-                                        Get.toNamed('/edit_promo',
-                                            arguments: promo[index]);
-                                        break;
-                                      case 'Hapus':
-                                        Popscreen().deletePromo(
-                                            controller, promo[index]);
-                                    }
-                                  },
-                                  dropdownColor: Colors.white, // Custom color
-                                  customButton: const Icon(Icons.menu),
-                                  items: [
-                                    {
-                                      'title': 'Ubah',
-                                      'icon': Icons.edit,
-                                      'color': AppColor.primary
-                                    },
-                                    {'divider': true},
-                                    {
-                                      'title': 'Hapus',
-                                      'icon': Icons.delete,
-                                      'color': AppColor.warning
-                                    },
-                                  ]),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
+                              return custom_list(
+                                usingGambar: false,
+                                isDeleted:
+                                    promo[index].aktif == 1 ? false : true,
+                                controller: controller,
+                                trailing: promo[index].aktif == 1
+                                    ? customDropdown(
+                                        onSelected: (value) {
+                                          switch (value) {
+                                            case 'Ubah':
+                                              Get.toNamed('/edit_promo',
+                                                  arguments: promo[index]);
+                                              break;
+                                            case 'Hapus':
+                                              Popscreen().deletePromo(
+                                                  controller, promo[index]);
+                                          }
+                                        },
+                                        dropdownColor:
+                                            Colors.white, // Custom color
+                                        customButton: const Icon(Icons.menu),
+                                        items: [
+                                            {
+                                              'title': 'Ubah',
+                                              'icon': Icons.edit,
+                                              'color': AppColor.primary
+                                            },
+                                            {'divider': true},
+                                            {
+                                              'title': 'Hapus',
+                                              'icon': Icons.delete,
+                                              'color': AppColor.warning
+                                            },
+                                          ])
+                                    : customDropdown(
+                                        onSelected: (value) {
+                                          switch (value) {
+                                            case 'Ubah':
+                                              Get.toNamed('/edit_promo',
+                                                  arguments: promo[index]);
+                                              break;
+                                          }
+                                        },
+                                        dropdownColor:
+                                            Colors.white, // Custom color
+                                        customButton: const Icon(Icons.menu),
+                                        items: [
+                                            {
+                                              'title': 'Ubah',
+                                              'icon': Icons.edit,
+                                              'color': AppColor.primary
+                                            },
+                                          ]),
+                                subtitle: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        style: AppFont.small(),
+                                        promo[index].promoNominal != 0.0
+                                            ? 'Rp. ' +
+                                                AppFormat().numFormat(
+                                                    promo[index].promoNominal)
+                                            : '% ' +
+                                                promo[index]
+                                                    .promoPersen!
+                                                    .toStringAsFixed(0)),
+                                    Text(
                                       style: AppFont.small(),
-                                      promo[index].promoNominal != 0.0
-                                          ? 'Rp. ' +
-                                              AppFormat().numFormat(
-                                                  promo[index].promoNominal)
-                                          : promo[index].promoNominal != 0.0
-                                              ? '% ' +
-                                                  AppFormat().numFormat(
-                                                      promo[index].promoPersen)
-                                              : '% 12312313'),
-                                  Text(
-                                    style: AppFont.small(),
-                                    promo[index].tglMulai! +
-                                        ' - ' +
-                                        promo[index].tglSelesai!,
-                                  )
-                                ],
-                              ),
-                              title: promo[index].namaPromo,
-                              gestureroute: '/detail_promo',
-                              gestureArgument: promo[index],
-                            );
-                          },
+                                      promo[index].tglMulai! +
+                                          ' - ' +
+                                          promo[index].tglSelesai!,
+                                    )
+                                  ],
+                                ),
+                                title: promo[index].namaPromo,
+                                gestureroute: '/detail_promo',
+                                gestureArgument: promo[index],
+                              );
+                            },
+                          ),
                         )
                       : EmptyData(),
                 );

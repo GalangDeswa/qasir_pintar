@@ -459,7 +459,7 @@ class TambahPaketProdukController extends GetxController {
   var ukurantemp = <DataUkuranProduk>[];
 
   fetchpajak({id_toko}) async {
-    print('-------------------fetch produk local---------------------');
+    print('-------------------fetch pajak paket local---------------------');
 
     List<Map<String, Object?>> query = await DBHelper().FETCH(
         'SELECT * FROM pajak_produk WHERE id_toko = "$id_toko" AND aktif = 1');
@@ -1157,6 +1157,7 @@ class TambahPaketProdukController extends GetxController {
 
   popaddprodukv2() {
     var con = Get.find<CentralProdukController>();
+    con.fetchProdukLocal(id_toko: id_toko, isAktif: true);
     Get.dialog(SheetViewport(
         child: Sheet(
       scrollConfiguration: SheetScrollConfiguration(),

@@ -1,8 +1,10 @@
+import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:qasir_pintar/Config/config.dart';
+import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Widget/widget.dart';
 
 import '../Kasir/model_penjualan.dart';
@@ -14,11 +16,19 @@ class HistoryPenjualan extends GetView<HistoryPenjualanController> {
   /// Converts "YYYY-MM-DD" → "Sabtu, 17 Mei 2025"
   String _formatIndonesianDate(String isoDate) {
     try {
-      final DateTime parsed = DateTime.parse(isoDate);
+      DateTime parsed;
+      // Try ISO first
+      try {
+        parsed = DateTime.parse(isoDate);
+      } catch (_) {
+        // If fails, try dd-MM-yyyy (Indonesian style)
+        parsed = DateFormat("dd-MM-yyyy").parse(isoDate);
+      }
+
       final DateFormat indFmt = DateFormat("EEEE, d MMMM yyyy", 'id_ID');
       return indFmt.format(parsed);
     } catch (e) {
-      return isoDate; // fallback if parsing fails
+      return isoDate; // fallback
     }
   }
 
@@ -34,6 +44,7 @@ class HistoryPenjualan extends GetView<HistoryPenjualanController> {
 
   @override
   Widget build(BuildContext context) {
+    var con = Get.find<CentralHistoryController>();
     return Scaffold(
       appBar: AppbarCustom(title: 'Riwayat Penjualan', NeedBottom: false),
       body: Padding(
@@ -42,39 +53,39 @@ class HistoryPenjualan extends GetView<HistoryPenjualanController> {
           children: [
             // ── Search bar row ─────────────────────────────────────────────
 
-            Container(
-              height: 60, padding: EdgeInsets.all(15),
-              //color: Colors.red,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(right: 10),
-                    child: Icon(FontAwesomeIcons.magnifyingGlass),
-                  ),
-                  Expanded(
-                    child: TextField(
-                      onChanged: (val) {
-                        //     con.searchPaketLocal(id_toko: con.id_toko);
-                      },
-                      controller: controller.search.value,
-                      decoration: InputDecoration(hintText: 'Pencarian'),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 10),
-                    child: Icon(Icons.sort),
-                  )
-                ],
-              ),
-            ),
-            // button_border_custom(
-            //     margin: EdgeInsets.all(15),
-            //     onPressed: () {
-            //       Get.toNamed('/tambahpaketproduk');
-            //     },
-            //     child: Text('Tambah paket produk'),
-            //     width: context.res_width),
+            Obx(() {
+              return customDatesearch(
+                  onReset: () {
+                    con.fetchRiwayatPenjualan(id_toko: con.id_toko);
+                  },
+                  sortValue: con.isAsc.value,
+                  onSortPressed: () {
+                    con.toggleSortPenjualan();
+                  },
+                  onOkTap: () {
+                    print('custom dates');
+                    con.fetchRiwayatPenjualanByTanggal(
+                        id_toko: con.id_toko,
+                        startDate: con.date1.toString(),
+                        endDate: con.date2.toString());
+                  },
+                  textController: con.pickdate.value,
+                  dates: con.dates,
+                  onDateChanged: (dates) {
+                    var list = <String>[];
+                    var start = dates.first;
+                    final end = dates.last;
+                    con.pickdate.value.text = (con.dateformat.format(start!) +
+                        ' - ' +
+                        con.dateformat.format(end!));
+
+                    con.date1 = start;
+                    con.date2 = end;
+                    print(con.date1);
+                    print(con.date2);
+                  });
+            }),
+
             Container(
               //height: 100,
               //color: Colors.blue,
@@ -96,8 +107,7 @@ class HistoryPenjualan extends GetView<HistoryPenjualanController> {
             // ── The scrolling list of grouped transactions ─────────────────
             Expanded(
               child: Obx(() {
-                final List<DataPenjualanByDate> groups =
-                    controller.groupedPenjualan;
+                final List<DataPenjualanByDate> groups = con.groupedPenjualan;
 
                 if (groups.isEmpty) {
                   return Center(
@@ -151,7 +161,7 @@ class HistoryPenjualan extends GetView<HistoryPenjualanController> {
 
   /// Builds the date header row: "Sabtu, 17 Mei 2025    Rp 105.000"
   Widget _buildDateHeader(DataPenjualanByDate group) {
-    final String dateStr = _formatIndonesianDate(group.date);
+    var parsed = AppFormat().dateFormat(group.date);
     final String totalStr = _formatRupiah(group.totalForDate.toDouble());
 
     return Container(
@@ -161,7 +171,7 @@ class HistoryPenjualan extends GetView<HistoryPenjualanController> {
         children: [
           Expanded(
             child: Text(
-              dateStr,
+              parsed,
               style: AppFont.regular(fontSize: 14),
             ),
           ),
@@ -179,8 +189,9 @@ class HistoryPenjualan extends GetView<HistoryPenjualanController> {
   /// [icon]   #12345ABC        Rp 50.000
   ///          Tunai
   Widget _buildTransactionRow(PenjualanItem item) {
+    var con = Get.find<CentralHistoryController>();
     final String amountStr = _formatRupiah(item.totalBayar);
-    var penjualan = controller.penjualan;
+    var penjualan = con.penjualan;
     var x = penjualan.where((p) => p.uuid == item.uuidPenjualan).first;
 
     return x.reversal != 1

@@ -16,6 +16,7 @@ import 'package:qasir_pintar/Modules - P.O.S/Produk/Produk/model_kategoriproduk.
 import 'package:qasir_pintar/Modules - P.O.S/Produk/controller_basemenuproduk.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../../../Controllers/CentralController.dart';
 import '../../../../Database/DB_helper.dart';
 import '../../../../Widget/widget.dart';
 import '../../../Pelanggan/List kategori pelanggan/controller_kategoripelanggan.dart';
@@ -303,7 +304,7 @@ class ProdukController extends GetxController {
 
     if (db != null) {
       print(db);
-      await Get.find<BaseMenuProdukController>()
+      await Get.find<CentralKategoriProdukController>()
           .fetchKategoriProdukLocal(id_toko: id_toko);
       // await Get.find<TambahSubKategoriController>()
       //     .fetchKategoriProdukLocal(id_toko: id_toko);

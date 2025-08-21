@@ -24,6 +24,7 @@ class PenerimaanProduk extends GetView<PenerimaanProdukController> {
   @override
   Widget build(BuildContext context) {
     var con = Get.find<CentralSupplierController>();
+    //con.fetchSupplierLocal(id_toko: controller.id_toko, isAktif: true);
     return Scaffold(
       appBar: AppbarCustom(
         title: 'Penerimaan Produk',
@@ -104,7 +105,9 @@ class PenerimaanProduk extends GetView<PenerimaanProdukController> {
                                                   (sum, item) =>
                                                       sum - (item.qty ?? 0));
                                               controller.jumlahqty.value.text =
-                                                  sumqty.toString();
+                                                  sumqty
+                                                      .toString()
+                                                      .replaceAll('-', '');
 
                                               if (customer[index].qty <= 0) {
                                                 var x =
@@ -172,325 +175,221 @@ class PenerimaanProduk extends GetView<PenerimaanProdukController> {
                         width: context.res_width),
                   ),
                   Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField2(
-                              dropdownSearchData: DropdownSearchData(
-                                  searchMatchFn: (item, searchValue) {
-                                    final text =
-                                        (item.child as Text).data ?? '';
-                                    return text
-                                        .toLowerCase()
-                                        .contains(searchValue.toLowerCase());
-                                  },
-                                  searchInnerWidgetHeight: 150,
-                                  searchController: controller.searchController,
-                                  searchInnerWidget: Container(
-                                    padding: EdgeInsets.all(10),
-                                    height: 60,
-                                    child: TextFormField(
-                                      decoration: InputDecoration(
-                                          hintText: 'Pencarian',
-                                          hintStyle: AppFont.regular(),
-                                          icon: Icon(
-                                            FontAwesomeIcons.search,
-                                            size: 15,
-                                          )),
-                                      expands: true,
-                                      maxLines: null,
-                                      controller: controller.searchController,
+                    return controller.produktemp.isEmpty
+                        ? Container()
+                        : Column(
+                            children: [
+                              Padding(
+                                padding: AppPading.customBottomPadding(),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Expanded(
+                                      child: DropdownButtonFormField2(
+                                        style: AppFont.regular(),
+                                        dropdownSearchData: DropdownSearchData(
+                                            searchMatchFn: (item, searchValue) {
+                                              final text =
+                                                  (item.child as Text).data ??
+                                                      '';
+                                              return text
+                                                  .toLowerCase()
+                                                  .contains(searchValue
+                                                      .toLowerCase());
+                                            },
+                                            searchInnerWidgetHeight: 150,
+                                            searchController:
+                                                controller.searchController,
+                                            searchInnerWidget: Container(
+                                              padding: EdgeInsets.all(10),
+                                              height: 60,
+                                              child: TextFormField(
+                                                decoration: InputDecoration(
+                                                    hintText: 'Pencarian',
+                                                    hintStyle:
+                                                        AppFont.regular(),
+                                                    icon: Icon(
+                                                      FontAwesomeIcons.search,
+                                                      size: 15,
+                                                    )),
+                                                expands: true,
+                                                maxLines: null,
+                                                controller:
+                                                    controller.searchController,
+                                              ),
+                                            )),
+                                        decoration: InputDecoration(
+                                          isDense: true,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(10),
+                                          ),
+                                        ),
+                                        validator: (value) {
+                                          if (value == null) {
+                                            return 'Supplier harus dipilih';
+                                          }
+                                          return null;
+                                        },
+                                        isExpanded: true,
+                                        dropdownStyleData: DropdownStyleData(
+                                            decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: Colors.white)),
+                                        hint: Text(
+                                          'Supplier',
+                                        ),
+                                        value: con.suppliervalue,
+                                        items: con.supplierList
+                                            .where((s) => s.aktif == 1)
+                                            .map((x) {
+                                          return DropdownMenuItem(
+                                            child: Text(
+                                              x.nama_supplier!,
+                                            ),
+                                            value: x.uuid,
+                                          );
+                                        }).toList(),
+                                        onChanged: (val) {
+                                          controller.suppliervalue.value =
+                                              val.toString();
+                                          print(controller.suppliervalue);
+                                        },
+                                      ),
                                     ),
-                                  )),
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
+                                    Container(
+                                        margin: EdgeInsets.only(left: 15),
+                                        padding: EdgeInsets.zero,
+                                        decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            color: AppColor.primary),
+                                        child: IconButton(
+                                            onPressed: () {
+                                              // Get.toNamed('/tambahsupplier');
+                                              controller.popAddSupplier();
+                                            },
+                                            icon: Icon(
+                                              Icons.add,
+                                              color: Colors.white,
+                                            ))),
+                                  ],
                                 ),
                               ),
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Supplier harus dipilih';
-                                }
-                                return null;
-                              },
-                              isExpanded: true,
-                              dropdownStyleData: DropdownStyleData(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white)),
-                              hint: Text('Supplier', style: AppFont.regular()),
-                              value: con.suppliervalue,
-                              items: con.supplierList.map((x) {
-                                return DropdownMenuItem(
-                                  child: Text(x.nama_supplier!),
-                                  value: x.uuid,
-                                );
-                              }).toList(),
-                              onChanged: (val) {
-                                controller.suppliervalue.value = val.toString();
-                                print(controller.suppliervalue);
-                              },
-                            ),
-                          ),
-                          Container(
-                              margin: EdgeInsets.only(left: 15),
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColor.primary),
-                              child: IconButton(
-                                  onPressed: () {
-                                    // Get.toNamed('/tambahsupplier');
-                                    controller.popAddSupplier();
+                              Obx(() {
+                                return customDropdownField(
+                                  validator: (value) {
+                                    if (value == null) {
+                                      return 'Jenis penerimaan harus dipilih';
+                                    }
+                                    return null;
                                   },
-                                  icon: Icon(
-                                    Icons.add,
-                                    color: Colors.white,
-                                  ))),
-                        ],
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField2(
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Jenis penerimaan harus dipilih';
-                                }
-                                return null;
-                              },
-                              isExpanded: true,
-                              dropdownStyleData: DropdownStyleData(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white)),
-                              hint: Text('Jenis Penerimaan',
-                                  style: AppFont.regular()),
-                              value: controller.jenispenerimaanvalue.value,
-                              items: controller.jenispenerimaan.map((x) {
-                                return DropdownMenuItem(
-                                  child: Text(x),
-                                  value: x,
-                                );
-                              }).toList(),
-                              onChanged: (val) {
-                                controller.jenispenerimaanvalue.value =
-                                    val.toString();
-                                controller.jenispenerimaanvalue.value == 'Lunas'
-                                    ? controller.sisabayar.value.text =
-                                        0.0.toString()
-                                    : controller.sisabayar.value.text =
-                                        (double.parse(controller
+                                  hintText: 'Jenis penerimaan',
+                                  items: controller.jenispenerimaan,
+                                  value: controller.jenispenerimaanvalue.value,
+                                  onChanged: (val) {
+                                    controller.jenispenerimaanvalue.value =
+                                        val.toString();
+                                    controller.jenispenerimaanvalue.value ==
+                                            'Lunas'
+                                        ? controller.sisabayar.value.text =
+                                            0.0.toString()
+                                        : controller.sisabayar.value
+                                            .text = (double.parse(controller
                                                     .totalbayar.value.text) -
                                                 double.parse(controller
                                                     .jumlahbayar.value.text))
                                             .toString();
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.nomorfaktur.value,
-                        decoration: InputDecoration(
-                          labelText: 'Nomor faktur',
-                          labelStyle: AppFont.regular(),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'nomor faktur harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        readOnly: true,
-                        controller: controller.jumlahqty.value,
-                        decoration: InputDecoration(
-                          labelText: 'Jumlah produk',
-                          labelStyle: AppFont.regular(),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Jumlah produk harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        readOnly: true,
-                        controller: controller.totalharga.value,
-                        inputFormatters: [ThousandsFormatter()],
-                        decoration: InputDecoration(
-                          labelText: 'Total harga',
-                          labelStyle: AppFont.regular(),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Jumlah harga harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.ongkir.value,
-                        onChanged: (x) {
-                          controller.cariTotalBayar();
-                        },
-                        inputFormatters: [ThousandsFormatter()],
-                        decoration: InputDecoration(
-                          labelText: 'Ongkos kirim (optional)',
-                          labelStyle: AppFont.regular(),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.number,
-                        // validator: (value) {
-                        //   if (value!.isEmpty) {
-                        //     return 'Ongkos kirim harus diisi';
-                        //   }
-                        //   return null;
-                        // },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        readOnly: true,
-                        inputFormatters: [ThousandsFormatter()],
-                        controller: controller.totalbayar.value,
-                        decoration: InputDecoration(
-                          labelText: 'Total bayar',
-                          labelStyle: AppFont.regular(),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Jumlah total bayar harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        inputFormatters: [ThousandsFormatter()],
-                        controller: controller.jumlahbayar.value,
-                        onChanged: (val) {
-                          // if (controller.jenispenerimaanvalue == 'Hutang') {
-                          //   controller.sisabayar.value.text = (double.parse(
-                          //               controller.totalbayar.value.text) -
-                          //           double.parse(
-                          //               controller.jumlahbayar.value.text))
-                          //       .toString();
-                          // }
-
-                          controller.cariSisaBayar();
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Jumlah bayar',
-                          labelStyle: AppFont.regular(),
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Jumlah bayar harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return controller.jenispenerimaanvalue.value == 'Lunas'
-                        ? Container()
-                        : Padding(
-                            padding: AppPading.customBottomPadding(),
-                            child: TextFormField(
-                              readOnly: true,
-                              inputFormatters: [ThousandsFormatter()],
-                              controller: controller.sisabayar.value,
-                              decoration: InputDecoration(
-                                labelText: 'Sisa bayar',
-                                labelStyle: AppFont.regular(),
-                                border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10)),
-                              ),
-                              keyboardType: TextInputType.number,
-                              // validator: (value) {
-                              //   if (value!.isEmpty) {
-                              //     return 'sisa bayar harus diisi';
-                              //   }
-                              //   return null;
-                              // },
-                            ),
+                                  },
+                                );
+                              }),
+                              Obx(() {
+                                return customTextField(
+                                    validator: (value) {
+                                      if (value == null) {
+                                        return 'Nomor faktur harus diisi';
+                                      }
+                                      return null;
+                                    },
+                                    controller: controller.nomorfaktur.value,
+                                    labelText: 'Nomor Faktur');
+                              }),
+                              Obx(() {
+                                return customTextField(
+                                    readOnly: true,
+                                    validator: (value) {
+                                      if (value == null) {
+                                        return 'jumlah harus diisi';
+                                      }
+                                      return null;
+                                    },
+                                    controller: controller.jumlahqty.value,
+                                    labelText: 'Jumlah produk');
+                              }),
+                              Obx(() {
+                                return customTextField(
+                                    readOnly: true,
+                                    validator: (value) {
+                                      if (value == null) {
+                                        return 'total harga harus diisi';
+                                      }
+                                      return null;
+                                    },
+                                    controller: controller.totalharga.value,
+                                    labelText: 'Total harga');
+                              }),
+                              Obx(() {
+                                return customTextField(
+                                    onChanged: (x) {
+                                      controller.cariTotalBayar();
+                                    },
+                                    inputFormatters: [ThousandsFormatter()],
+                                    controller: controller.ongkir.value,
+                                    labelText: 'Ongkos kirim (opsional');
+                              }),
+                              Obx(() {
+                                return customTextField(
+                                    readOnly: true,
+                                    inputFormatters: [ThousandsFormatter()],
+                                    controller: controller.totalbayar.value,
+                                    labelText: 'Total bayar');
+                              }),
+                              Obx(() {
+                                return customTextField(
+                                    onChanged: (x) {
+                                      controller.cariSisaBayar();
+                                    },
+                                    inputFormatters: [ThousandsFormatter()],
+                                    controller: controller.jumlahbayar.value,
+                                    labelText: 'Jumlah bayar');
+                              }),
+                              Obx(() {
+                                return controller.jenispenerimaanvalue.value ==
+                                        'Lunas'
+                                    ? Container()
+                                    : customTextField(
+                                        readOnly: true,
+                                        inputFormatters: [ThousandsFormatter()],
+                                        controller: controller.sisabayar.value,
+                                        labelText: 'Sisa bayar');
+                              }),
+                              button_solid_custom(
+                                  onPressed: () {
+                                    if (controller
+                                        .registerKey.value.currentState!
+                                        .validate()) {
+                                      controller.tambahPenerimaanProduk();
+                                    }
+                                  },
+                                  child: Text(
+                                    'Tambah',
+                                    style: AppFont.regular_white_bold(),
+                                  ),
+                                  width: context.res_width)
+                            ],
                           );
                   }),
-                  button_solid_custom(
-                      onPressed: () {
-                        if (controller.registerKey.value.currentState!
-                            .validate()) {
-                          controller.tambahPenerimaanProduk();
-                        }
-                      },
-                      child: Text(
-                        'Tambah',
-                        style: AppFont.regular_white_bold(),
-                      ),
-                      width: context.res_width)
                 ],
               ),
             ),

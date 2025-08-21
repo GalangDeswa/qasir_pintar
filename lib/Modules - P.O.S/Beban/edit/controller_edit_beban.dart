@@ -28,13 +28,15 @@ class EditBebanController extends GetxController {
     tanggal.value.text = data.tanggalBeban!;
     keterangan.value.text = data.keterangan!;
     karyawanvalue.value = data.idKaryawan;
+    isAktif.value = data.aktif == 1 ? true : false;
   }
 
   var tambahBaru = ''.obs;
   DataBeban data = Get.arguments;
+  var isAktif = true.obs;
 
   Map<String, dynamic> DataEditBeban(
-      {nama, kategori, jumlah, tanggal, keterangan, karyawan}) {
+      {nama, kategori, jumlah, tanggal, keterangan, karyawan, aktif}) {
     var map = <String, dynamic>{};
 
     map['id_kategori_beban'] = kategori;
@@ -43,6 +45,7 @@ class EditBebanController extends GetxController {
     map['jumlah_beban'] = jumlah;
     map['tanggal_beban'] = tanggal;
     map['keterangan'] = keterangan;
+    map['aktif'] = aktif;
 
     return map;
   }
@@ -61,6 +64,7 @@ class EditBebanController extends GetxController {
             jumlah: double.parse(jumlahbeban.value.text.replaceAll(',', '')),
             tanggal: tanggal.value.text,
             keterangan: keterangan.value.text,
+            aktif: isAktif.value == true ? 1 : 0,
             karyawan: karyawanvalue.value));
     if (beban == 1) {
       await Get.find<CentralBebanController>().fetchBeban();

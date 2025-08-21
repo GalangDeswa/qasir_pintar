@@ -19,690 +19,738 @@ class ProdukThumb extends GetView<KasirController> {
   @override
   Widget build(BuildContext context) {
     var con = Get.find<CentralProdukController>();
+
     var conpaket = Get.find<CentralPaketController>();
     return Padding(
       padding: AppPading.defaultBodyPadding(),
       child: Container(
         // color: Colors.red,
         child: Obx(() {
-          return controller.indexdisplay == 0
-              ? GridView.builder(
-                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      mainAxisExtent: context.res_height / 4.5,
-                      maxCrossAxisExtent: context.res_width / 2.0,
-                      childAspectRatio: 1 / 1,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 20),
-                  itemCount: con.produk.length,
-                  itemBuilder: (BuildContext context, index) {
-                    var produk = con.produk;
-                    return produk[index].tampilkan_di_produk == 1
-                        ? GestureDetector(
-                            onTap: () {
-                              //controller.addKeranjang(produk[index]);
-                              controller.addToCart(produk[index]);
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                //color: Colors.red,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    // Shadow color
-                                    spreadRadius: 1,
+          return controller.indexdisplay.value == 0
+              ? Padding(
+                  padding: AppPading.customListPadding(bottomPadding: 70),
+                  child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                          mainAxisExtent: context.res_height / 4.5,
+                          maxCrossAxisExtent: context.res_width / 2.0,
+                          childAspectRatio: 1 / 1,
+                          crossAxisSpacing: 20,
+                          mainAxisSpacing: 20),
+                      itemCount: con.produk.length,
+                      itemBuilder: (BuildContext context, index) {
+                        var produk = con.produk;
+                        return produk[index].tampilkan_di_produk == 1
+                            ? GestureDetector(
+                                onTap: () {
+                                  //controller.addKeranjang(produk[index]);
+                                  controller.addToCart(produk[index]);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    //color: Colors.red,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        // Shadow color
+                                        spreadRadius: 1,
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    color: Colors.white,
-                                    // color: Colors.purpleAccent,
-                                    height: 85,
-                                    width: context.res_width,
-                                    child: produk[index].gambar_produk_utama !=
-                                                '' &&
-                                            produk[index].gambar_produk_utama !=
-                                                null
-                                        ? controller.isBase64Svg(produk[index]
-                                                .gambar_produk_utama!)
-                                            ? SvgPicture.memory(
-                                                base64Decode(produk[index]
-                                                    .gambar_produk_utama!),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        color: Colors.white,
+                                        // color: Colors.purpleAccent,
+                                        height: 85,
+                                        width: context.res_width,
+                                        child: produk[index]
+                                                        .gambar_produk_utama !=
+                                                    '' &&
+                                                produk[index]
+                                                        .gambar_produk_utama !=
+                                                    null
+                                            ? controller.isBase64Svg(
+                                                    produk[index]
+                                                        .gambar_produk_utama!)
+                                                ? SvgPicture.memory(
+                                                    base64Decode(produk[index]
+                                                        .gambar_produk_utama!),
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.contain,
+                                                  )
+                                                : Image.memory(
+                                                    base64Decode(produk[index]
+                                                        .gambar_produk_utama!),
+                                                    width: 10,
+                                                    height: 10,
+                                                    fit: BoxFit.contain,
+                                                  )
+                                            : Image.asset(
+                                                AppString.defaultImg,
                                                 width: 50,
                                                 height: 50,
                                                 fit: BoxFit.contain,
-                                              )
-                                            : Image.memory(
-                                                base64Decode(produk[index]
-                                                    .gambar_produk_utama!),
-                                                width: 10,
-                                                height: 10,
-                                                fit: BoxFit.contain,
-                                              )
-                                        : Image.asset(
-                                            AppString.defaultImg,
-                                            width: 50,
-                                            height: 50,
-                                            fit: BoxFit.contain,
-                                          ),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      padding: EdgeInsets.all(15),
-                                      width: context.res_width,
-                                      //height: context.res_height * 0.1,
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(0),
-                                              topRight: Radius.circular(0),
-                                              bottomLeft: Radius.circular(20),
-                                              bottomRight:
-                                                  Radius.circular(20))),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            overflow: TextOverflow.ellipsis,
-                                            produk[index].nama_produk!,
-                                            style: AppFont.regular_bold(),
-                                          ),
-                                          produk[index].diskon != 0.0
-                                              ? Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
+                                              ),
+                                      ),
+                                      Expanded(
+                                        child: Container(
+                                          padding: EdgeInsets.all(15),
+                                          width: context.res_width,
+                                          //height: context.res_height * 0.1,
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(0),
+                                                  topRight: Radius.circular(0),
+                                                  bottomLeft:
+                                                      Radius.circular(20),
+                                                  bottomRight:
+                                                      Radius.circular(20))),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                overflow: TextOverflow.ellipsis,
+                                                produk[index].nama_produk!,
+                                                style: AppFont.regular_bold(),
+                                              ),
+                                              produk[index].diskon != 0.0
+                                                  ? Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          'Rp ${NumberFormat('#,###').format(
+                                                            produk[index]
+                                                                .harga_jual_eceran!,
+                                                          )}',
+                                                          style: TextStyle(
+                                                              decoration:
+                                                                  TextDecoration
+                                                                      .lineThrough,
+                                                              fontSize: 8),
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              'Rp. ' +
+                                                                  AppFormat()
+                                                                      .numFormat(
+                                                                    produk[index]
+                                                                            .harga_jual_eceran! -
+                                                                        produk[index]
+                                                                            .diskon!,
+                                                                  ),
+                                                              style: AppFont
+                                                                  .small(),
+                                                            ),
+                                                            Container(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(3),
+                                                              margin: EdgeInsets
+                                                                  .only(
+                                                                      left: 5),
+                                                              decoration: BoxDecoration(
+                                                                  color: Colors
+                                                                      .green,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              5)),
+                                                              child: Text(
+                                                                  (produk[index].diskon! /
+                                                                              produk[index]
+                                                                                  .harga_jual_eceran! *
+                                                                              100)
+                                                                          .toStringAsFixed(
+                                                                              0) +
+                                                                      '%',
+                                                                  style: AppFont
+                                                                      .small_white()),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : Text(
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                       'Rp ${NumberFormat('#,###').format(
                                                         produk[index]
                                                             .harga_jual_eceran!,
                                                       )}',
-                                                      style: TextStyle(
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .lineThrough,
-                                                          fontSize: 8),
+                                                      style: AppFont.small(),
                                                     ),
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          'Rp. ' +
-                                                              AppFormat()
-                                                                  .numFormat(
-                                                                produk[index]
-                                                                        .harga_jual_eceran! -
-                                                                    produk[index]
-                                                                        .diskon!,
-                                                              ),
-                                                          style:
-                                                              AppFont.small(),
-                                                        ),
-                                                        Container(
-                                                          padding:
-                                                              EdgeInsets.all(3),
-                                                          margin:
-                                                              EdgeInsets.only(
-                                                                  left: 5),
-                                                          decoration: BoxDecoration(
-                                                              color:
-                                                                  Colors.green,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          5)),
-                                                          child: Text(
-                                                              (produk[index].diskon! /
-                                                                          produk[index]
-                                                                              .harga_jual_eceran! *
-                                                                          100)
-                                                                      .toStringAsFixed(
-                                                                          0) +
-                                                                  '%',
-                                                              style: AppFont
-                                                                  .small_white()),
-                                                        )
-                                                      ],
-                                                    ),
-                                                  ],
-                                                )
-                                              : Text(
+                                              Obx(() {
+                                                return Text(
+                                                  produk[index].hitung_stok == 1
+                                                      ? 'Stock : ' +
+                                                          (produk[index].qty! -
+                                                                  produk[index]
+                                                                      .info_stok_habis!)
+                                                              .toString()
+                                                      : 'Nonstock',
                                                   overflow:
                                                       TextOverflow.ellipsis,
-                                                  'Rp ${NumberFormat('#,###').format(
-                                                    produk[index]
-                                                        .harga_jual_eceran!,
-                                                  )}',
                                                   style: AppFont.small(),
-                                                ),
-                                          Obx(() {
-                                            return Text(
-                                              produk[index].hitung_stok == 1
-                                                  ? 'Stock : ' +
-                                                      (produk[index].qty! -
-                                                              produk[index]
-                                                                  .info_stok_habis!)
-                                                          .toString()
-                                                  : 'Nonstock',
-                                              overflow: TextOverflow.ellipsis,
-                                              style: AppFont.small(),
-                                            );
-                                          }),
-                                          StockDisplay(
-                                            item: produk[index],
-                                            isPackage: false,
-                                          )
-                                        ],
+                                                );
+                                              }),
+                                              StockDisplay(
+                                                item: produk[index],
+                                                isPackage: false,
+                                              )
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                          )
-                        : GestureDetector(
-                            onTap: () {
-                              Get.toNamed('/isiproduk',
-                                  arguments: produk[index]);
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    // Shadow color
-                                    spreadRadius: 1,
-                                    // Spread radius
-                                    blurRadius: 5,
-                                    // Blur radius
-                                    offset: Offset(2,
-                                        3), // Changes the position of the shadow
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
+                                ),
+                              )
+                            : GestureDetector(
+                                onTap: () {
+                                  Get.toNamed('/isiproduk',
+                                      arguments: produk[index]);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
                                     color: Colors.grey[300],
-
-                                    // color: Colors.purpleAccent,
-                                    height: 85,
-                                    width: context.res_width,
-                                    child: produk[index].gambar_produk_utama !=
-                                                '' &&
-                                            produk[index].gambar_produk_utama !=
-                                                null
-                                        ? controller.isBase64Svg(produk[index]
-                                                .gambar_produk_utama!)
-                                            ? SvgPicture.memory(
-                                                base64Decode(produk[index]
-                                                    .gambar_produk_utama!),
-                                                width: 60,
-                                                height: 70,
-                                                fit: BoxFit.cover,
-                                              )
-                                            : Image.memory(
-                                                base64Decode(produk[index]
-                                                    .gambar_produk_utama!),
-                                                width: 60,
-                                                height: 70,
-                                                fit: BoxFit.cover,
-                                              )
-                                        : Image.asset(
-                                            AppString.defaultImg,
-                                            width: 60,
-                                            height: 70,
-                                            fit: BoxFit.cover,
-                                          ),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      padding: EdgeInsets.all(15),
-                                      width: context.res_width,
-                                      //height: context.res_height * 0.1,
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey[300],
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(0),
-                                              topRight: Radius.circular(0),
-                                              bottomLeft: Radius.circular(20),
-                                              bottomRight:
-                                                  Radius.circular(20))),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            overflow: TextOverflow.ellipsis,
-                                            produk[index].nama_produk!,
-                                            style: AppFont.regular_bold(),
-                                          ),
-                                          Text(
-                                            overflow: TextOverflow.ellipsis,
-                                            'Nonaktif',
-                                            style: TextStyle(color: Colors.red),
-                                          ),
-                                          Align(
-                                            alignment: Alignment.centerRight,
-                                            child: DropdownButton2(
-                                              hint: Text('Pilih tampilan'),
-                                              customButton: const FaIcon(
-                                                FontAwesomeIcons.list,
-                                                // color: Colors.white,
-                                                size: 20,
-                                              ),
-                                              items: [
-                                                ...MenuItems.firstItems.map(
-                                                  (item) => DropdownMenuItem<
-                                                      MenuItem>(
-                                                    value: item,
-                                                    child: MenuItems.buildItem(
-                                                        item),
-                                                  ),
-                                                ),
-                                                const DropdownMenuItem<Divider>(
-                                                    enabled: false,
-                                                    child: Divider()),
-                                                ...MenuItems.secondItems.map(
-                                                  (item) => DropdownMenuItem<
-                                                      MenuItem>(
-                                                    value: item,
-                                                    child: MenuItems.buildItem(
-                                                        item),
-                                                  ),
-                                                ),
-                                              ],
-                                              onChanged: (value) {
-                                                MenuItems.onChanged(
-                                                    context,
-                                                    value! as MenuItem,
-                                                    controller,
-                                                    produk[index]);
-                                              },
-                                              dropdownStyleData:
-                                                  DropdownStyleData(
-                                                width: 160,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(4),
-                                                ),
-                                                offset: const Offset(0, 8),
-                                              ),
-                                              menuItemStyleData:
-                                                  MenuItemStyleData(
-                                                customHeights: [
-                                                  ...List<double>.filled(
-                                                      MenuItems
-                                                          .firstItems.length,
-                                                      48),
-                                                  8,
-                                                  ...List<double>.filled(
-                                                      MenuItems
-                                                          .secondItems.length,
-                                                      48),
-                                                ],
-                                                padding: const EdgeInsets.only(
-                                                    left: 16, right: 16),
-                                              ),
-                                            ),
-                                          ),
-                                        ],
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        // Shadow color
+                                        spreadRadius: 1,
+                                        // Spread radius
+                                        blurRadius: 5,
+                                        // Blur radius
+                                        offset: Offset(2,
+                                            3), // Changes the position of the shadow
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                          );
-                  })
-              : GridView.builder(
-                  gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                      mainAxisExtent: context.res_height / 4.5,
-                      maxCrossAxisExtent: context.res_width / 2.0,
-                      childAspectRatio: 1 / 1,
-                      crossAxisSpacing: 20,
-                      mainAxisSpacing: 20),
-                  itemCount: conpaket.paketproduk.length,
-                  itemBuilder: (BuildContext context, index) {
-                    var paketproduk = conpaket.paketproduk;
-                    return paketproduk[index].aktif == 1
-                        ? GestureDetector(
-                            onTap: () {
-                              controller.addToCart(paketproduk[index]);
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                //color: Colors.red,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    // Shadow color
-                                    spreadRadius: 1,
-                                    // Spread radius
-                                    blurRadius: 5,
-                                    // Blur radius
-                                    offset: Offset(2,
-                                        3), // Changes the position of the shadow
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        color: Colors.grey[300],
+
+                                        // color: Colors.purpleAccent,
+                                        height: 85,
+                                        width: context.res_width,
+                                        child: produk[index]
+                                                        .gambar_produk_utama !=
+                                                    '' &&
+                                                produk[index]
+                                                        .gambar_produk_utama !=
+                                                    null
+                                            ? controller.isBase64Svg(
+                                                    produk[index]
+                                                        .gambar_produk_utama!)
+                                                ? SvgPicture.memory(
+                                                    base64Decode(produk[index]
+                                                        .gambar_produk_utama!),
+                                                    width: 60,
+                                                    height: 70,
+                                                    fit: BoxFit.cover,
+                                                  )
+                                                : Image.memory(
+                                                    base64Decode(produk[index]
+                                                        .gambar_produk_utama!),
+                                                    width: 60,
+                                                    height: 70,
+                                                    fit: BoxFit.cover,
+                                                  )
+                                            : Image.asset(
+                                                AppString.defaultImg,
+                                                width: 60,
+                                                height: 70,
+                                                fit: BoxFit.cover,
+                                              ),
+                                      ),
+                                      Expanded(
+                                        child: Container(
+                                          padding: EdgeInsets.all(15),
+                                          width: context.res_width,
+                                          //height: context.res_height * 0.1,
+                                          decoration: BoxDecoration(
+                                              color: Colors.grey[300],
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(0),
+                                                  topRight: Radius.circular(0),
+                                                  bottomLeft:
+                                                      Radius.circular(20),
+                                                  bottomRight:
+                                                      Radius.circular(20))),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                overflow: TextOverflow.ellipsis,
+                                                produk[index].nama_produk!,
+                                                style: AppFont.regular_bold(),
+                                              ),
+                                              Text(
+                                                overflow: TextOverflow.ellipsis,
+                                                'Nonaktif',
+                                                style: TextStyle(
+                                                    color: Colors.red),
+                                              ),
+                                              Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: DropdownButton2(
+                                                  hint: Text('Pilih tampilan'),
+                                                  customButton: const FaIcon(
+                                                    FontAwesomeIcons.list,
+                                                    // color: Colors.white,
+                                                    size: 20,
+                                                  ),
+                                                  items: [
+                                                    ...MenuItems.firstItems.map(
+                                                      (item) =>
+                                                          DropdownMenuItem<
+                                                              MenuItem>(
+                                                        value: item,
+                                                        child:
+                                                            MenuItems.buildItem(
+                                                                item),
+                                                      ),
+                                                    ),
+                                                    const DropdownMenuItem<
+                                                            Divider>(
+                                                        enabled: false,
+                                                        child: Divider()),
+                                                    ...MenuItems.secondItems
+                                                        .map(
+                                                      (item) =>
+                                                          DropdownMenuItem<
+                                                              MenuItem>(
+                                                        value: item,
+                                                        child:
+                                                            MenuItems.buildItem(
+                                                                item),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                  onChanged: (value) {
+                                                    MenuItems.onChanged(
+                                                        context,
+                                                        value! as MenuItem,
+                                                        controller,
+                                                        produk[index]);
+                                                  },
+                                                  dropdownStyleData:
+                                                      DropdownStyleData(
+                                                    width: 160,
+                                                    padding: const EdgeInsets
+                                                        .symmetric(vertical: 5),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4),
+                                                    ),
+                                                    offset: const Offset(0, 8),
+                                                  ),
+                                                  menuItemStyleData:
+                                                      MenuItemStyleData(
+                                                    customHeights: [
+                                                      ...List<double>.filled(
+                                                          MenuItems.firstItems
+                                                              .length,
+                                                          48),
+                                                      8,
+                                                      ...List<double>.filled(
+                                                          MenuItems.secondItems
+                                                              .length,
+                                                          48),
+                                                    ],
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 16,
+                                                            right: 16),
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    color: Colors.white,
-                                    // color: Colors.purpleAccent,
-                                    height: 85,
-                                    width: context.res_width,
-                                    child: paketproduk[index].gambar_utama !=
-                                                '' &&
+                                ),
+                              );
+                      }),
+                )
+              : Padding(
+                  padding: AppPading.customListPadding(bottomPadding: 70),
+                  child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
+                          mainAxisExtent: context.res_height / 4.5,
+                          maxCrossAxisExtent: context.res_width / 2.0,
+                          childAspectRatio: 1 / 1,
+                          crossAxisSpacing: 20,
+                          mainAxisSpacing: 20),
+                      itemCount: conpaket.paketproduk.length,
+                      itemBuilder: (BuildContext context, index) {
+                        var paketproduk = conpaket.paketproduk;
+                        return paketproduk[index].aktif == 1
+                            ? GestureDetector(
+                                onTap: () {
+                                  controller.addToCart(paketproduk[index]);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    //color: Colors.red,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        // Shadow color
+                                        spreadRadius: 1,
+                                        // Spread radius
+                                        blurRadius: 5,
+                                        // Blur radius
+                                        offset: Offset(2,
+                                            3), // Changes the position of the shadow
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        color: Colors.white,
+                                        // color: Colors.purpleAccent,
+                                        height: 85,
+                                        width: context.res_width,
+                                        child:
                                             paketproduk[index].gambar_utama !=
-                                                null
-                                        ? controller.isBase64Svg(
-                                                paketproduk[index]
-                                                    .gambar_utama!)
-                                            ? SvgPicture.memory(
-                                                base64Decode(paketproduk[index]
-                                                    .gambar_utama!),
-                                                width: 50,
-                                                height: 50,
-                                                fit: BoxFit.contain,
-                                              )
-                                            : Image.memory(
-                                                base64Decode(paketproduk[index]
-                                                    .gambar_utama!),
-                                                width: 10,
-                                                height: 10,
-                                                fit: BoxFit.contain,
-                                              )
-                                        : Image.asset(
-                                            AppString.defaultImg,
-                                            width: 50,
-                                            height: 50,
-                                            fit: BoxFit.contain,
-                                          ),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      padding: EdgeInsets.all(15),
-                                      width: context.res_width,
-                                      //height: context.res_height * 0.1,
-                                      decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(0),
-                                              topRight: Radius.circular(0),
-                                              bottomLeft: Radius.circular(20),
-                                              bottomRight:
-                                                  Radius.circular(20))),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            overflow: TextOverflow.ellipsis,
-                                            paketproduk[index].nama_paket!,
-                                            style: AppFont.regular_bold(),
-                                          ),
-                                          paketproduk[index].diskon != 0.0
-                                              ? Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    Text(
+                                                        '' &&
+                                                    paketproduk[index]
+                                                            .gambar_utama !=
+                                                        null
+                                                ? controller.isBase64Svg(
+                                                        paketproduk[index]
+                                                            .gambar_utama!)
+                                                    ? SvgPicture.memory(
+                                                        base64Decode(
+                                                            paketproduk[index]
+                                                                .gambar_utama!),
+                                                        width: 50,
+                                                        height: 50,
+                                                        fit: BoxFit.contain,
+                                                      )
+                                                    : Image.memory(
+                                                        base64Decode(
+                                                            paketproduk[index]
+                                                                .gambar_utama!),
+                                                        width: 10,
+                                                        height: 10,
+                                                        fit: BoxFit.contain,
+                                                      )
+                                                : Image.asset(
+                                                    AppString.defaultImg,
+                                                    width: 50,
+                                                    height: 50,
+                                                    fit: BoxFit.contain,
+                                                  ),
+                                      ),
+                                      Expanded(
+                                        child: Container(
+                                          padding: EdgeInsets.all(15),
+                                          width: context.res_width,
+                                          //height: context.res_height * 0.1,
+                                          decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(0),
+                                                  topRight: Radius.circular(0),
+                                                  bottomLeft:
+                                                      Radius.circular(20),
+                                                  bottomRight:
+                                                      Radius.circular(20))),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                overflow: TextOverflow.ellipsis,
+                                                paketproduk[index].nama_paket!,
+                                                style: AppFont.regular_bold(),
+                                              ),
+                                              paketproduk[index].diskon != 0.0
+                                                  ? Column(
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: [
+                                                        Text(
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                          'Rp ${NumberFormat('#,###').format(
+                                                            paketproduk[index]
+                                                                .harga_jual_paket!,
+                                                          )}',
+                                                          style: TextStyle(
+                                                              decoration:
+                                                                  TextDecoration
+                                                                      .lineThrough,
+                                                              fontSize: 8),
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Text(
+                                                              'Rp. ' +
+                                                                  AppFormat()
+                                                                      .numFormat(
+                                                                    paketproduk[index]
+                                                                            .harga_jual_paket! -
+                                                                        paketproduk[index]
+                                                                            .diskon!,
+                                                                  ),
+                                                              style: AppFont
+                                                                  .small(),
+                                                            ),
+                                                            Container(
+                                                              padding:
+                                                                  EdgeInsets
+                                                                      .all(3),
+                                                              margin: EdgeInsets
+                                                                  .only(
+                                                                      left: 5),
+                                                              decoration: BoxDecoration(
+                                                                  color: Colors
+                                                                      .green,
+                                                                  borderRadius:
+                                                                      BorderRadius
+                                                                          .circular(
+                                                                              5)),
+                                                              child: Text(
+                                                                  (paketproduk[index].diskon! /
+                                                                              paketproduk[index]
+                                                                                  .harga_jual_paket! *
+                                                                              100)
+                                                                          .toStringAsFixed(
+                                                                              0) +
+                                                                      '%',
+                                                                  style: AppFont
+                                                                      .small_white()),
+                                                            )
+                                                          ],
+                                                        ),
+                                                      ],
+                                                    )
+                                                  : Text(
                                                       overflow:
                                                           TextOverflow.ellipsis,
                                                       'Rp ${NumberFormat('#,###').format(
                                                         paketproduk[index]
                                                             .harga_jual_paket!,
                                                       )}',
-                                                      style: TextStyle(
-                                                          decoration:
-                                                              TextDecoration
-                                                                  .lineThrough,
-                                                          fontSize: 8),
+                                                      style: AppFont.small(),
                                                     ),
-                                                    Row(
-                                                      children: [
-                                                        Text(
-                                                          'Rp. ' +
-                                                              AppFormat()
-                                                                  .numFormat(
-                                                                paketproduk[index]
-                                                                        .harga_jual_paket! -
-                                                                    paketproduk[
-                                                                            index]
-                                                                        .diskon!,
-                                                              ),
-                                                          style:
-                                                              AppFont.small(),
-                                                        ),
-                                                        Container(
-                                                          padding:
-                                                              EdgeInsets.all(3),
-                                                          margin:
-                                                              EdgeInsets.only(
-                                                                  left: 5),
-                                                          decoration: BoxDecoration(
-                                                              color:
-                                                                  Colors.green,
-                                                              borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          5)),
-                                                          child: Text(
-                                                              (paketproduk[index]
-                                                                              .diskon! /
-                                                                          paketproduk[index]
-                                                                              .harga_jual_paket! *
-                                                                          100)
-                                                                      .toStringAsFixed(
-                                                                          0) +
-                                                                  '%',
-                                                              style: AppFont
-                                                                  .small_white()),
-                                                        )
-                                                      ],
+                                              // Text(
+                                              //   paketproduk[index].hitungStock == 1
+                                              //       ? 'Stock'
+                                              //       : 'Nonstock',
+                                              //   style: AppFont.small(),
+                                              // ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              )
+                            : GestureDetector(
+                                onTap: () {
+                                  Get.toNamed('/detailpaketproduk',
+                                      arguments: paketproduk[index]);
+                                },
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[300],
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black.withOpacity(0.1),
+                                        // Shadow color
+                                        spreadRadius: 1,
+                                        // Spread radius
+                                        blurRadius: 5,
+                                        // Blur radius
+                                        offset: Offset(2,
+                                            3), // Changes the position of the shadow
+                                      ),
+                                    ],
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      Container(
+                                        color: Colors.grey[300],
+
+                                        // color: Colors.purpleAccent,
+                                        height: 85,
+                                        width: context.res_width,
+                                        child:
+                                            paketproduk[index].gambar_utama !=
+                                                        '' &&
+                                                    paketproduk[index]
+                                                            .gambar_utama !=
+                                                        null
+                                                ? controller.isBase64Svg(
+                                                        paketproduk[index]
+                                                            .gambar_utama!)
+                                                    ? SvgPicture.memory(
+                                                        base64Decode(
+                                                            paketproduk[index]
+                                                                .gambar_utama!),
+                                                        width: 60,
+                                                        height: 70,
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                    : Image.memory(
+                                                        base64Decode(
+                                                            paketproduk[index]
+                                                                .gambar_utama!),
+                                                        width: 60,
+                                                        height: 70,
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                : Image.asset(
+                                                    AppString.defaultImg,
+                                                    width: 60,
+                                                    height: 70,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                      ),
+                                      Expanded(
+                                        child: Container(
+                                          padding: EdgeInsets.all(15),
+                                          width: context.res_width,
+                                          //height: context.res_height * 0.1,
+                                          decoration: BoxDecoration(
+                                              color: Colors.grey[300],
+                                              borderRadius: BorderRadius.only(
+                                                  topLeft: Radius.circular(0),
+                                                  topRight: Radius.circular(0),
+                                                  bottomLeft:
+                                                      Radius.circular(20),
+                                                  bottomRight:
+                                                      Radius.circular(20))),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.start,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                overflow: TextOverflow.ellipsis,
+                                                paketproduk[index].nama_paket!,
+                                                style: AppFont.regular_bold(),
+                                              ),
+                                              Text(
+                                                overflow: TextOverflow.ellipsis,
+                                                'Nonaktif',
+                                                style: TextStyle(
+                                                    color: Colors.red),
+                                              ),
+                                              Align(
+                                                alignment:
+                                                    Alignment.centerRight,
+                                                child: DropdownButton2(
+                                                  hint: Text('Pilih tampilan'),
+                                                  customButton: const FaIcon(
+                                                    FontAwesomeIcons.list,
+                                                    // color: Colors.white,
+                                                    size: 20,
+                                                  ),
+                                                  items: [
+                                                    ...MenuItems.firstItems.map(
+                                                      (item) =>
+                                                          DropdownMenuItem<
+                                                              MenuItem>(
+                                                        value: item,
+                                                        child:
+                                                            MenuItems.buildItem(
+                                                                item),
+                                                      ),
+                                                    ),
+                                                    const DropdownMenuItem<
+                                                            Divider>(
+                                                        enabled: false,
+                                                        child: Divider()),
+                                                    ...MenuItems.secondItems
+                                                        .map(
+                                                      (item) =>
+                                                          DropdownMenuItem<
+                                                              MenuItem>(
+                                                        value: item,
+                                                        child:
+                                                            MenuItems.buildItem(
+                                                                item),
+                                                      ),
                                                     ),
                                                   ],
-                                                )
-                                              : Text(
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                  'Rp ${NumberFormat('#,###').format(
-                                                    paketproduk[index]
-                                                        .harga_jual_paket!,
-                                                  )}',
-                                                  style: AppFont.small(),
-                                                ),
-                                          // Text(
-                                          //   paketproduk[index].hitungStock == 1
-                                          //       ? 'Stock'
-                                          //       : 'Nonstock',
-                                          //   style: AppFont.small(),
-                                          // ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
-                        : GestureDetector(
-                            onTap: () {
-                              Get.toNamed('/detailpaketproduk',
-                                  arguments: paketproduk[index]);
-                            },
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: Colors.grey[300],
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.1),
-                                    // Shadow color
-                                    spreadRadius: 1,
-                                    // Spread radius
-                                    blurRadius: 5,
-                                    // Blur radius
-                                    offset: Offset(2,
-                                        3), // Changes the position of the shadow
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    color: Colors.grey[300],
-
-                                    // color: Colors.purpleAccent,
-                                    height: 85,
-                                    width: context.res_width,
-                                    child: paketproduk[index].gambar_utama !=
-                                                '' &&
-                                            paketproduk[index].gambar_utama !=
-                                                null
-                                        ? controller.isBase64Svg(
-                                                paketproduk[index]
-                                                    .gambar_utama!)
-                                            ? SvgPicture.memory(
-                                                base64Decode(paketproduk[index]
-                                                    .gambar_utama!),
-                                                width: 60,
-                                                height: 70,
-                                                fit: BoxFit.cover,
-                                              )
-                                            : Image.memory(
-                                                base64Decode(paketproduk[index]
-                                                    .gambar_utama!),
-                                                width: 60,
-                                                height: 70,
-                                                fit: BoxFit.cover,
-                                              )
-                                        : Image.asset(
-                                            AppString.defaultImg,
-                                            width: 60,
-                                            height: 70,
-                                            fit: BoxFit.cover,
-                                          ),
-                                  ),
-                                  Expanded(
-                                    child: Container(
-                                      padding: EdgeInsets.all(15),
-                                      width: context.res_width,
-                                      //height: context.res_height * 0.1,
-                                      decoration: BoxDecoration(
-                                          color: Colors.grey[300],
-                                          borderRadius: BorderRadius.only(
-                                              topLeft: Radius.circular(0),
-                                              topRight: Radius.circular(0),
-                                              bottomLeft: Radius.circular(20),
-                                              bottomRight:
-                                                  Radius.circular(20))),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            overflow: TextOverflow.ellipsis,
-                                            paketproduk[index].nama_paket!,
-                                            style: AppFont.regular_bold(),
-                                          ),
-                                          Text(
-                                            overflow: TextOverflow.ellipsis,
-                                            'Nonaktif',
-                                            style: TextStyle(color: Colors.red),
-                                          ),
-                                          Align(
-                                            alignment: Alignment.centerRight,
-                                            child: DropdownButton2(
-                                              hint: Text('Pilih tampilan'),
-                                              customButton: const FaIcon(
-                                                FontAwesomeIcons.list,
-                                                // color: Colors.white,
-                                                size: 20,
-                                              ),
-                                              items: [
-                                                ...MenuItems.firstItems.map(
-                                                  (item) => DropdownMenuItem<
-                                                      MenuItem>(
-                                                    value: item,
-                                                    child: MenuItems.buildItem(
-                                                        item),
+                                                  // onChanged: (value) {
+                                                  //   MenuItems.onChanged(
+                                                  //       context,
+                                                  //       value! as MenuItem,
+                                                  //       controller,
+                                                  //       paketproduk[index]);
+                                                  // },
+                                                  dropdownStyleData:
+                                                      DropdownStyleData(
+                                                    width: 160,
+                                                    padding: const EdgeInsets
+                                                        .symmetric(vertical: 5),
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              4),
+                                                    ),
+                                                    offset: const Offset(0, 8),
+                                                  ),
+                                                  menuItemStyleData:
+                                                      MenuItemStyleData(
+                                                    customHeights: [
+                                                      ...List<double>.filled(
+                                                          MenuItems.firstItems
+                                                              .length,
+                                                          48),
+                                                      8,
+                                                      ...List<double>.filled(
+                                                          MenuItems.secondItems
+                                                              .length,
+                                                          48),
+                                                    ],
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 16,
+                                                            right: 16),
                                                   ),
                                                 ),
-                                                const DropdownMenuItem<Divider>(
-                                                    enabled: false,
-                                                    child: Divider()),
-                                                ...MenuItems.secondItems.map(
-                                                  (item) => DropdownMenuItem<
-                                                      MenuItem>(
-                                                    value: item,
-                                                    child: MenuItems.buildItem(
-                                                        item),
-                                                  ),
-                                                ),
-                                              ],
-                                              // onChanged: (value) {
-                                              //   MenuItems.onChanged(
-                                              //       context,
-                                              //       value! as MenuItem,
-                                              //       controller,
-                                              //       paketproduk[index]);
-                                              // },
-                                              dropdownStyleData:
-                                                  DropdownStyleData(
-                                                width: 160,
-                                                padding:
-                                                    const EdgeInsets.symmetric(
-                                                        vertical: 5),
-                                                decoration: BoxDecoration(
-                                                  borderRadius:
-                                                      BorderRadius.circular(4),
-                                                ),
-                                                offset: const Offset(0, 8),
                                               ),
-                                              menuItemStyleData:
-                                                  MenuItemStyleData(
-                                                customHeights: [
-                                                  ...List<double>.filled(
-                                                      MenuItems
-                                                          .firstItems.length,
-                                                      48),
-                                                  8,
-                                                  ...List<double>.filled(
-                                                      MenuItems
-                                                          .secondItems.length,
-                                                      48),
-                                                ],
-                                                padding: const EdgeInsets.only(
-                                                    left: 16, right: 16),
-                                              ),
-                                            ),
+                                            ],
                                           ),
-                                        ],
+                                        ),
                                       ),
-                                    ),
+                                    ],
                                   ),
-                                ],
-                              ),
-                            ),
-                          );
-                  });
+                                ),
+                              );
+                      }),
+                );
         }),
       ),
     );

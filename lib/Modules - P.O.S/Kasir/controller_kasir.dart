@@ -44,6 +44,10 @@ class KasirController extends GetxController {
     super.onInit();
     print('Kasir CON INIt--------------------------------->');
     uuid.value = box.read('uuid', fallback: 'null');
+    Get.find<CentralProdukController>()
+        .fetchProdukLocal(id_toko: uuid.value, isAktif: true);
+    Get.find<CentralPaketController>()
+        .fetchPaketLocal(id_toko: uuid.value, isAktif: true);
     rolevalue = box.read('karyawan_role', fallback: 'null');
     namaKaryawan.value = box.read('karyawan_nama', fallback: 'null');
     karyawanvalue = box.read('karyawan_id', fallback: 'null');
@@ -52,9 +56,8 @@ class KasirController extends GetxController {
     print(box.read('karyawan_nama', fallback: null));
     // await getKaryawan();
 
-    await fetchPromo(id_toko: id_toko);
-    await Get.find<CentralPelangganController>()
-        .fetchPelangganLocal(id_toko: id_toko);
+    //await fetchPromo(id_toko: id_toko);
+
     namatoko.value = box.read('user_business_name', fallback: 'Default Toko');
     namaKaryawan.value =
         box.read('karyawan_nama', fallback: 'Default karyawan');
@@ -1058,10 +1061,13 @@ class KasirController extends GetxController {
   var pelangganvalue = ''.obs;
   var namaPelanggan = ''.obs;
 
+  //TODO; check search/sort via central controller
+
   popListPelanggan() async {
     var con = Get.find<CentralPelangganController>();
+    var fetch = await con.fetchPelangganLocal(id_toko: id_toko, isAktif: true);
     print('fetch pelanggan pop');
-    con.fetchPelangganLocal(id_toko: id_toko);
+
     con.pelangganList.refresh();
     //Get.put(PromoController());
     Get.dialog(SheetViewport(
@@ -1194,6 +1200,8 @@ class KasirController extends GetxController {
   var namaPromo = ''.obs;
 
   popListPromo() async {
+    var con = Get.find<CentralPromoController>();
+    var fetch = await con.fetchPromoKasir(id_toko: id_toko);
     Get.dialog(SheetViewport(
         child: Sheet(
       scrollConfiguration: SheetScrollConfiguration(),
@@ -1246,11 +1254,11 @@ class KasirController extends GetxController {
                 ),
                 Obx(() {
                   return Expanded(
-                    child: promolist.isNotEmpty
+                    child: con.promo.isNotEmpty
                         ? ListView.builder(
-                            itemCount: promolist.length,
+                            itemCount: con.promo.length,
                             itemBuilder: (context, index) {
-                              final promo = promolist;
+                              final promo = con.promo;
 
                               return Column(children: [
                                 GestureDetector(
@@ -2048,9 +2056,15 @@ class KasirController extends GetxController {
 
     // 3) Check against stock
     final lacking = <String>[];
+    final inactive = <String>[];
     for (var detail in produkinpackage) {
       final pid = detail.id_produk.toString();
       final local = productsById[pid];
+
+      if (local != null && local.tampilkan_di_produk == 0) {
+        inactive.add(local.nama_produk ?? '');
+      }
+
       if (local != null && local.hitung_stok == 1) {
         final need = reserved[pid]!;
         final have = local.qty! - local.info_stok_habis!;
@@ -2059,6 +2073,15 @@ class KasirController extends GetxController {
           lacking.add('${local.nama_produk}: perlu $need, sisa $stock');
         }
       }
+    }
+
+    if (inactive.isNotEmpty) {
+      Get.snackbar(
+        'Produk tidak aktif :',
+        inactive.join(', '), // <-- all product names
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
     }
 
     if (lacking.isNotEmpty) {
@@ -2217,11 +2240,18 @@ class KasirController extends GetxController {
 
     // 3) Check against stock
     final lacking = <String>[];
+    final inactive = <String>[];
     for (var detail in produkinpackage) {
       final pid = detail.id_produk.toString();
       final local = productsById[pid];
 
-      if (local != null && local.hitung_stok == 1) {
+      if (local != null && local.tampilkan_di_produk == 0) {
+        inactive.add(local.nama_produk ?? '');
+      }
+
+      if (local != null &&
+          local.hitung_stok == 1 &&
+          local.tampilkan_di_produk == 1) {
         final need = reserved[pid]!;
         final have = local.qty! - local.info_stok_habis!;
 
@@ -2230,6 +2260,16 @@ class KasirController extends GetxController {
           lacking.add('${local.nama_produk}: perlu $need, sisa $stock');
         }
       }
+    }
+
+    // 2) Show snackbar if inactive products exist
+    if (inactive.isNotEmpty) {
+      Get.snackbar(
+        'Produk tidak aktif :',
+        inactive.join(', '), // <-- all product names
+        snackPosition: SnackPosition.BOTTOM,
+      );
+      return;
     }
 
     if (lacking.isNotEmpty) {

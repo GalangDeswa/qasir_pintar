@@ -41,9 +41,23 @@ class EditPaketProdukController extends GetxController {
     pajakdisplay.value = data.pajak != null ? true : false;
     pajakValue = data.pajak ?? null;
     tampilkanDiProduk.value = data.tampilkan_di_paket == 1 ? true : false;
-    harga_hpp.value = data.hpp ?? 0;
-    harga_modal.value = data.harga_modal ?? 0;
+    harga_hpp.value = data.hpp ?? 0.0;
+    harga_modal.value = data.harga_modal ?? 0.0;
+    diskon.value.text = AppFormat().numFormat(data.diskon!);
+    diskonvalue.value = data.diskon ?? 0.0;
+    showdiskon.value = data.diskon != 0.0 ? true : false;
+    if (opsidiskon.isNotEmpty) {
+      selecteddiskon.value = opsidiskon[0]; // Default to first option (Rp.)
+    }
   }
+
+  var selecteddiskon = ''.obs;
+  var diskonnominal = 0.0.obs;
+  var diskonvalue = 0.0.obs;
+  var diskonpersen = 0.0.obs;
+  var diskon = TextEditingController().obs;
+  var opsidiskon = ['Rp.', '%'].obs;
+  var showdiskon = false.obs;
 
   void deleteImage() {
     // Reset the picked image file
@@ -633,6 +647,7 @@ class EditPaketProdukController extends GetxController {
     nama_paket,
     harga_modal,
     tampilkan_di_paket,
+    diskon,
   }) {
     var map = <String, dynamic>{};
 
@@ -646,6 +661,7 @@ class EditPaketProdukController extends GetxController {
     map['nama_paket'] = nama_paket;
     map['harga_modal'] = harga_modal;
     map['tampilkan_di_paket'] = tampilkan_di_paket;
+    map['diskon'] = diskon;
 
     return map;
   }
@@ -686,9 +702,14 @@ class EditPaketProdukController extends GetxController {
           harga_jual_paket:
               double.parse(hargaJualPaket.value.text.replaceAll(',', '')),
           gambar_utama: image64,
-          pajak: pajakdisplay == 1 ? pajakValue : null,
+          pajak: pajakdisplay.value == true ? pajakValue : null,
           nama_paket: namaPaket.value.text,
           harga_modal: double.parse(hargaModal.value.text.replaceAll(',', '')),
+          diskon: selecteddiskon.value == 'Rp.'
+              ? diskonvalue.value
+              : (double.parse(hargaJualPaket.value.text.replaceAll(',', '')) *
+                  diskonvalue.value /
+                  100),
         ));
     if (paket == 1) {
       for (DataProdukTemp detailPaketlist in produktemp) {
