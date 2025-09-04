@@ -313,7 +313,7 @@ class toast {
       backgroundColor: Colors.orange,
       borderRadius: 20,
       margin: EdgeInsets.all(15),
-      duration: Duration(seconds: 1),
+      duration: Duration(seconds: 5),
       isDismissible: true,
       dismissDirection: DismissDirection.horizontal,
       forwardAnimationCurve: Curves.elasticInOut,
@@ -828,7 +828,7 @@ class DashedBorderPainter extends CustomPainter {
 class customDropdownField extends StatelessWidget {
   final String hintText;
   final String? value;
-  final List<String> items;
+  final List<DropdownMenuItem<String>>? items;
   final Function(String?) onChanged;
   final String? Function(String?)? validator;
 
@@ -868,12 +868,7 @@ class customDropdownField extends StatelessWidget {
               ),
               hint: Text(hintText),
               value: value,
-              items: items
-                  .map((x) => DropdownMenuItem(
-                        value: x,
-                        child: Text(x),
-                      ))
-                  .toList(),
+              items: items,
               onChanged: onChanged,
             ),
           ),
@@ -891,6 +886,8 @@ class customTextField extends StatelessWidget {
   final bool? readOnly;
   final Function(String?)? onChanged;
   final List<TextInputFormatter>? inputFormatters;
+  final Widget? prefixIcon;
+  final String? hintText;
 
   const customTextField({
     super.key,
@@ -901,6 +898,8 @@ class customTextField extends StatelessWidget {
     this.readOnly,
     this.onChanged,
     this.inputFormatters,
+    this.prefixIcon,
+    this.hintText,
   });
 
   @override
@@ -914,6 +913,8 @@ class customTextField extends StatelessWidget {
         readOnly: readOnly ?? false,
         controller: controller,
         decoration: InputDecoration(
+          hintText: hintText,
+          prefixIcon: prefixIcon,
           labelText: labelText,
           labelStyle: AppFont.regular(),
           border: OutlineInputBorder(

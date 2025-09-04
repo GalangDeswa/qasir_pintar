@@ -4,9 +4,11 @@ import 'package:qasir_pintar/Modules - P.O.S/Base%20menu/controller_basemenu.dar
 import 'package:qasir_pintar/Modules - P.O.S/Kasir/controller_kasir.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Pelanggan/List%20Pelanggan/controller_pelanggan.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Users/controller_user.dart';
+import 'package:qasir_pintar/Services/Handler.dart';
 
 import '../../Controllers/printerController.dart';
 import '../Kasir - Pembayaran/controller_pembayaran.dart';
+import '../Produk/Paket produk/add/controller_addpaketproduk.dart';
 import '../pengaturan/controller_pengaturan.dart';
 
 class BasemenuBinding extends Bindings {
@@ -55,8 +57,13 @@ class BasemenuBinding extends Bindings {
         () => CentralPenerimaanController(),
         fenix: true);
 
+    Get.lazyPut<TambahPaketProdukController>(
+        () => TambahPaketProdukController(),
+        fenix: true);
+
     Get.lazyPut<PengaturanController>(() => PengaturanController());
     Get.lazyPut<UserController>(() => UserController());
+    Get.put(API(), permanent: true);
 
     // Get.lazyPut<CentralProdukController>(() => CentralProdukController(),
     //     fenix: true);

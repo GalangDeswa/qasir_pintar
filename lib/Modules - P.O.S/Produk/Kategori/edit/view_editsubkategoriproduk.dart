@@ -27,61 +27,33 @@ class EditSubKategoriProduk extends GetView<EditSubKategoriProdukController> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: DropdownButtonFormField2(
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        validator: (value) {
-                          if (value == null) {
-                            return 'Sub Kategori dipilih';
-                          }
-                          return null;
-                        },
-                        isExpanded: true,
-                        dropdownStyleData: DropdownStyleData(
-                            decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                color: Colors.white)),
-                        hint: Text('Sub Kategori', style: AppFont.regular()),
-                        value: controller.kategorivalue,
-                        items: controller.kategoriprodukList.map((x) {
-                          return DropdownMenuItem(
-                            child: Text(x.namakelompok!),
-                            value: x.uuid,
-                          );
-                        }).toList(),
-                        onChanged: (val) {
-                          print('asdasdasdasd');
-                          controller.kategorivalue = val;
-                          print(controller.kategorivalue);
-                        },
-                      ),
+                    return customDropdownField(
+                      hintText: 'Kategori produk',
+                      items: controller.kategoriprodukList.map((x) {
+                        return DropdownMenuItem(
+                          child: Text(x.namakelompok!),
+                          value: x.uuid,
+                        );
+                      }).toList(),
+                      value: controller.kategorivalue,
+                      onChanged: (val) {
+                        controller.kategorivalue = val;
+                        print(controller.kategorivalue);
+                      },
                     );
                   }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.nama.value,
-                        decoration: InputDecoration(
-                          labelText: 'Sub Kategori Produk',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Kategori harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
+
+                  //TODO custom fom pajak dll
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Sub kategori harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.nama.value,
+                      keyboardType: TextInputType.text,
+                      labelText: 'Sub kategori produk'),
                   Obx(() {
                     return Padding(
                       padding: AppPading.customBottomPadding(),

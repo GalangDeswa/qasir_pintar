@@ -6,137 +6,6 @@ import 'package:qasir_pintar/Config/config.dart';
 import '../../../../Widget/widget.dart';
 import 'controller_addproduk.dart';
 
-// class TambahGambarProduk extends GetView<TambahProdukController> {
-//
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: AppBar(
-//         title: Text('Tambah Gambar Produk'),
-//       ),
-//       body: Padding(
-//         padding: const EdgeInsets.all(16.0),
-//         child: Form(
-//           key: controller.formKey,
-//           child: Column(
-//             children: [
-//               Obx(() {
-//                 return Padding(
-//                   padding: const EdgeInsets.only(bottom: 16.0),
-//                   child: TextFormField(
-//                     controller: controller.id.value,
-//                     decoration: InputDecoration(
-//                       labelText: 'ID',
-//                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-//                     ),
-//                     keyboardType: TextInputType.number,
-//                     validator: (value) {
-//                       if (value!.isEmpty) {
-//                         return 'ID harus diisi';
-//                       }
-//                       return null;
-//                     },
-//                   ),
-//                 );
-//               }),
-//               Obx(() {
-//                 return Padding(
-//                   padding: const EdgeInsets.only(bottom: 16.0),
-//                   child: TextFormField(
-//                     controller: controller.uuid.value,
-//                     decoration: InputDecoration(
-//                       labelText: 'UUID',
-//                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-//                     ),
-//                     validator: (value) {
-//                       if (value!.isEmpty) {
-//                         return 'UUID harus diisi';
-//                       }
-//                       return null;
-//                     },
-//                   ),
-//                 );
-//               }),
-//               Obx(() {
-//                 return Padding(
-//                   padding: const EdgeInsets.only(bottom: 16.0),
-//                   child: TextFormField(
-//                     controller: controller.idToko.value,
-//                     decoration: InputDecoration(
-//                       labelText: 'ID Toko',
-//                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-//                     ),
-//                     validator: (value) {
-//                       if (value!.isEmpty) {
-//                         return 'ID Toko harus diisi';
-//                       }
-//                       return null;
-//                     },
-//                   ),
-//                 );
-//               }),
-//               Obx(() {
-//                 return Padding(
-//                   padding: const EdgeInsets.only(bottom: 16.0),
-//                   child: TextFormField(
-//                     controller: controller.idProduk.value,
-//                     decoration: InputDecoration(
-//                       labelText: 'ID Produk',
-//                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-//                     ),
-//                     validator: (value) {
-//                       if (value!.isEmpty) {
-//                         return 'ID Produk harus diisi';
-//                       }
-//                       return null;
-//                     },
-//                   ),
-//                 );
-//               }),
-//               Obx(() {
-//                 return Padding(
-//                   padding: const EdgeInsets.only(bottom: 16.0),
-//                   child: TextFormField(
-//                     controller: controller.gambar.value,
-//                     decoration: InputDecoration(
-//                       labelText: 'Gambar URL',
-//                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-//                     ),
-//                     validator: (value) {
-//                       if (value!.isEmpty) {
-//                         return 'Gambar URL harus diisi';
-//                       }
-//                       return null;
-//                     },
-//                   ),
-//                 );
-//               }),
-//               Obx(() {
-//                 return SwitchListTile(
-//                   title: Text('Aktif'),
-//                   value: controller.aktif.value,
-//                   onChanged: (bool value) {
-//                     controller.aktif.value = value;
-//                   },
-//                 );
-//               }),
-//               ElevatedButton(
-//                 onPressed: () {
-//                   if (controller.formKey.currentState!.validate()) {
-//                     controller.tambahGambarProduk();
-//                   }
-//                 },
-//                 child: Text('Tambah'),
-//               ),
-//             ],
-//           ),
-//         ),
-//       ),
-//     );
-//   }
-// }
-
 class TambahHargaJualProduk extends GetView<TambahProdukController> {
   @override
   Widget build(BuildContext context) {
@@ -304,46 +173,38 @@ class TambahPajakProduk extends GetView<TambahProdukController> {
           key: controller.pajakkey.value,
           child: Column(
             children: [
-              Obx(() {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: TextFormField(
-                    controller: controller.namaPajak.value,
-                    decoration: InputDecoration(
-                      labelText: 'Nama Pajak',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Nama Pajak harus diisi';
-                      }
-                      return null;
-                    },
-                  ),
-                );
-              }),
-              Obx(() {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: TextFormField(
-                    controller: controller.nominalPajak.value,
-                    decoration: InputDecoration(
-                      prefixIcon: Icon(Icons.percent),
-                      labelText: 'Nominal Pajak',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
-                    keyboardType: TextInputType.number,
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Nominal Pajak harus diisi';
-                      }
-                      return null;
-                    },
-                  ),
-                );
-              }),
+              customTextField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Nama pajak harus disini';
+                    }
+                    return null;
+                  },
+                  controller: controller.namaPajak.value,
+                  keyboardType: TextInputType.text,
+                  labelText: 'Nama pajak'),
+              customTextField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'nominal pajak harus disini';
+                    }
+                    if (double.tryParse(value) == null) {
+                      return 'nominal pajak harus angka';
+                    }
+                    if (double.parse(value) <= 0) {
+                      return 'nominal pajak harus lebih dari 0';
+                    }
+                    if (double.parse(value) > 100) {
+                      return 'nominal pajak harus kurang dari 100';
+                    }
+
+                    return null;
+                  },
+                  controller: controller.nominalPajak.value,
+                  hintText: '10%',
+                  keyboardType: TextInputType.number,
+                  prefixIcon: Icon(Icons.percent),
+                  labelText: 'Nominal pajak'),
               button_solid_custom(
                   onPressed: () {
                     if (controller.pajakkey.value.currentState!.validate()) {
@@ -371,25 +232,15 @@ class TambahUkuranProduk extends GetView<TambahProdukController> {
           key: controller.ukurankey.value,
           child: Column(
             children: [
-              Obx(() {
-                return Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
-                  child: TextFormField(
-                    controller: controller.ukuranProduk.value,
-                    decoration: InputDecoration(
-                      labelText: 'Ukuran',
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                    ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Ukuran harus diisi';
-                      }
-                      return null;
-                    },
-                  ),
-                );
-              }),
+              customTextField(
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Ukuran harus disini';
+                    }
+                    return null;
+                  },
+                  controller: controller.ukuranProduk.value,
+                  labelText: 'Ukuran'),
               button_solid_custom(
                   onPressed: () {
                     if (controller.ukurankey.value.currentState!.validate()) {

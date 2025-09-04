@@ -2,12 +2,17 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:group_button/group_button.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meta/meta.dart';
 import 'package:pattern_formatter/numeric_formatter.dart';
@@ -27,7 +32,10 @@ import '../../Widget/widget.dart';
 import '../Base menu/controller_basemenu.dart';
 import '../Kasir - Rincian Pembayaran/view_rincianpembayaran.dart';
 import '../Pelanggan/List Pelanggan/model_pelanggan.dart';
+import '../Pelanggan/List kategori pelanggan/controller_kategoripelanggan.dart';
 import '../Pelanggan/List kategori pelanggan/model_kategoriPelanggan.dart';
+import '../Pelanggan/Tambah Pelanggan/controller_tambahpelanggan.dart';
+import '../Pelanggan/Tambah Pelanggan/view_tambahpelanggan.dart';
 import '../Produk/Data produk/model_produk.dart';
 import '../Produk/Kategori/model_subkategoriproduk.dart';
 import '../Produk/Produk/model_kategoriproduk.dart';
@@ -306,9 +314,15 @@ class KasirController extends GetxController {
                 children: [
                   Padding(
                     padding: AppPading.customBottomPadding(),
-                    child: Text(
-                      'Keranjang Tersimpan',
-                      style: AppFont.regular_bold(),
+                    child: Container(
+                      padding: EdgeInsets.all(10),
+                      decoration: BoxDecoration(
+                          color: AppColor.primary,
+                          borderRadius: BorderRadius.circular(10)),
+                      child: Text(
+                        ' Keranjang Tersimpan',
+                        style: AppFont.regular_white_bold(),
+                      ),
                     ),
                   ),
                   Expanded(
@@ -317,129 +331,140 @@ class KasirController extends GetxController {
                         itemBuilder: (context, index) {
                           var cart = savedCart[index];
 
-                          return ExpansionTile(
-                            trailing: IconButton(
-                              onPressed: () async {
-                                print('add saved cart');
+                          return Column(
+                            children: [
+                              ExpansionTile(
+                                trailing: IconButton(
+                                  onPressed: () async {
+                                    print('add saved cart');
 
-                                // 1) FIRST: pull it out of savedCart so your validator won't double‑count it
-                                final restored = savedCart.removeAt(index);
-                                savedCart.refresh();
-                                Get.back();
+                                    // 1) FIRST: pull it out of savedCart so your validator won't double‑count it
+                                    final restored = savedCart.removeAt(index);
+                                    savedCart.refresh();
+                                    Get.back();
 
-                                // 2) THEN: restore all the items
-                                for (final item in restored.item) {
-                                  if (item.qty > 1) {
-                                    for (var i = 0; i < item.qty; i++) {
-                                      addToCart(
-                                          item); // or just addToCart(item) if sync
+                                    // 2) THEN: restore all the items
+                                    for (final item in restored.item) {
+                                      if (item.qty > 1) {
+                                        for (var i = 0; i < item.qty; i++) {
+                                          addToCart(
+                                              item); // or just addToCart(item) if sync
+                                        }
+                                      } else {
+                                        addToCart(item);
+                                      }
                                     }
-                                  } else {
-                                    addToCart(item);
-                                  }
-                                }
 
-                                // 3) Restore all your discount/promo/customer info
-                                jumlahdiskonkasir.value = restored.diskon;
-                                promovalue.value = restored.promoValue;
-                                namaPromo.value = restored.namaPromo;
-                                promolistvalue = restored.promoUUID;
-                                namaPelanggan.value = restored.customerName;
-                                pelangganvalue.value = restored.customerUUID;
-                                metode_diskon.value = restored.metodeDiskon;
-                                displaydiskon.value = restored.displayDiskon;
+                                    // 3) Restore all your discount/promo/customer info
+                                    jumlahdiskonkasir.value = restored.diskon;
+                                    promovalue.value = restored.promoValue;
+                                    namaPromo.value = restored.namaPromo;
+                                    promolistvalue = restored.promoUUID;
+                                    namaPelanggan.value = restored.customerName;
+                                    pelangganvalue.value =
+                                        restored.customerUUID;
+                                    metode_diskon.value = restored.metodeDiskon;
+                                    displaydiskon.value =
+                                        restored.displayDiskon;
 
-                                print('restored discount info for this cart:');
-                                print(' Discount: ${restored.diskon}');
-                                print(' Promo:    ${restored.namaPromo}');
-                                print(' Customer: ${restored.customerName}');
+                                    print(
+                                        'restored discount info for this cart:');
+                                    print(' Discount: ${restored.diskon}');
+                                    print(' Promo:    ${restored.namaPromo}');
+                                    print(
+                                        ' Customer: ${restored.customerName}');
 
-                                // 4) slide the sheet up
-                                kasirsheet.value.animateTo(SheetOffset(1));
-                              },
-                              icon: Icon(FontAwesomeIcons.cartPlus),
-                            ),
-                            title: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  DateFormat('HH:mm dd-MM-yyyy')
-                                      .format(cart.savedAt),
-                                  style: AppFont.regular_bold(),
+                                    // 4) slide the sheet up
+                                    kasirsheet.value.animateTo(SheetOffset(1));
+                                  },
+                                  icon: Icon(FontAwesomeIcons.cartPlus),
                                 ),
-                                Text(
-                                  'Keranjang nomor : ${index + 1}',
-                                  style: AppFont.regular(),
-                                ),
-                              ],
-                            ),
-                            childrenPadding: EdgeInsets.zero,
-                            children: cart.item.map((data) {
-                              print(data);
-                              return Container(
-                                padding: EdgeInsets.all(10),
-                                color: AppColor.primary.withValues(alpha: 0.1),
-                                child: Column(
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text('Produk',
-                                            style: AppFont.regular()),
-                                        Text('subtotal',
-                                            style: AppFont.regular())
-                                      ],
+                                    Text(
+                                      DateFormat('HH:mm dd-MM-yyyy')
+                                          .format(cart.savedAt),
+                                      style: AppFont.regular_bold(),
                                     ),
-                                    Divider(),
-                                    ListTile(
-                                      contentPadding: EdgeInsets.zero,
-                                      trailing: Text(
-                                        (data.isPaket == true
-                                                ? 'Rp. ' +
-                                                    AppFormat().numFormat(
-                                                        data.hargaPaket! *
-                                                            data.qty)
-                                                : 'Rp. ' +
-                                                    AppFormat().numFormat(
-                                                        data.hargaEceran! *
-                                                            data.qty))
-                                            .toString(),
-                                        style: AppFont.regular(),
-                                      ),
-                                      title: data.isPaket == true
-                                          ? Text(
-                                              data.namaPaket!,
-                                              style: AppFont.regular(),
-                                            )
-                                          : Text(
-                                              data.namaProduk!,
-                                              style: AppFont.regular(),
-                                            ),
-                                      subtitle: Row(
-                                        children: [
-                                          Text(
-                                            data.isPaket == true
-                                                ? 'Rp. ' +
-                                                    AppFormat().numFormat(
-                                                        data.hargaPaket)
-                                                : 'Rp. ' +
-                                                    AppFormat().numFormat(
-                                                        data.hargaEceran),
-                                            style: AppFont.regular(),
-                                          ),
-                                          Padding(
-                                            padding: EdgeInsets.only(left: 5),
-                                            child: Text(
-                                                'x ' + data.qty.toString()),
-                                          ),
-                                        ],
-                                      ),
+                                    Text(
+                                      'Keranjang nomor : ${index + 1}',
+                                      style: AppFont.regular(),
                                     ),
                                   ],
                                 ),
-                              );
-                            }).toList(),
+                                childrenPadding: EdgeInsets.zero,
+                                children: cart.item.map((data) {
+                                  print(data);
+                                  return Container(
+                                    padding: EdgeInsets.all(10),
+                                    color:
+                                        AppColor.primary.withValues(alpha: 0.1),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text('Produk',
+                                                style: AppFont.regular()),
+                                            Text('subtotal',
+                                                style: AppFont.regular())
+                                          ],
+                                        ),
+                                        Divider(),
+                                        ListTile(
+                                          contentPadding: EdgeInsets.zero,
+                                          trailing: Text(
+                                            (data.isPaket == true
+                                                    ? 'Rp. ' +
+                                                        AppFormat().numFormat(
+                                                            data.hargaPaket! *
+                                                                data.qty)
+                                                    : 'Rp. ' +
+                                                        AppFormat().numFormat(
+                                                            data.hargaEceran! *
+                                                                data.qty))
+                                                .toString(),
+                                            style: AppFont.regular(),
+                                          ),
+                                          title: data.isPaket == true
+                                              ? Text(
+                                                  data.namaPaket!,
+                                                  style: AppFont.regular(),
+                                                )
+                                              : Text(
+                                                  data.namaProduk!,
+                                                  style: AppFont.regular(),
+                                                ),
+                                          subtitle: Row(
+                                            children: [
+                                              Text(
+                                                data.isPaket == true
+                                                    ? 'Rp. ' +
+                                                        AppFormat().numFormat(
+                                                            data.hargaPaket)
+                                                    : 'Rp. ' +
+                                                        AppFormat().numFormat(
+                                                            data.hargaEceran),
+                                                style: AppFont.regular(),
+                                              ),
+                                              Padding(
+                                                padding:
+                                                    EdgeInsets.only(left: 5),
+                                                child: Text(
+                                                    'x ' + data.qty.toString()),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                              Divider(),
+                            ],
                           );
                         }),
                   ),
@@ -521,13 +546,14 @@ class KasirController extends GetxController {
   }
 
   hitungpromo() {
+    var con = Get.find<CentralPromoController>();
     if (namaPromo.value == '') {
       print('tidak ada nama promo');
       promovalue.value = 0.0;
       return;
     }
     print('hitung prom new----->');
-    var p = promolist.where((x) => x.uuid == promolistvalue).first;
+    var p = con.promo.where((x) => x.uuid == promolistvalue).first;
     print(p.promoNominal.toString() + '----' + p.promoPersen.toString());
 
     if (p.promoNominal == 0.0) {
@@ -780,7 +806,7 @@ class KasirController extends GetxController {
 
   addbayar(double x) {
     if (bayar.value.text.isEmpty) {
-      bayar.value.text = x.toString();
+      bayar.value.text = AppFormat().numFormat(x);
       bayarvalue.value = x;
     } else {
       var sum = bayarvalue.value + x;
@@ -1058,14 +1084,34 @@ class KasirController extends GetxController {
     )));
   }
 
+  popAddPelanggan() {
+    // Get.put(TambahPromoController());
+    // Get.put(PromoController());
+    Get.dialog(SheetViewport(
+        child: Sheet(
+      scrollConfiguration: SheetScrollConfiguration(),
+      initialOffset: const SheetOffset(0.5),
+      physics: BouncingSheetPhysics(),
+      snapGrid: MultiSnapGrid(snaps: [SheetOffset(0.5), SheetOffset(1)]),
+      child: Material(
+          color: Colors.white,
+          child: Container(
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(10),
+                      topRight: Radius.circular(10))),
+              padding: AppPading.defaultBodyPadding(),
+              height: Get.height,
+              child: TambahPelangganPembayaran())),
+    )));
+  }
+
   var pelangganvalue = ''.obs;
   var namaPelanggan = ''.obs;
 
-  //TODO; check search/sort via central controller
-
   popListPelanggan() async {
     var con = Get.find<CentralPelangganController>();
-    var fetch = await con.fetchPelangganLocal(id_toko: id_toko, isAktif: true);
+    await con.fetchPelangganLocal(id_toko: id_toko, isAktif: true);
     print('fetch pelanggan pop');
 
     con.pelangganList.refresh();
@@ -1095,7 +1141,8 @@ class KasirController extends GetxController {
                           child: TextField(
                             controller: con.search.value,
                             onChanged: (val) {
-                              con.serachPelangganLocal();
+                              con.serachPelangganLocal(
+                                  id_toko: con.id_toko, search: val);
                             },
                             decoration: InputDecoration(
                               hintText: 'Pencarian',
@@ -1112,7 +1159,8 @@ class KasirController extends GetxController {
                                 color: AppColor.primary),
                             child: IconButton(
                                 onPressed: () {
-                                  Get.toNamed('/tambahpelanggan');
+                                  Get.put(TambahPelangganController());
+                                  popAddPelanggan();
                                 },
                                 icon: Icon(
                                   Icons.add,
@@ -1201,7 +1249,7 @@ class KasirController extends GetxController {
 
   popListPromo() async {
     var con = Get.find<CentralPromoController>();
-    var fetch = await con.fetchPromoKasir(id_toko: id_toko);
+    con.fetchPromoKasir(id_toko: id_toko);
     Get.dialog(SheetViewport(
         child: Sheet(
       scrollConfiguration: SheetScrollConfiguration(),
@@ -1227,7 +1275,8 @@ class KasirController extends GetxController {
                         child: TextField(
                           controller: searchpromo.value,
                           onChanged: (val) {
-                            searchPromoLocal();
+                            con.searchPromoKasir(
+                                id_toko: con.id_toko, search: val);
                           },
                           decoration: InputDecoration(
                             hintText: 'Pencarian',
@@ -1267,16 +1316,20 @@ class KasirController extends GetxController {
                                       promolistvalue = null;
                                       namaPromo.value = '';
                                       hitungPembayaran();
-                                      Navigator.pop(context);
+                                      Get.back();
 
                                       Get.showSnackbar(toast()
                                           .bottom_snackbar_error(
                                               "Berhasil", 'Promo dihapus'));
                                     } else {
+                                      print(promo[index].uuid! +
+                                          '  ' +
+                                          promo[index].namaPromo!);
                                       promolistvalue = promo[index].uuid;
                                       namaPromo.value = promo[index].namaPromo!;
                                       hitungPembayaran();
-                                      Navigator.pop(context);
+                                      //Navigator.pop(context);
+                                      Get.back();
                                       Get.showSnackbar(toast()
                                           .bottom_snackbar_success(
                                               "Berhasil", 'Promo ditambah'));
@@ -1356,6 +1409,7 @@ class KasirController extends GetxController {
   var promopersen = 0.0.obs;
 
   tambahPromo() async {
+    var con = Get.find<CentralPromoController>();
     print('-------------------tambah pelanggan local---------------------');
 
     Get.dialog(showloading(), barrierDismissible: false);
@@ -1375,11 +1429,13 @@ class KasirController extends GetxController {
         ).DB());
 
     if (db != null) {
-      await fetchPromo(id_toko: id_toko);
-      var x = promolist.where((x) => x.uuid == uuid).first;
+      await con.fetchPromo(id_toko: id_toko);
+      await con.fetchPromoKasir(id_toko: id_toko);
+      var x = con.promo.where((x) => x.uuid == uuid).first;
       promolistvalue = x.uuid!;
       namaPromo.value = x.namaPromo!;
       hitungPembayaran();
+      Get.back();
       Get.back();
       Get.back();
       Get.showSnackbar(toast().bottom_snackbar_success('Sukses', 'Berhasil'));
@@ -1637,15 +1693,6 @@ class KasirController extends GetxController {
   popLoginKaryawanUlang() {
     print(
         '<------------------- POP LOGIN KARYAWN Ualng -------------------------->');
-    // await box.remove('karyawan_login');
-    // await box.remove('karyawan_nama');
-    // await box.remove('karyawan_id');
-    // await box.remove('karyawan_role');
-
-    // await box.write('karyawan_login', true);
-    // await box.write('karyawan_id', karyawanvalue);
-    // await box.write('karyawan_nama', namaKaryawan.value);
-    // await box.write('karyawan_role', rolevalue);
 
     var templogin = true;
     var tempkaryawan_nama = namaKaryawan.value;
@@ -2697,6 +2744,316 @@ WHERE
 
   var thumb = false.obs;
   var paketproduk = <DataPaketProduk>[].obs;
+  var image64;
+  File? pickedImageFile;
+  var pikedImagePath = ''.obs;
+  final ImagePicker picker = ImagePicker();
+  List<XFile> images = [];
+  List<String> listimagepath = [];
+  var selectedfilecount = 0.obs;
+
+  Future pickImageGallery() async {
+    try {
+      final image = await ImagePicker().pickImage(
+          source: ImageSource.gallery,
+          imageQuality: 100,
+          maxHeight: 300,
+          maxWidth: 300);
+      if (image == null) return;
+      pickedImageFile = File(image.path);
+      final bytes = File(image!.path).readAsBytesSync();
+      String base64Image = base64Encode(bytes);
+      image64 = base64Image;
+      pikedImagePath.value = pickedImageFile!.path;
+      pickedIconPath.value = '';
+      print(pikedImagePath);
+      Get.back();
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
+
+  var pickedIconPath = ''.obs;
+
+  Future<String> svgToBase64(String assetPath) async {
+    final String svgString = await rootBundle.loadString(assetPath);
+    return base64Encode(utf8.encode(svgString));
+  }
+
+  Future pickImageCamera() async {
+    try {
+      final image = await ImagePicker().pickImage(
+          source: ImageSource.camera,
+          imageQuality: 100,
+          maxHeight: 300,
+          maxWidth: 300);
+      if (image == null) return;
+      pickedImageFile = File(image.path);
+      final bytes = File(image!.path).readAsBytesSync();
+      String base64Image = base64Encode(bytes);
+      image64 = base64Image;
+      //  final temppath = File(image!.path);
+      pikedImagePath.value = pickedImageFile!.path;
+      pickedIconPath.value = '';
+      print(image64);
+      Get.back();
+    } on PlatformException catch (e) {
+      print('Failed to pick image: $e');
+    }
+  }
+
+  pilihIcon(BuildContext context) {
+    final List<String> icons = [
+      'assets/icons/user1.svg',
+      'assets/icons/user2.svg',
+      'assets/icons/user3.svg',
+      'assets/icons/user4.svg',
+      'assets/icons/user5.svg',
+      'assets/icons/user6.svg',
+      'assets/icons/user7.svg',
+      'assets/icons/user8.svg',
+      'assets/icons/user9.svg',
+    ];
+
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Colors.white,
+        contentPadding: const EdgeInsets.all(10),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(
+            Radius.circular(12.0),
+          ),
+        ),
+        content: Container(
+          width: context.res_height / 2,
+          height: context.res_height / 2,
+          child: GridView.builder(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 3, // 3 icons per row
+              crossAxisSpacing: 20,
+              mainAxisSpacing: 20,
+            ),
+            itemCount: icons.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                onTap: () {
+                  // Handle icon selection
+                  _onIconSelected(icons[index]);
+                  Get.back(); // Close the dialog
+                },
+                child: Card(
+                  color: Colors.white,
+                  elevation: 5,
+                  margin: EdgeInsets.all(1),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SvgPicture.asset(
+                      icons[index],
+                      width: 30, // Adjust size as needed
+                      height: 30,
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
+  pilihsourcefoto() {
+    Get.dialog(
+      AlertDialog(
+        backgroundColor: Colors.white,
+        contentPadding: const EdgeInsets.all(20),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.all(Radius.circular(16.0)),
+        ),
+        content: Builder(
+          builder: (context) {
+            return Container(
+              width: context.res_height / 2.6,
+              height: context.res_height / 2.6,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Pilih Sumber Foto",
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.blueAccent,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 20),
+                  Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: button_solid_custom(
+                        onPressed: () {
+                          pickImageGallery();
+                        },
+                        child: Text(
+                          'Galeri',
+                          style: AppFont.regular_white_bold(),
+                        ),
+                        width: context.res_width),
+                  ),
+                  Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: button_solid_custom(
+                        onPressed: () {
+                          pickImageCamera();
+                        },
+                        child:
+                            Text('Kamera', style: AppFont.regular_white_bold()),
+                        width: context.res_width),
+                  ),
+                  Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: button_border_custom(
+                        onPressed: () {
+                          pilihIcon(context);
+                        },
+                        child: Text('Ikon', style: AppFont.regular_bold()),
+                        width: context.res_width),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Future<void> _onIconSelected(String iconPath) async {
+    // Handle the selected icon
+    pikedImagePath.value = '';
+    pickedIconPath.value = iconPath;
+    final String base64Svg = await svgToBase64(iconPath);
+    image64 = base64Svg;
+    print('Base64 SVG: $base64Svg');
+    Get.back();
+
+    // You can store the icon path in a variable or database
+  }
+
+  checkContactPermission() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+    if (androidInfo.version.sdkInt >= 33) {
+      var status = await Permission.contacts.status;
+      print(status);
+      if (!status.isGranted) {
+        await Permission.contacts.request();
+      }
+    } else {
+      var status = await Permission.contacts.status;
+      print(status);
+      if (!status.isGranted) {
+        await Permission.contacts.request();
+      }
+    }
+    return true;
+  }
+
+  Future<void> showPermissionDeniedDialog() async {
+    await Get.dialog(
+      AlertDialog(
+        title: Text('Izin Kontak Diperlukan'),
+        content: Text(
+          'Aplikasi memerlukan akses ke kontak Anda untuk memilih pelanggan. '
+          'Silakan aktifkan izin kontak di pengaturan.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: Text('Batal'),
+          ),
+          TextButton(
+            onPressed: () async {
+              Get.back();
+              await openAppSettings();
+            },
+            child: Text('Buka Pengaturan'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> selectContact() async {
+    try {
+      final contact = await FlutterContacts.openExternalPick();
+      if (contact != null) {
+        // Update your controllers
+        nama.value.text = contact.displayName;
+
+        if (contact.emails.isNotEmpty) {
+          email.value.text = contact.emails.first.address;
+        }
+
+        if (contact.phones.isNotEmpty) {
+          telepon.value.text = contact.phones.first.number;
+        }
+      }
+    } catch (e) {
+      Get.snackbar('Error', 'Gagal memilih kontak: $e');
+    }
+  }
+
+  var tanggal = TextEditingController().obs;
+  DateFormat dateFormat = DateFormat("dd-MM-yyyy");
+  stringdate() {
+    var ff = dateFormat.format(datedata.first!);
+    tanggal.value.text = ff;
+  }
+
+  tambahPelangganLocal() async {
+    var con = Get.find<TambahPelangganController>();
+    print('-------------------tambah pelanggan local---------------------');
+
+    Get.dialog(showloading(), barrierDismissible: false);
+    var uuid = Uuid().v4();
+    var db = await DBHelper().INSERT(
+        'pelanggan',
+        DataPelanggan(
+          uuid: uuid,
+          idToko: id_toko,
+          email: con.email.value.text,
+          alamat: con.alamat.value.text,
+          namaPelanggan: con.nama.value.text,
+          noHp: con.telepon.value.text,
+          tglLahir: con.tanggal.value.text,
+          foto: con.image64,
+          statusPelanggan: 1,
+          idKategori: con.kategorivalue,
+        ).DB());
+
+    if (db != null) {
+      // await Get.find<PelangganController>()
+      //     .fetchPelangganLocal(id_toko: id_toko);
+      await Get.find<CentralPelangganController>()
+          .fetchPelangganLocal(id_toko: id_toko, isAktif: true);
+
+      var conpelanggan = Get.find<CentralPelangganController>();
+      var x =
+          conpelanggan.pelangganList.where((element) => element.uuid == uuid);
+      pelangganvalue.value = x.first.uuid!;
+
+      namaPelanggan.value = x.first.namaPelanggan!;
+      print(pelangganvalue.value);
+      print(namaPelanggan.value);
+      Get.back(closeOverlays: true);
+      Get.showSnackbar(
+          toast().bottom_snackbar_success('Sukses', 'Berhasil registrasi'));
+    } else {
+      Get.back();
+      Get.showSnackbar(toast().bottom_snackbar_error('error', 'gagal'));
+    }
+  }
 }
 
 class TambahPromoPembayaran extends GetView<KasirController> {
@@ -2719,157 +3076,6 @@ class TambahPromoPembayaran extends GetView<KasirController> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Obx(() {
-                  //   return Padding(
-                  //     padding: EdgeInsets.only(bottom: 100, top: 50),
-                  //     child: Row(
-                  //       mainAxisAlignment: MainAxisAlignment.center,
-                  //       crossAxisAlignment: CrossAxisAlignment.center,
-                  //       children: [
-                  //         controller.pikedImagePath.value == '' &&
-                  //             controller.pickedIconPath.value == ''
-                  //             ? Stack(
-                  //           alignment: Alignment.center,
-                  //           children: [
-                  //             Container(
-                  //               width: 120,
-                  //               height: 120,
-                  //               decoration: BoxDecoration(
-                  //                 shape: BoxShape.circle,
-                  //                 color: AppColor.primary,
-                  //               ),
-                  //               child: Icon(
-                  //                 FontAwesomeIcons.image,
-                  //                 color: Colors.white,
-                  //                 size: 55,
-                  //               ),
-                  //             ),
-                  //             Positioned(
-                  //               bottom: 0,
-                  //               right: 0,
-                  //               child: TextButton(
-                  //                 style: TextButton.styleFrom(
-                  //                   shape: CircleBorder(),
-                  //                   padding: EdgeInsets.all(8),
-                  //                   backgroundColor: AppColor.secondary,
-                  //                 ),
-                  //                 onPressed: () async {
-                  //                   DeviceInfoPlugin deviceInfo =
-                  //                   DeviceInfoPlugin();
-                  //                   AndroidDeviceInfo androidInfo =
-                  //                   await deviceInfo.androidInfo;
-                  //                   if (androidInfo.version.sdkInt >=
-                  //                       33) {
-                  //                     var status =
-                  //                     await Permission.camera.status;
-                  //                     if (!status.isGranted) {
-                  //                       await Permission.camera.request();
-                  //                     }
-                  //                   } else {
-                  //                     var status =
-                  //                     await Permission.camera.status;
-                  //                     if (!status.isGranted) {
-                  //                       await Permission.camera.request();
-                  //                     }
-                  //                   }
-                  //
-                  //                   controller.pilihsourcefoto();
-                  //                 },
-                  //                 child: Icon(
-                  //                   Icons.add,
-                  //                   color: Colors.white,
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         )
-                  //             : Stack(
-                  //           alignment: Alignment.center,
-                  //           children: [
-                  //             Container(
-                  //               width: 120,
-                  //               height: 120,
-                  //               decoration: BoxDecoration(
-                  //                 shape: BoxShape.circle,
-                  //                 color: AppColor.primary,
-                  //               ),
-                  //               child: ClipOval(
-                  //                 child: controller.pikedImagePath != ''
-                  //                     ? Image.file(
-                  //                   File(controller
-                  //                       .pickedImageFile!.path),
-                  //                   width: 120,
-                  //                   height: 120,
-                  //                   fit: BoxFit.cover,
-                  //                 )
-                  //                     : SvgPicture.asset(
-                  //                   controller.pickedIconPath.value,
-                  //                   width: 120,
-                  //                   height: 120,
-                  //                   fit: BoxFit.contain,
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //             Positioned(
-                  //               bottom: 0,
-                  //               right: 0,
-                  //               child: TextButton(
-                  //                 style: TextButton.styleFrom(
-                  //                   shape: CircleBorder(),
-                  //                   padding: EdgeInsets.all(8),
-                  //                   backgroundColor: AppColor.secondary,
-                  //                 ),
-                  //                 onPressed: () async {
-                  //                   DeviceInfoPlugin deviceInfo =
-                  //                   DeviceInfoPlugin();
-                  //                   AndroidDeviceInfo androidInfo =
-                  //                   await deviceInfo.androidInfo;
-                  //                   if (androidInfo.version.sdkInt >=
-                  //                       33) {
-                  //                     var status =
-                  //                     await Permission.camera.status;
-                  //                     if (!status.isGranted) {
-                  //                       await Permission.camera.request();
-                  //                     }
-                  //                   } else {
-                  //                     var status =
-                  //                     await Permission.camera.status;
-                  //                     if (!status.isGranted) {
-                  //                       await Permission.camera.request();
-                  //                     }
-                  //                   }
-                  //
-                  //                   controller.pilihsourcefoto();
-                  //                 },
-                  //                 child: FaIcon(
-                  //                   FontAwesomeIcons.pencil,
-                  //                   color: Colors.white,
-                  //                 ),
-                  //               ),
-                  //             ),
-                  //           ],
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   );
-                  // }),
-                  // Padding(
-                  //   padding: AppPading.customBottomPadding(),
-                  //   child: button_border_custom(
-                  //       onPressed: () async {
-                  //         if (await controller.checkContactPermission()) {
-                  //           controller.selectContact();
-                  //         } else {
-                  //           Get.snackbar(
-                  //             'Izin Diperlukan',
-                  //             'Silakan berikan izin akses kontak terlebih dahulu',
-                  //             snackPosition: SnackPosition.BOTTOM,
-                  //           );
-                  //         }
-                  //       },
-                  //       child: Text('Tambah dari kontak'),
-                  //       width: context.res_width),
-                  // ),
                   Obx(() {
                     return Padding(
                       padding: AppPading.customBottomPadding(),
@@ -2892,90 +3098,90 @@ class TambahPromoPembayaran extends GetView<KasirController> {
                   }),
                   Obx(
                     () {
-                      // Update text field when radio changes
-                      final isNominal = controller.selecteddiskon.value ==
-                          controller.opsidiskon[0];
-                      final currentValue = isNominal
-                          ? controller.promonominal.value.toStringAsFixed(0)
-                          : controller.promopersen.value.toStringAsFixed(0);
-
-                      // Update controller text when value changes
-                      if (controller.promo.value.text != currentValue) {
-                        controller.promo.value.text = currentValue;
-                      }
-
                       return Padding(
                         padding: AppPading.customBottomPadding(),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
-                              child: TextFormField(
-                                controller: controller.promo.value,
-                                decoration: InputDecoration(
-                                  prefixIcon: isNominal
-                                      ? const Icon(Icons.money)
-                                      : const Icon(Icons.percent),
-                                  labelText: 'Nilai Promo',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                              child: Obx(() {
+                                return TextFormField(
+                                  inputFormatters: [ThousandsFormatter()],
+                                  controller: controller.promo.value,
+                                  decoration: InputDecoration(
+                                    prefixIcon:
+                                        controller.selecteddiskon.value ==
+                                                controller.opsidiskon[0]
+                                            ? const Icon(Icons.money)
+                                            : const Icon(Icons.percent),
+                                    labelText: 'Nilai Promo',
+                                    border: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                    ),
                                   ),
-                                ),
-                                keyboardType: TextInputType.number,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty)
-                                    return 'Diskon harus diisi';
-                                  final parsed = double.tryParse(value);
-                                  if (parsed == null)
-                                    return 'Masukkan angka valid';
-                                  if (isNominal && parsed <= 0)
-                                    return 'Nominal harus > 0';
-                                  if (!isNominal &&
-                                      (parsed <= 0 || parsed > 100)) {
-                                    return 'Persen harus 1-100';
-                                  }
-                                  return null;
-                                },
-                                onChanged: (value) {
-                                  final parsed = double.tryParse(value);
-                                  if (parsed == null) return;
+                                  keyboardType: TextInputType.number,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty)
+                                      return 'Diskon harus diisi';
+                                    final parsed = double.tryParse(value
+                                        .replaceAll(RegExp(r'[^0-9.]'), ''));
+                                    if (parsed == null)
+                                      return 'Masukkan angka valid';
+                                    if (controller.selecteddiskon.value ==
+                                            controller.opsidiskon[0] &&
+                                        parsed <= 0) {
+                                      return 'Nominal harus > 0';
+                                    }
+                                    if (controller.selecteddiskon.value !=
+                                            controller.opsidiskon[0] &&
+                                        (parsed <= 0 || parsed > 100)) {
+                                      return 'Persen harus 1-100';
+                                    }
+                                    return null;
+                                  },
+                                  onChanged: (value) {
+                                    final cleanValue = value.replaceAll(
+                                        RegExp(r'[^0-9.]'), '');
+                                    final parsed = double.tryParse(cleanValue);
+                                    if (parsed == null) return;
 
-                                  if (isNominal) {
-                                    controller.promopersen.value = 0.0;
-                                    controller.promonominal.value = parsed;
-                                    print('nominal');
-                                    print('nominal --> ' +
-                                        controller.promonominal.value
-                                            .toString() +
-                                        'persen --> ' +
-                                        controller.promopersen.value
-                                            .toString());
-                                  } else {
-                                    controller.promonominal.value = 0.0;
-                                    controller.promopersen.value = parsed;
-                                    print('persen');
-                                    print('nominal --> ' +
-                                        controller.promonominal.value
-                                            .toString() +
-                                        'persen --> ' +
-                                        controller.promopersen.value
-                                            .toString());
-                                  }
-                                },
-                              ),
+                                    if (controller.selecteddiskon.value ==
+                                        controller.opsidiskon[0]) {
+                                      controller.diskonpersen.value = 0.0;
+                                      controller.diskonnominal.value = parsed;
+                                      print('nominal');
+                                      print('nominal --> ' +
+                                          controller.diskonnominal.value
+                                              .toString() +
+                                          'persen --> ' +
+                                          controller.diskonpersen.value
+                                              .toString());
+                                    } else {
+                                      controller.diskonnominal.value = 0.0;
+                                      controller.diskonpersen.value = parsed;
+                                      print('persen');
+                                      print('nominal --> ' +
+                                          controller.diskonnominal.value
+                                              .toString() +
+                                          'persen --> ' +
+                                          controller.diskonpersen.value
+                                              .toString());
+                                    }
+                                  },
+                                );
+                              }),
                             ),
                             Expanded(
-                              child: Obx(
-                                () => Row(
+                              child: Obx(() {
+                                return Row(
                                   children: [
                                     Expanded(
                                       child: RadioMenuButton(
                                         value: controller.opsidiskon[0],
                                         groupValue:
                                             controller.selecteddiskon.value,
-                                        onChanged: (x) {
-                                          controller.selecteddiskon.value = x!;
-                                        },
+                                        onChanged: (x) => controller
+                                            .selecteddiskon.value = x!,
                                         child: const Text('Rp.'),
                                       ),
                                     ),
@@ -2984,22 +3190,20 @@ class TambahPromoPembayaran extends GetView<KasirController> {
                                         value: controller.opsidiskon[1],
                                         groupValue:
                                             controller.selecteddiskon.value,
-                                        onChanged: (x) {
-                                          controller.selecteddiskon.value = x!;
-                                        },
+                                        onChanged: (x) => controller
+                                            .selecteddiskon.value = x!,
                                         child: const Text('%'),
                                       ),
                                     ),
                                   ],
-                                ),
-                              ),
+                                );
+                              }),
                             ),
                           ],
                         ),
                       );
                     },
                   ),
-
                   Obx(() {
                     return Container(
                       //color: Colors.red,
@@ -3017,15 +3221,19 @@ class TambahPromoPembayaran extends GetView<KasirController> {
                                   config:
                                       CalendarDatePicker2WithActionButtonsConfig(
                                     weekdayLabels: [
-                                      'Minggu',
-                                      'Senin',
-                                      'Selasa',
-                                      'Rabu',
-                                      'Kamis',
-                                      'Jumat',
-                                      'Sabtu',
+                                      'Ming',
+                                      'Sen',
+                                      'Sel',
+                                      'Rab',
+                                      'Kam',
+                                      'Jum',
+                                      'Sab',
                                     ],
                                     firstDayOfWeek: 1,
+                                    controlsTextStyle:
+                                        const TextStyle(fontSize: 10),
+                                    weekdayLabelTextStyle:
+                                        const TextStyle(fontSize: 10),
                                     calendarType: CalendarDatePicker2Type.range,
                                     centerAlignModePicker: true,
                                   ),
@@ -3075,7 +3283,6 @@ class TambahPromoPembayaran extends GetView<KasirController> {
                       ),
                     );
                   }),
-
                   Obx(() {
                     return Padding(
                       padding: AppPading.customBottomPadding(),
@@ -3101,6 +3308,429 @@ class TambahPromoPembayaran extends GetView<KasirController> {
                         if (controller.registerKey.value.currentState!
                             .validate()) {
                           controller.tambahPromo();
+                        }
+                        //Get.toNamed('/setuptoko');
+                        // Get.toNamed('/loginform');
+                      },
+                      child: Text(
+                        'Tambah',
+                        style: AppFont.regular_white_bold(),
+                      ),
+                      width: context.res_width)
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+//TODO : tambah user via kasir
+
+class TambahPelangganPembayaran extends GetView<TambahPelangganController> {
+  const TambahPelangganPembayaran({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    var con = Get.find<KasirController>();
+    return Scaffold(
+      appBar: AppbarCustom(
+        title: 'Pelanggan Baru',
+        NeedBottom: false,
+      ),
+      body: Padding(
+        padding: AppPading.defaultBodyPadding(),
+        child: SingleChildScrollView(
+          child: Form(
+            key: controller.registerKey(),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Obx(() {
+                    return Container(
+                      margin: AppPading.customBottomPadding(),
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                          border: Border.all(color: Colors.black, width: 0.5)),
+                      child: Padding(
+                        padding: EdgeInsets.only(bottom: 40, top: 40),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            controller.pikedImagePath.value == '' &&
+                                    controller.pickedIconPath.value == ''
+                                ? Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Container(
+                                        width: 120,
+                                        height: 120,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: AppColor.primary,
+                                        ),
+                                        child: Icon(
+                                          FontAwesomeIcons.image,
+                                          color: Colors.white,
+                                          size: 55,
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: TextButton(
+                                          style: TextButton.styleFrom(
+                                            shape: CircleBorder(),
+                                            padding: EdgeInsets.all(8),
+                                            backgroundColor: AppColor.secondary,
+                                          ),
+                                          onPressed: () async {
+                                            DeviceInfoPlugin deviceInfo =
+                                                DeviceInfoPlugin();
+                                            AndroidDeviceInfo androidInfo =
+                                                await deviceInfo.androidInfo;
+                                            if (androidInfo.version.sdkInt >=
+                                                33) {
+                                              var status = await Permission
+                                                  .camera.status;
+                                              if (!status.isGranted) {
+                                                await Permission.camera
+                                                    .request();
+                                              }
+                                            } else {
+                                              var status = await Permission
+                                                  .camera.status;
+                                              if (!status.isGranted) {
+                                                await Permission.camera
+                                                    .request();
+                                              }
+                                            }
+
+                                            controller.pilihsourcefoto();
+                                          },
+                                          child: Icon(
+                                            Icons.add,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  )
+                                : Stack(
+                                    alignment: Alignment.center,
+                                    children: [
+                                      Container(
+                                        width: 120,
+                                        height: 120,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: AppColor.primary,
+                                        ),
+                                        child: ClipOval(
+                                          child: controller.pikedImagePath != ''
+                                              ? Image.file(
+                                                  File(controller
+                                                      .pickedImageFile!.path),
+                                                  width: 120,
+                                                  height: 120,
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : SvgPicture.asset(
+                                                  controller
+                                                      .pickedIconPath.value,
+                                                  width: 120,
+                                                  height: 120,
+                                                  fit: BoxFit.contain,
+                                                ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 0,
+                                        right: 0,
+                                        child: TextButton(
+                                          style: TextButton.styleFrom(
+                                            shape: CircleBorder(),
+                                            padding: EdgeInsets.all(8),
+                                            backgroundColor: AppColor.secondary,
+                                          ),
+                                          onPressed: () async {
+                                            DeviceInfoPlugin deviceInfo =
+                                                DeviceInfoPlugin();
+                                            AndroidDeviceInfo androidInfo =
+                                                await deviceInfo.androidInfo;
+                                            if (androidInfo.version.sdkInt >=
+                                                33) {
+                                              var status = await Permission
+                                                  .camera.status;
+                                              if (!status.isGranted) {
+                                                await Permission.camera
+                                                    .request();
+                                              }
+                                            } else {
+                                              var status = await Permission
+                                                  .camera.status;
+                                              if (!status.isGranted) {
+                                                await Permission.camera
+                                                    .request();
+                                              }
+                                            }
+
+                                            controller.pilihsourcefoto();
+                                          },
+                                          child: FaIcon(
+                                            FontAwesomeIcons.pencil,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                          ],
+                        ),
+                      ),
+                    );
+                  }),
+                  Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: button_border_custom(
+                        onPressed: () async {
+                          if (await controller.checkContactPermission()) {
+                            controller.selectContact();
+                          } else {
+                            Get.snackbar(
+                              'Izin Diperlukan',
+                              'Silakan berikan izin akses kontak terlebih dahulu',
+                              snackPosition: SnackPosition.BOTTOM,
+                            );
+                          }
+                        },
+                        child: Text('Tambah dari kontak'),
+                        width: context.res_width),
+                  ),
+                  Obx(() {
+                    return Padding(
+                      padding: AppPading.customBottomPadding(),
+                      child: TextFormField(
+                        controller: controller.nama.value,
+                        decoration: InputDecoration(
+                          labelText: 'Nama',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        keyboardType: TextInputType.name,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Nama harus diisi';
+                          }
+                          return null;
+                        },
+                      ),
+                    );
+                  }),
+                  Obx(() {
+                    return Padding(
+                      padding: AppPading.customBottomPadding(),
+                      child: TextFormField(
+                        controller: controller.email.value,
+                        decoration: InputDecoration(
+                          labelText: 'Email (Optional)',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        keyboardType: TextInputType.emailAddress,
+                        // validator: (value) {
+                        //   if (value!.isEmpty) {
+                        //     return 'Email harus diisi';
+                        //   } else if (value.isEmail == false) {
+                        //     return 'Periksa format email';
+                        //   }
+                        //   return null;
+                        // },
+                      ),
+                    );
+                  }),
+                  Obx(() {
+                    return Padding(
+                      padding: AppPading.customBottomPadding(),
+                      child: TextFormField(
+                        controller: controller.telepon.value,
+                        decoration: InputDecoration(
+                          labelText: 'Nomor telepon',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        keyboardType: TextInputType.phone,
+                        validator: (value) {
+                          if (value!.isEmpty) {
+                            return 'Nomor telepon harus diisi';
+                          }
+                          return null;
+                        },
+                      ),
+                    );
+                  }),
+                  Obx(() {
+                    return Padding(
+                      padding: AppPading.customBottomPadding(),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: DropdownButtonFormField2(
+                              decoration: InputDecoration(
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              validator: (value) {
+                                if (value == null) {
+                                  return 'Kategori pelanggan harus dipilih';
+                                }
+                                return null;
+                              },
+                              isExpanded: true,
+                              dropdownStyleData: DropdownStyleData(
+                                  decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.white)),
+                              hint: Text('Kategori Pelanggan',
+                                  style: AppFont.regular()),
+                              value: controller.kategorivalue,
+                              items: controller.kategoripelangganList.map((x) {
+                                return DropdownMenuItem(
+                                  child: Text(x.kategori!),
+                                  value: x.uuid,
+                                );
+                              }).toList(),
+                              onChanged: (val) {
+                                controller.kategorivalue = val;
+                                print(controller.kategorivalue);
+                              },
+                            ),
+                          ),
+                          Container(
+                              margin: EdgeInsets.only(left: 15),
+                              decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: AppColor.primary),
+                              child: IconButton(
+                                  onPressed: () {
+                                    Get.toNamed('/tambahkategoripelanggan',
+                                        arguments: Get.put(
+                                            KategoriPelangganController()));
+                                  },
+                                  icon: Icon(
+                                    Icons.add,
+                                    color: Colors.white,
+                                  ))),
+                        ],
+                      ),
+                    );
+                  }),
+                  Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: Container(
+                      child: TextFormField(
+                        onTap: () {
+                          FocusScope.of(context).requestFocus(new FocusNode());
+                          showDialog(
+                              context: context,
+                              builder: (_) => AlertDialog(
+                                    backgroundColor: Colors.white,
+                                    content: Container(
+                                        width: context.res_width * 0.9,
+                                        height: context.res_height * 0.6,
+                                        child:
+                                            CalendarDatePicker2WithActionButtons(
+                                          config:
+                                              CalendarDatePicker2WithActionButtonsConfig(
+                                            dayMaxWidth: MediaQuery.of(context)
+                                                        .size
+                                                        .width /
+                                                    7 -
+                                                10,
+                                            controlsTextStyle: TextStyle(
+                                              fontSize: 10, // Adjust font size
+                                              fontWeight: FontWeight
+                                                  .bold, // Make it bold
+                                              color: Colors
+                                                  .blue, // Change text color
+                                            ),
+
+                                            // Adjust day width based on screen width
+                                            weekdayLabelTextStyle:
+                                                TextStyle(fontSize: 10),
+                                            weekdayLabels: [
+                                              'Ming',
+                                              'Sen',
+                                              'Sel',
+                                              'Rab',
+                                              'Kam',
+                                              'Jum',
+                                              'Sab',
+                                            ],
+                                            firstDayOfWeek: 1,
+
+                                            calendarType:
+                                                CalendarDatePicker2Type.single,
+                                          ),
+                                          onCancelTapped: () {
+                                            Get.back();
+                                          },
+                                          value: controller.datedata,
+                                          onValueChanged: (dates) {
+                                            print(dates);
+                                            controller.datedata = dates;
+                                            controller.stringdate();
+                                            Get.back();
+                                          },
+                                        )),
+                                  ));
+                        },
+                        controller: controller.tanggal.value,
+                        onChanged: ((String pass) {}),
+                        decoration: InputDecoration(
+                          labelText: "Tanggal Lahir (opsional)",
+                          labelStyle: AppFont.regular(),
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                      ),
+                    ),
+                  ),
+                  Obx(() {
+                    return Padding(
+                      padding: AppPading.customBottomPadding(),
+                      child: TextFormField(
+                        controller: controller.alamat.value,
+                        decoration: InputDecoration(
+                          labelText: 'Alamat (Opsional)',
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        keyboardType: TextInputType.name,
+                        // validator: (value) {
+                        //   if (value!.isEmpty) {
+                        //     return 'Alamat harus diisi';
+                        //   }
+                        //   return null;
+                        // },
+                      ),
+                    );
+                  }),
+                  button_solid_custom(
+                      onPressed: () {
+                        if (controller.registerKey.value.currentState!
+                            .validate()) {
+                          con.tambahPelangganLocal();
                         }
                         //Get.toNamed('/setuptoko');
                         // Get.toNamed('/loginform');

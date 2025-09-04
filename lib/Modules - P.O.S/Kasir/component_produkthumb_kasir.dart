@@ -10,6 +10,7 @@ import 'package:qasir_pintar/Config/config.dart';
 import 'package:qasir_pintar/Controllers/CentralController.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Base%20menu/controller_basemenu.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Kasir/controller_kasir.dart';
+import 'package:qasir_pintar/Widget/widget.dart';
 
 import '../Produk/Data produk/model_produk.dart';
 
@@ -31,7 +32,7 @@ class ProdukThumb extends GetView<KasirController> {
                   padding: AppPading.customListPadding(bottomPadding: 70),
                   child: GridView.builder(
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                          mainAxisExtent: context.res_height / 4.5,
+                          mainAxisExtent: context.res_height / 4.0,
                           maxCrossAxisExtent: context.res_width / 2.0,
                           childAspectRatio: 1 / 1,
                           crossAxisSpacing: 20,
@@ -45,24 +46,16 @@ class ProdukThumb extends GetView<KasirController> {
                                   //controller.addKeranjang(produk[index]);
                                   controller.addToCart(produk[index]);
                                 },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    //color: Colors.red,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        // Shadow color
-                                        spreadRadius: 1,
-                                      ),
-                                    ],
-                                  ),
+                                child: Card(
+                                  color: Colors.white,
+                                  elevation: 3,
                                   child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Container(
-                                        color: Colors.white,
-                                        // color: Colors.purpleAccent,
-                                        height: 85,
-                                        width: context.res_width,
+                                      Expanded(
                                         child: produk[index]
                                                         .gambar_produk_utama !=
                                                     '' &&
@@ -75,22 +68,16 @@ class ProdukThumb extends GetView<KasirController> {
                                                 ? SvgPicture.memory(
                                                     base64Decode(produk[index]
                                                         .gambar_produk_utama!),
-                                                    width: 50,
-                                                    height: 50,
-                                                    fit: BoxFit.contain,
+                                                    fit: BoxFit.cover,
                                                   )
                                                 : Image.memory(
                                                     base64Decode(produk[index]
                                                         .gambar_produk_utama!),
-                                                    width: 10,
-                                                    height: 10,
-                                                    fit: BoxFit.contain,
+                                                    fit: BoxFit.cover,
                                                   )
                                             : Image.asset(
                                                 AppString.defaultImg,
-                                                width: 50,
-                                                height: 50,
-                                                fit: BoxFit.contain,
+                                                fit: BoxFit.cover,
                                               ),
                                       ),
                                       Expanded(
@@ -99,7 +86,6 @@ class ProdukThumb extends GetView<KasirController> {
                                           width: context.res_width,
                                           //height: context.res_height * 0.1,
                                           decoration: BoxDecoration(
-                                              color: Colors.white,
                                               borderRadius: BorderRadius.only(
                                                   topLeft: Radius.circular(0),
                                                   topRight: Radius.circular(0),
@@ -149,12 +135,12 @@ class ProdukThumb extends GetView<KasirController> {
                                                                             .diskon!,
                                                                   ),
                                                               style: AppFont
-                                                                  .small(),
+                                                                  .regular_bold(),
                                                             ),
                                                             Container(
                                                               padding:
                                                                   EdgeInsets
-                                                                      .all(3),
+                                                                      .all(4),
                                                               margin: EdgeInsets
                                                                   .only(
                                                                       left: 5),
@@ -174,7 +160,7 @@ class ProdukThumb extends GetView<KasirController> {
                                                                               0) +
                                                                       '%',
                                                                   style: AppFont
-                                                                      .small_white()),
+                                                                      .small_white_bold()),
                                                             )
                                                           ],
                                                         ),
@@ -187,7 +173,8 @@ class ProdukThumb extends GetView<KasirController> {
                                                         produk[index]
                                                             .harga_jual_eceran!,
                                                       )}',
-                                                      style: AppFont.small(),
+                                                      style: AppFont
+                                                          .regular_bold(),
                                                     ),
                                               Obx(() {
                                                 return Text(
@@ -217,33 +204,15 @@ class ProdukThumb extends GetView<KasirController> {
                               )
                             : GestureDetector(
                                 onTap: () {
-                                  Get.toNamed('/isiproduk',
-                                      arguments: produk[index]);
+                                  Get.showSnackbar(toast()
+                                      .bottom_snackbar_error(
+                                          'Gagal', 'Produk tidak aktif'));
                                 },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[300],
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        // Shadow color
-                                        spreadRadius: 1,
-                                        // Spread radius
-                                        blurRadius: 5,
-                                        // Blur radius
-                                        offset: Offset(2,
-                                            3), // Changes the position of the shadow
-                                      ),
-                                    ],
-                                  ),
+                                child: Card(
+                                  color: Colors.grey[300],
                                   child: Column(
                                     children: [
-                                      Container(
-                                        color: Colors.grey[300],
-
-                                        // color: Colors.purpleAccent,
-                                        height: 85,
-                                        width: context.res_width,
+                                      Expanded(
                                         child: produk[index]
                                                         .gambar_produk_utama !=
                                                     '' &&
@@ -256,21 +225,15 @@ class ProdukThumb extends GetView<KasirController> {
                                                 ? SvgPicture.memory(
                                                     base64Decode(produk[index]
                                                         .gambar_produk_utama!),
-                                                    width: 60,
-                                                    height: 70,
                                                     fit: BoxFit.cover,
                                                   )
                                                 : Image.memory(
                                                     base64Decode(produk[index]
                                                         .gambar_produk_utama!),
-                                                    width: 60,
-                                                    height: 70,
                                                     fit: BoxFit.cover,
                                                   )
                                             : Image.asset(
                                                 AppString.defaultImg,
-                                                width: 60,
-                                                height: 70,
                                                 fit: BoxFit.cover,
                                               ),
                                       ),
@@ -305,82 +268,6 @@ class ProdukThumb extends GetView<KasirController> {
                                                 style: TextStyle(
                                                     color: Colors.red),
                                               ),
-                                              Align(
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                child: DropdownButton2(
-                                                  hint: Text('Pilih tampilan'),
-                                                  customButton: const FaIcon(
-                                                    FontAwesomeIcons.list,
-                                                    // color: Colors.white,
-                                                    size: 20,
-                                                  ),
-                                                  items: [
-                                                    ...MenuItems.firstItems.map(
-                                                      (item) =>
-                                                          DropdownMenuItem<
-                                                              MenuItem>(
-                                                        value: item,
-                                                        child:
-                                                            MenuItems.buildItem(
-                                                                item),
-                                                      ),
-                                                    ),
-                                                    const DropdownMenuItem<
-                                                            Divider>(
-                                                        enabled: false,
-                                                        child: Divider()),
-                                                    ...MenuItems.secondItems
-                                                        .map(
-                                                      (item) =>
-                                                          DropdownMenuItem<
-                                                              MenuItem>(
-                                                        value: item,
-                                                        child:
-                                                            MenuItems.buildItem(
-                                                                item),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                  onChanged: (value) {
-                                                    MenuItems.onChanged(
-                                                        context,
-                                                        value! as MenuItem,
-                                                        controller,
-                                                        produk[index]);
-                                                  },
-                                                  dropdownStyleData:
-                                                      DropdownStyleData(
-                                                    width: 160,
-                                                    padding: const EdgeInsets
-                                                        .symmetric(vertical: 5),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              4),
-                                                    ),
-                                                    offset: const Offset(0, 8),
-                                                  ),
-                                                  menuItemStyleData:
-                                                      MenuItemStyleData(
-                                                    customHeights: [
-                                                      ...List<double>.filled(
-                                                          MenuItems.firstItems
-                                                              .length,
-                                                          48),
-                                                      8,
-                                                      ...List<double>.filled(
-                                                          MenuItems.secondItems
-                                                              .length,
-                                                          48),
-                                                    ],
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 16,
-                                                            right: 16),
-                                                  ),
-                                                ),
-                                              ),
                                             ],
                                           ),
                                         ),
@@ -395,7 +282,7 @@ class ProdukThumb extends GetView<KasirController> {
                   padding: AppPading.customListPadding(bottomPadding: 70),
                   child: GridView.builder(
                       gridDelegate: SliverGridDelegateWithMaxCrossAxisExtent(
-                          mainAxisExtent: context.res_height / 4.5,
+                          mainAxisExtent: context.res_height / 4.0,
                           maxCrossAxisExtent: context.res_width / 2.0,
                           childAspectRatio: 1 / 1,
                           crossAxisSpacing: 20,
@@ -403,34 +290,22 @@ class ProdukThumb extends GetView<KasirController> {
                       itemCount: conpaket.paketproduk.length,
                       itemBuilder: (BuildContext context, index) {
                         var paketproduk = conpaket.paketproduk;
-                        return paketproduk[index].aktif == 1
+                        return paketproduk[index].tampilkan_di_paket == 1
                             ? GestureDetector(
                                 onTap: () {
+                                  //controller.addKeranjang(produk[index]);
                                   controller.addToCart(paketproduk[index]);
                                 },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    //color: Colors.red,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        // Shadow color
-                                        spreadRadius: 1,
-                                        // Spread radius
-                                        blurRadius: 5,
-                                        // Blur radius
-                                        offset: Offset(2,
-                                            3), // Changes the position of the shadow
-                                      ),
-                                    ],
-                                  ),
+                                child: Card(
+                                  color: Colors.white,
+                                  elevation: 3,
                                   child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Container(
-                                        color: Colors.white,
-                                        // color: Colors.purpleAccent,
-                                        height: 85,
-                                        width: context.res_width,
+                                      Expanded(
                                         child:
                                             paketproduk[index].gambar_utama !=
                                                         '' &&
@@ -444,23 +319,17 @@ class ProdukThumb extends GetView<KasirController> {
                                                         base64Decode(
                                                             paketproduk[index]
                                                                 .gambar_utama!),
-                                                        width: 50,
-                                                        height: 50,
-                                                        fit: BoxFit.contain,
+                                                        fit: BoxFit.cover,
                                                       )
                                                     : Image.memory(
                                                         base64Decode(
                                                             paketproduk[index]
                                                                 .gambar_utama!),
-                                                        width: 10,
-                                                        height: 10,
-                                                        fit: BoxFit.contain,
+                                                        fit: BoxFit.cover,
                                                       )
                                                 : Image.asset(
                                                     AppString.defaultImg,
-                                                    width: 50,
-                                                    height: 50,
-                                                    fit: BoxFit.contain,
+                                                    fit: BoxFit.cover,
                                                   ),
                                       ),
                                       Expanded(
@@ -469,7 +338,6 @@ class ProdukThumb extends GetView<KasirController> {
                                           width: context.res_width,
                                           //height: context.res_height * 0.1,
                                           decoration: BoxDecoration(
-                                              color: Colors.white,
                                               borderRadius: BorderRadius.only(
                                                   topLeft: Radius.circular(0),
                                                   topRight: Radius.circular(0),
@@ -519,12 +387,12 @@ class ProdukThumb extends GetView<KasirController> {
                                                                             .diskon!,
                                                                   ),
                                                               style: AppFont
-                                                                  .small(),
+                                                                  .regular_bold(),
                                                             ),
                                                             Container(
                                                               padding:
                                                                   EdgeInsets
-                                                                      .all(3),
+                                                                      .all(4),
                                                               margin: EdgeInsets
                                                                   .only(
                                                                       left: 5),
@@ -544,7 +412,7 @@ class ProdukThumb extends GetView<KasirController> {
                                                                               0) +
                                                                       '%',
                                                                   style: AppFont
-                                                                      .small_white()),
+                                                                      .small_white_bold()),
                                                             )
                                                           ],
                                                         ),
@@ -557,14 +425,27 @@ class ProdukThumb extends GetView<KasirController> {
                                                         paketproduk[index]
                                                             .harga_jual_paket!,
                                                       )}',
-                                                      style: AppFont.small(),
+                                                      style: AppFont
+                                                          .regular_bold(),
                                                     ),
-                                              // Text(
-                                              //   paketproduk[index].hitungStock == 1
-                                              //       ? 'Stock'
-                                              //       : 'Nonstock',
-                                              //   style: AppFont.small(),
-                                              // ),
+                                              // Obx(() {
+                                              //   return Text(
+                                              //     paketproduk[index].hitung_stok == 1
+                                              //         ? 'Stock : ' +
+                                              //             (paketproduk[index].qty! -
+                                              //                     produk[index]
+                                              //                         .info_stok_habis!)
+                                              //                 .toString()
+                                              //         : 'Nonstock',
+                                              //     overflow:
+                                              //         TextOverflow.ellipsis,
+                                              //     style: AppFont.small(),
+                                              //   );
+                                              // }),
+                                              // StockDisplay(
+                                              //   item: produk[index],
+                                              //   isPackage: false,
+                                              // )
                                             ],
                                           ),
                                         ),
@@ -575,33 +456,15 @@ class ProdukThumb extends GetView<KasirController> {
                               )
                             : GestureDetector(
                                 onTap: () {
-                                  Get.toNamed('/detailpaketproduk',
-                                      arguments: paketproduk[index]);
+                                  Get.showSnackbar(toast()
+                                      .bottom_snackbar_error(
+                                          'Gagal', 'Produk tidak aktif'));
                                 },
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[300],
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withOpacity(0.1),
-                                        // Shadow color
-                                        spreadRadius: 1,
-                                        // Spread radius
-                                        blurRadius: 5,
-                                        // Blur radius
-                                        offset: Offset(2,
-                                            3), // Changes the position of the shadow
-                                      ),
-                                    ],
-                                  ),
+                                child: Card(
+                                  color: Colors.grey[300],
                                   child: Column(
                                     children: [
-                                      Container(
-                                        color: Colors.grey[300],
-
-                                        // color: Colors.purpleAccent,
-                                        height: 85,
-                                        width: context.res_width,
+                                      Expanded(
                                         child:
                                             paketproduk[index].gambar_utama !=
                                                         '' &&
@@ -615,22 +478,16 @@ class ProdukThumb extends GetView<KasirController> {
                                                         base64Decode(
                                                             paketproduk[index]
                                                                 .gambar_utama!),
-                                                        width: 60,
-                                                        height: 70,
                                                         fit: BoxFit.cover,
                                                       )
                                                     : Image.memory(
                                                         base64Decode(
                                                             paketproduk[index]
                                                                 .gambar_utama!),
-                                                        width: 60,
-                                                        height: 70,
                                                         fit: BoxFit.cover,
                                                       )
                                                 : Image.asset(
                                                     AppString.defaultImg,
-                                                    width: 60,
-                                                    height: 70,
                                                     fit: BoxFit.cover,
                                                   ),
                                       ),
@@ -664,82 +521,6 @@ class ProdukThumb extends GetView<KasirController> {
                                                 'Nonaktif',
                                                 style: TextStyle(
                                                     color: Colors.red),
-                                              ),
-                                              Align(
-                                                alignment:
-                                                    Alignment.centerRight,
-                                                child: DropdownButton2(
-                                                  hint: Text('Pilih tampilan'),
-                                                  customButton: const FaIcon(
-                                                    FontAwesomeIcons.list,
-                                                    // color: Colors.white,
-                                                    size: 20,
-                                                  ),
-                                                  items: [
-                                                    ...MenuItems.firstItems.map(
-                                                      (item) =>
-                                                          DropdownMenuItem<
-                                                              MenuItem>(
-                                                        value: item,
-                                                        child:
-                                                            MenuItems.buildItem(
-                                                                item),
-                                                      ),
-                                                    ),
-                                                    const DropdownMenuItem<
-                                                            Divider>(
-                                                        enabled: false,
-                                                        child: Divider()),
-                                                    ...MenuItems.secondItems
-                                                        .map(
-                                                      (item) =>
-                                                          DropdownMenuItem<
-                                                              MenuItem>(
-                                                        value: item,
-                                                        child:
-                                                            MenuItems.buildItem(
-                                                                item),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                  // onChanged: (value) {
-                                                  //   MenuItems.onChanged(
-                                                  //       context,
-                                                  //       value! as MenuItem,
-                                                  //       controller,
-                                                  //       paketproduk[index]);
-                                                  // },
-                                                  dropdownStyleData:
-                                                      DropdownStyleData(
-                                                    width: 160,
-                                                    padding: const EdgeInsets
-                                                        .symmetric(vertical: 5),
-                                                    decoration: BoxDecoration(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              4),
-                                                    ),
-                                                    offset: const Offset(0, 8),
-                                                  ),
-                                                  menuItemStyleData:
-                                                      MenuItemStyleData(
-                                                    customHeights: [
-                                                      ...List<double>.filled(
-                                                          MenuItems.firstItems
-                                                              .length,
-                                                          48),
-                                                      8,
-                                                      ...List<double>.filled(
-                                                          MenuItems.secondItems
-                                                              .length,
-                                                          48),
-                                                    ],
-                                                    padding:
-                                                        const EdgeInsets.only(
-                                                            left: 16,
-                                                            right: 16),
-                                                  ),
-                                                ),
                                               ),
                                             ],
                                           ),
@@ -836,11 +617,7 @@ class StockDisplay extends GetView<KasirController> {
 
     // 2) Non‑stock items
     if (item.hitung_stok != 1) {
-      return Text(
-        'Nonstock',
-        overflow: TextOverflow.ellipsis,
-        style: AppFont.small(),
-      );
+      return Container();
     }
 
     // 3) Trigger load once per UUID

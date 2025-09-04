@@ -30,7 +30,6 @@ class ViewIsiproduk extends GetView<IsiProdukController> {
                     style: AppFont.regular_bold(),
                   ),
                 ),
-
                 controller.gambarlist.isNotEmpty
                     ? Padding(
                         padding: AppPading.customBottomPadding(),
@@ -70,7 +69,6 @@ class ViewIsiproduk extends GetView<IsiProdukController> {
                         'Gambar kosong',
                         style: AppFont.regular(),
                       ),
-
                 SizedBox(
                   height: 10,
                 ),
@@ -79,43 +77,31 @@ class ViewIsiproduk extends GetView<IsiProdukController> {
                     _buildDetailTile(
                         title: 'Nama Produk',
                         value: controller.data.nama_produk!),
-                    Divider(height: 0, thickness: 0.5),
                     _buildDetailTile(
                         title: 'Kode Produk',
                         value: controller.data.kode_produk!),
-                    Divider(height: 0, thickness: 0.5),
                     _buildDetailTile(
                         title: 'Kategori',
                         value: controller.data.namaKategori ?? '-'),
-                    Divider(height: 0, thickness: 0.5),
                     _buildDetailTile(
                         title: 'Sub Kategori',
                         value: controller.data.namasubKategori ?? '-'),
-                    Divider(height: 0, thickness: 0.5),
                     _buildDetailTile(
                         title: 'Jenis Poduk',
                         value: controller.data.jenisProduk ?? '-'),
-                    Divider(height: 0, thickness: 0.5),
+                    Divider(),
                     _buildDetailTile(
                         title: 'Harga Beli',
                         value:
                             'Rp ${NumberFormat('#,###').format(controller.data.harga_beli)}'),
-                    Divider(height: 0, thickness: 0.5),
                     _buildDetailTile(
                         title: 'HPP',
                         value:
                             'Rp ${NumberFormat('#,###').format(controller.data.hpp)}'),
-                  ],
-                ),
-
-                // Pricing Section
-                Column(
-                  children: [
                     _buildDetailTile(
                         title: 'Harga Jual Grosir',
                         value:
                             'Rp ${NumberFormat('#,###').format(controller.data.harga_jual_grosir)}'),
-                    Divider(height: 0, thickness: 0.5),
                     _buildDetailTile(
                         title: 'Harga Jual Eceran',
                         value:
@@ -129,38 +115,26 @@ class ViewIsiproduk extends GetView<IsiProdukController> {
                         value: controller.data.diskon != null
                             ? 'Rp ${NumberFormat('#,###').format(controller.data.diskon)}'
                             : '-'),
-                    Divider(height: 0, thickness: 0.5),
                     _buildDetailTile(
                         title: controller.data.namaPajak ?? 'Pajak',
                         value: controller.data.namaPajak != null
                             ? ' ${NumberFormat('#,###').format(controller.data.nominalpajak)} %'
                             : '-'),
-                    // 'Rp ${NumberFormat('#,###').format(controller.data.pajak)}'),
-                  ],
-                ),
-
-                // Taxes Section
-
-                // Additional Details
-                Column(
-                  children: [
+                    Divider(),
                     _buildDetailTile(
                         title: 'Ukuran',
                         value: controller.data.namaukuran ?? '-'),
                     // 'Rp ${NumberFormat('#,###').format(controller.data.ukuran)}'),
-                    Divider(height: 0, thickness: 0.5),
-                    _buildDetailTile(
-                        title: 'Harga Jual Eceran',
-                        value:
-                            'Rp ${NumberFormat('#,###').format(controller.data.harga_jual_eceran)}'),
+
                     _buildDetailTile(
                         title: 'Berat',
                         value: controller.data.berat?.toString() ?? '-'),
-                    Divider(height: 0, thickness: 0.5),
+
                     _buildDetailTile(
                         title: 'Volume',
                         value:
-                            '${controller.data.volume_panjang ?? '-'} x ${controller.data.volume_lebar ?? '-'} x ${controller.data.volume_tinggi ?? '-'}'),
+                            'Panjang : ${controller.data.volume_panjang ?? '-'} M  x  Lebar : ${controller.data.volume_lebar ?? '-'} M  x  Tinggi : ${controller.data.volume_tinggi ?? '-'} M'),
+                    Divider(),
                     _buildSwitchTile(
                         title: 'Hitung Stok',
                         value: controller.data.hitung_stok == 1),
@@ -178,26 +152,15 @@ class ViewIsiproduk extends GetView<IsiProdukController> {
                                   value: controller.data.info_stok_habis
                                           ?.toString() ??
                                       '0'),
-                              Divider(height: 0, thickness: 0.5),
+                              Divider(),
+                              _buildSwitchTile(
+                                  title: 'Aktif',
+                                  value:
+                                      controller.data.tampilkan_di_produk == 1),
                             ],
                           ),
-
-                    _buildSwitchTile(
-                        title: 'Aktif',
-                        value: controller.data.tampilkan_di_produk == 1),
                   ],
                 ),
-
-                // Edit Button
-                // Padding(
-                //   padding: AppPading.customTopPadding(),
-                //   child: button_solid_custom(
-                //       onPressed: () {
-                //         Get.toNamed('/editisiproduk', arguments: controller.data);
-                //       },
-                //       child: Text('Edit Produk'),
-                //       width: context.res_width),
-                // )
               ],
             );
           }),

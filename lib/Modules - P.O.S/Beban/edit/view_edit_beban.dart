@@ -28,171 +28,75 @@ class EditBeban extends GetView<EditBebanController> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Obx(() {
-                  //   return controller.con.listBebanRutin.isEmpty
-                  //       ? Container()
-                  //       : Padding(
-                  //     padding: AppPading.customBottomPadding(),
-                  //     child: Row(
-                  //       children: [
-                  //         Expanded(
-                  //           child: DropdownButtonFormField2(
-                  //             decoration: InputDecoration(
-                  //               border: OutlineInputBorder(
-                  //                 borderRadius: BorderRadius.circular(10),
-                  //               ),
-                  //             ),
-                  //             isExpanded: true,
-                  //             dropdownStyleData: DropdownStyleData(
-                  //                 decoration: BoxDecoration(
-                  //                     borderRadius:
-                  //                     BorderRadius.circular(10),
-                  //                     color: Colors.white)),
-                  //             hint: Text('Pilih beban rutin',
-                  //                 style: AppFont.regular()),
-                  //             value: controller.bebanvalue.value,
-                  //             items:
-                  //             controller.con.listBebanRutin.map((x) {
-                  //               return DropdownMenuItem(
-                  //                 child: Text(x.namaBeban!),
-                  //                 value: x.uuid,
-                  //               );
-                  //             }).toList(),
-                  //             onChanged: (val) async {
-                  //               print('beban uuid--->');
-                  //               print(val);
-                  //               controller.bebanvalue.value =
-                  //                   val.toString();
-                  //
-                  //               var beban = controller.con.listBebanRutin
-                  //                   .firstWhere(
-                  //                       (element) => element.uuid == val);
-                  //
-                  //               controller.nama.value.text =
-                  //               beban.namaBeban!;
-                  //               controller.kategorivalue.value =
-                  //                   beban.idKategoriBeban;
-                  //               controller.jumlahbeban.value.text =
-                  //                   beban.jumlahBeban!.toStringAsFixed(0);
-                  //               // controller.tanggal.value.text =
-                  //               //     beban.tanggalBeban!;
-                  //               //
-                  //               // String input = beban.tanggalBeban!;
-                  //               // DateFormat format =
-                  //               //     DateFormat('dd-MM-yyyy');
-                  //               // DateTime parsedDate = format.parse(input);
-                  //               //
-                  //               // controller.datedata.add(parsedDate);
-                  //               controller.keterangan.value.text =
-                  //                   beban.keterangan ?? '';
-                  //               // controller.karyawanvalue.value =
-                  //               //     beban.idKaryawan;
-                  //             },
-                  //           ),
-                  //         ),
-                  //       ],
-                  //     ),
-                  //   );
-                  // }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.nama.value,
-                        decoration: InputDecoration(
-                          labelText: 'Nama Beban',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'kode promo harus diisi';
-                          }
-                          return null;
-                        },
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nama beban harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.nama.value,
+                      keyboardType: TextInputType.text,
+                      labelText: 'Nama beban'),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Obx(() {
+                          return customDropdownField(
+                            hintText: 'Kategori beban',
+                            validator: (value) {
+                              if (value == null || value.isEmpty) {
+                                return 'Kategori harus dipilih';
+                              }
+                              return null;
+                            },
+                            items: controller.con.listKategoriBeban
+                                .where((y) => y.aktif == 1)
+                                .map((x) {
+                              return DropdownMenuItem(
+                                child: Text(x.namaKategoriBeban!),
+                                value: x.uuid,
+                              );
+                            }).toList(),
+                            value: controller.kategorivalue.value,
+                            onChanged: (val) async {
+                              controller.kategorivalue.value = val.toString();
+                            },
+                          );
+                        }),
                       ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField2(
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Kategori harus dipilih';
-                                }
-                                return null;
+                      Container(
+                          margin: EdgeInsets.only(left: 15),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.circle, color: AppColor.primary),
+                          child: IconButton(
+                              onPressed: () {
+                                Get.toNamed('/tambah_kategori_beban');
                               },
-                              isExpanded: true,
-                              dropdownStyleData: DropdownStyleData(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white)),
-                              hint: Text('kategori', style: AppFont.regular()),
-                              value: controller.kategorivalue.value,
-                              items: controller.con.listKategoriBeban.map((x) {
-                                return DropdownMenuItem(
-                                  child: Text(x.namaKategoriBeban!),
-                                  value: x.uuid,
-                                );
-                              }).toList(),
-                              onChanged: (val) async {
-                                controller.kategorivalue.value = val.toString();
-                              },
-                            ),
-                          ),
-                          Container(
-                              margin: EdgeInsets.only(left: 15),
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColor.primary),
-                              child: IconButton(
-                                  onPressed: () {
-                                    Get.toNamed('/tambah_kategori_beban');
-                                  },
-                                  icon: Icon(
-                                    Icons.add,
-                                    color: Colors.white,
-                                  ))),
-                        ],
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        inputFormatters: [ThousandsFormatter()],
-                        controller: controller.jumlahbeban.value,
-                        decoration: InputDecoration(
-                          labelText: 'Jumlah beban',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'kode promo harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
+                              icon: Icon(
+                                Icons.add,
+                                color: Colors.white,
+                              ))),
+                    ],
+                  ),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Jumlah beban harus diisi';
+                        }
+                        return null;
+                      },
+                      controller: controller.jumlahbeban.value,
+                      labelText: 'Jumlah beban',
+                      inputFormatters: [ThousandsFormatter()],
+                      keyboardType: TextInputType.number),
                   Obx(() {
                     return Padding(
                       padding: AppPading.customBottomPadding(),
                       child: Container(
                         child: TextFormField(
+                          style: AppFont.regular(),
                           onTap: () {
                             FocusScope.of(context)
                                 .requestFocus(new FocusNode());
@@ -214,7 +118,7 @@ class EditBeban extends GetView<EditBebanController> {
                                                           7 -
                                                       10,
                                               controlsTextStyle: TextStyle(
-                                                fontSize: 12,
+                                                fontSize: 10,
                                                 // Adjust font size
                                                 fontWeight: FontWeight.bold,
                                                 // Make it bold
@@ -224,7 +128,7 @@ class EditBeban extends GetView<EditBebanController> {
 
                                               // Adjust day width based on screen width
                                               weekdayLabelTextStyle:
-                                                  TextStyle(fontSize: 12),
+                                                  TextStyle(fontSize: 10),
                                               weekdayLabels: [
                                                 'Ming',
                                                 'Sen',
@@ -235,6 +139,7 @@ class EditBeban extends GetView<EditBebanController> {
                                                 'Sab',
                                               ],
                                               firstDayOfWeek: 1,
+
                                               calendarType:
                                                   CalendarDatePicker2Type
                                                       .single,
@@ -272,80 +177,37 @@ class EditBeban extends GetView<EditBebanController> {
                       ),
                     );
                   }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.keterangan.value,
-                        decoration: InputDecoration(
-                          labelText: 'Keterangan',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        // validator: (value) {
-                        //   if (value!.isEmpty) {
-                        //     return 'Alamat harus diisi';
-                        //   }
-                        //   return null;
-                        // },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField2(
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Karyawan harus dipilih';
-                                }
-                                return null;
-                              },
-                              isExpanded: true,
-                              dropdownStyleData: DropdownStyleData(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white)),
-                              hint: Text('Di tambah oleh',
-                                  style: AppFont.regular()),
-                              value: controller.karyawanvalue.value,
-                              items: controller.conKar.karyawanList.map((x) {
-                                return DropdownMenuItem(
-                                  child: Text(x.nama_karyawan!),
-                                  value: x.uuid,
-                                );
-                              }).toList(),
-                              onChanged: (val) async {
-                                controller.karyawanvalue.value = val.toString();
-                              },
-                            ),
-                          ),
-                          // Container(
-                          //     margin: EdgeInsets.only(left: 15),
-                          //     decoration: BoxDecoration(
-                          //         shape: BoxShape.circle,
-                          //         color: AppColor.primary),
-                          //     child: IconButton(
-                          //         onPressed: () {
-                          //           Get.toNamed('/tambah_kategori_beban');
-                          //         },
-                          //         icon: Icon(
-                          //           Icons.add,
-                          //           color: Colors.white,
-                          //         ))),
-                        ],
-                      ),
-                    );
-                  }),
+                  customTextField(
+                    controller: controller.keterangan.value,
+                    labelText: 'Keterangan beban',
+                    validator: (value) {
+                      print('print value validator');
+                      print(value);
+                      if (value == null || value.isEmpty) {
+                        return 'keterangan harus dipilih';
+                      }
+                      return null;
+                    },
+                  ),
+                  customDropdownField(
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Karyawan harus dipilih';
+                      }
+                      return null;
+                    },
+                    hintText: 'Ditambah oleh',
+                    items: controller.conKar.karyawanList.map((x) {
+                      return DropdownMenuItem(
+                        child: Text(x.nama_karyawan!),
+                        value: x.uuid,
+                      );
+                    }).toList(),
+                    value: controller.karyawanvalue.value,
+                    onChanged: (val) async {
+                      controller.karyawanvalue.value = val.toString();
+                    },
+                  ),
                   Obx(() {
                     return Padding(
                       padding: AppPading.customBottomPadding(),

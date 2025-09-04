@@ -170,26 +170,16 @@ class TambahProdukv2 extends GetView<ProdukController> {
                       ),
                     );
                   }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.nama.value,
-                        decoration: InputDecoration(
-                          labelText: 'Kategori Produk',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Kategori harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
+                  customTextField(
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Nama kategori harus diisi';
+                      }
+                      return null;
+                    },
+                    controller: controller.nama.value,
+                    labelText: 'Nama kategori',
+                  ),
                   button_solid_custom(
                       onPressed: () {
                         if (controller.registerKey.value.currentState!

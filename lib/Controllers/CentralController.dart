@@ -34,6 +34,7 @@ import '../Modules - P.O.S/Produk/stock/penerimaan produk/controller_penerimaan_
 import '../Modules - P.O.S/Promo/model_promo.dart';
 import '../Modules - P.O.S/Supplier/model_supplier.dart';
 import '../Services/BoxStorage.dart';
+import '../Services/Handler.dart';
 import '../Widget/widget.dart';
 
 final StorageService box = Get.find<StorageService>();
@@ -1870,7 +1871,7 @@ class CentralPelangganController extends GetxController {
     LEFT JOIN 
         kategori_pelanggan ON pelanggan.ID_Kategori = kategori_pelanggan.uuid 
     WHERE 
-        pelanggan.id_toko = "$id_toko" AND pelanggan.nama_pelanggan LIKE "%${search}%"
+        pelanggan.id_toko = "$id_toko" AND pelanggan.nama_pelanggan LIKE "%${search}%" AND pelanggan.aktif = 1
   ''');
     List<DataPelanggan> jenis = query.isNotEmpty
         ? query.map((e) => DataPelanggan.fromJsondb(e)).toList()
@@ -2803,7 +2804,7 @@ class CentralPromoController extends GetxController {
   }
 
   fetchPromoKasir({id_toko}) async {
-    print('-------------------fetch promo local---------------------');
+    print('-------------------fetch promo kasir local---------------------');
 
     // Get today's date in YYYY-MM-DD format
     final today = DateTime.now();
@@ -2815,14 +2816,46 @@ class CentralPromoController extends GetxController {
     String sql = '''
     SELECT * FROM promo 
     WHERE id_toko = "$id_toko" 
-    AND tgl_selesai >= "$todayStr"
+    AND tgl_selesai >= "$todayStr" ORDER BY id DESC
   ''';
 
     List<Map<String, Object?>> query = await DBHelper().FETCH(sql);
+    print(sql);
 
     if (query.isNotEmpty) {
       List<DataPromo> data = query.map((e) => DataPromo.fromJsondb(e)).toList();
       promo.value = data;
+      print(data);
+      return data;
+    } else {
+      print('empty');
+      return [];
+    }
+  }
+
+  searchPromoKasir({id_toko, search}) async {
+    print('-------------------fetch promo kasir local---------------------');
+
+    // Get today's date in YYYY-MM-DD format
+    final today = DateTime.now();
+    final todayStr = "${today.year.toString().padLeft(4, '0')}-"
+        "${today.month.toString().padLeft(2, '0')}-"
+        "${today.day.toString().padLeft(2, '0')}";
+
+    // Query: promo not expired (end_date >= today)
+    String sql = '''
+    SELECT * FROM promo 
+    WHERE id_toko = "$id_toko" 
+    AND tgl_selesai >= "$todayStr" AND promo.nama_promo LIKE "%${search}%"
+  ''';
+
+    List<Map<String, Object?>> query = await DBHelper().FETCH(sql);
+    print(sql);
+
+    if (query.isNotEmpty) {
+      List<DataPromo> data = query.map((e) => DataPromo.fromJsondb(e)).toList();
+      promo.value = data;
+      print(data);
       return data;
     } else {
       print('empty');
@@ -2899,9 +2932,11 @@ class CentralPenerimaanController extends GetxController {
   Future<void> onInit() async {
     // TODO: implement onInit
     super.onInit();
-    await fetchPenerimaanLocal(id_toko: id_toko);
+    //await fetchPenerimaanLocal(id_toko: id_toko);
+    fecthProdukAPI();
   }
 
+  var tampilan = ''.obs;
   List<DateTime?> dates = [];
   var pickdate = TextEditingController().obs;
   final dateformat = DateFormat('dd-MM-yyyy');
@@ -2955,6 +2990,19 @@ class CentralPenerimaanController extends GetxController {
   var searchproduk = TextEditingController().obs;
   var subsearch = TextEditingController().obs;
   var penerimaan = <DataPenerimaanProduk>[].obs;
+  var produkAPI = <DataProdukApi>[].obs;
+  var isLoading = false.obs;
+
+  fecthProdukAPI() async {
+    isLoading.value = true;
+    print('CON -  fecthProdukAPI ');
+    final api = Get.find<API>();
+    await api.fetchProduk().then((value) {
+      produkAPI.value = value;
+    });
+    isLoading.value = false;
+    print(produkAPI);
+  }
 
   searchPenerimaanByDateLocal(
       {required String id_toko,

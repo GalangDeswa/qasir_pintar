@@ -137,15 +137,15 @@ class LoginForm extends GetView<LoginFormController> {
                   ),
                 ),
                 SizedBox(height: 17.0),
-                Align(
-                  alignment: Alignment.center,
-                  child: TextButton(
-                    onPressed: () {
-                      // Handle forgot password logic here
-                    },
-                    child: Text('Lupa Password?'),
-                  ),
-                ),
+                // Align(
+                //   alignment: Alignment.center,
+                //   child: TextButton(
+                //     onPressed: () {
+                //       // Handle forgot password logic here
+                //     },
+                //     child: Text('Lupa Password?'),
+                //   ),
+                // ),
               ],
             ),
           ),

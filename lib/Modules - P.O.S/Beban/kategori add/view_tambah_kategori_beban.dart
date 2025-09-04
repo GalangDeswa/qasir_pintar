@@ -14,7 +14,7 @@ class TambahKategoriBeban extends GetView<TambahKategoriBebanController> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppbarCustom(
-        title: 'Tambah Kategori',
+        title: 'Tambah Kategori Beban',
         NeedBottom: false,
       ),
       body: Padding(
@@ -27,26 +27,16 @@ class TambahKategoriBeban extends GetView<TambahKategoriBebanController> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.nama.value,
-                        decoration: InputDecoration(
-                          labelText: 'Nama kategori',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'kategori beban harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
+                  customTextField(
+                    controller: controller.nama.value,
+                    labelText: 'Kategori beban',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Kategori beban harus diisi';
+                      }
+                      return null;
+                    },
+                  ),
                   button_solid_custom(
                       onPressed: () {
                         if (controller.registerKey.value.currentState!

@@ -132,6 +132,7 @@ import '../Modules - P.O.S/Produk/binding_basemenuproduk.dart';
 import '../Modules - P.O.S/Produk/stock/detail penerimaan produk/binding_detailpenerimaanproduk.dart';
 import '../Modules - P.O.S/Produk/stock/penerimaan produk/view_penerimaan_produk.dart';
 import '../Modules - P.O.S/Produk/stock/view_basemenustock.dart';
+import '../Modules - P.O.S/Produk/stock/view_rincian_pembayaran_pemesanan.dart';
 import '../Modules - P.O.S/Promo/view_promo.dart';
 import '../Modules - P.O.S/Splash/binding_splash.dart';
 import '../Modules - P.O.S/Splash/view_splashintro.dart';
@@ -317,6 +318,11 @@ final List<GetPage<dynamic>> route = [
       name: "/rincianpembayaran",
       page: () => RincianPembayaran(),
       binding: KasirBinding()),
+
+  GetPage(
+      name: "/rincianpembayaranpemesanan",
+      page: () => RincianPembayaranPemesanan(),
+      binding: BasemenuStockBinding()),
 
   // ======================== CUSTOMER MANAGEMENT ========================
   GetPage(

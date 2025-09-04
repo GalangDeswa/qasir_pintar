@@ -5,6 +5,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/stock/controller_basemenustock.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/stock/view_listpenerimaan.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Produk/stock/view_stocklist.dart';
+import 'package:qasir_pintar/Modules%20-%20P.O.S/Produk/stock/view_statuslist.dart';
 
 import '../../../Config/config.dart';
 import '../../../Middleware/customPageRole.dart';
@@ -19,23 +20,23 @@ class BasemenuStock extends GetView<BasemenuStockController> {
     return CustomRole(
       allowedRoles: ['ADMIN', 'MANAGER'],
       child: DefaultTabController(
-        length: 2,
+        length: 3,
         child: Builder(builder: (context) {
           final tabController = DefaultTabController.of(context);
           return Builder(builder: (context) {
             return Scaffold(
-              floatingActionButton: ListenableBuilder(
-                listenable: tabController,
-                builder: (context, _) {
-                  return tabController.index == 0
-                      ? customFloat(
-                          onPressed: () {
-                            Get.toNamed('/penerimaan_produk');
-                          },
-                        )
-                      : SizedBox.shrink();
-                },
-              ),
+              // floatingActionButton: ListenableBuilder(
+              //   listenable: tabController,
+              //   builder: (context, _) {
+              //     return tabController.index == 0
+              //         ? customFloat(
+              //             onPressed: () {
+              //               Get.toNamed('/penerimaan_produk');
+              //             },
+              //           )
+              //         : SizedBox.shrink();
+              //   },
+              // ),
               appBar: AppbarCustom(
                 title: 'Inventori',
                 NeedBottom: true,
@@ -63,7 +64,24 @@ class BasemenuStock extends GetView<BasemenuStockController> {
                         ),
                         child: Center(
                           child: Text(
-                            'Penerimaan',
+                            'Pemesanan',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Tab(
+                      child: Container(
+                        width: context.res_width * 0.25,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Center(
+                          child: Text(
+                            'Status',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 12,
@@ -92,13 +110,11 @@ class BasemenuStock extends GetView<BasemenuStockController> {
                   ],
                 ),
               ),
-              body: Padding(
-                padding: AppPading.defaultBodyPadding(),
-                child: TabBarView(children: [
-                  Listpenerimaan(),
-                  StockList(),
-                ]),
-              ),
+              body: TabBarView(children: [
+                Listpenerimaan(),
+                ListStatusPenerimaan(),
+                StockList(),
+              ]),
             );
           });
         }),

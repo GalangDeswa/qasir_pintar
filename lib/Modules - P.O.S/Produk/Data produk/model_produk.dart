@@ -1,3 +1,146 @@
+class DataProdukApi {
+  DataProdukApi({
+    this.id,
+    this.userId,
+    this.group,
+    this.unit,
+    this.name,
+    this.value,
+    this.fund,
+    this.buy,
+    this.sell,
+    this.picture,
+    this.status,
+    this.createdAt,
+    this.sync,
+  });
+
+  final int? id;
+  final int? userId;
+  final String? group;
+  final String? unit;
+  final String? name;
+  final int? value;
+  final double? fund;
+  final double? buy;
+  final double? sell;
+  final String? picture;
+  final int? status;
+  final String? createdAt;
+  final int? sync;
+
+  /// from database json/map
+  factory DataProdukApi.fromJsondb(Map<String, dynamic> json) {
+    return DataProdukApi(
+      id: json['id'],
+      userId: json['user_id'],
+      group: json['group'],
+      unit: json['unit'],
+      name: json['name'],
+      value: json['value'],
+      fund: json['fund'] != null ? (json['fund'] as num).toDouble() : null,
+      buy: json['buy'] != null ? (json['buy'] as num).toDouble() : null,
+      sell: json['sell'] != null ? (json['sell'] as num).toDouble() : null,
+      picture: json['picture'],
+      status: json['status'],
+      createdAt: json['created_at'],
+      sync: json['sync'],
+    );
+  }
+
+  /// to Map for database insert/update
+  Map<String, dynamic> DB() {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    map['user_id'] = userId;
+    map['group'] = group;
+    map['unit'] = unit;
+    map['name'] = name;
+    map['value'] = value;
+    map['fund'] = fund;
+    map['buy'] = buy;
+    map['sell'] = sell;
+    map['picture'] = picture;
+    map['status'] = status;
+    map['created_at'] = createdAt;
+    map['sync'] = sync;
+    return map;
+  }
+}
+
+class DataProdukApiCart {
+  DataProdukApiCart({
+    this.id,
+    this.userId,
+    this.group,
+    this.unit,
+    this.name,
+    this.value,
+    this.fund,
+    this.buy,
+    this.sell,
+    this.picture,
+    this.status,
+    this.createdAt,
+    this.sync,
+    required this.qty,
+  });
+
+  final int? id;
+  final int? userId;
+  final String? group;
+  final String? unit;
+  final String? name;
+  final int? value;
+  final double? fund;
+  final double? buy;
+  final double? sell;
+  final String? picture;
+  final int? status;
+  final String? createdAt;
+  final int? sync;
+  int qty = 0;
+
+  /// from database json/map
+  factory DataProdukApiCart.fromJsondb(Map<String, dynamic> json) {
+    return DataProdukApiCart(
+      id: json['id'],
+      userId: json['user_id'],
+      group: json['group'],
+      unit: json['unit'],
+      name: json['name'],
+      value: json['value'],
+      fund: json['fund'] != null ? (json['fund'] as num).toDouble() : null,
+      buy: json['buy'] != null ? (json['buy'] as num).toDouble() : null,
+      sell: json['sell'] != null ? (json['sell'] as num).toDouble() : null,
+      picture: json['picture'],
+      status: json['status'],
+      createdAt: json['created_at'],
+      sync: json['sync'],
+      qty: json['qty'], // optional if you want to track local sync status
+    );
+  }
+
+  /// to Map for database insert/update
+  Map<String, dynamic> DB() {
+    final map = <String, dynamic>{};
+    map['id'] = id;
+    map['user_id'] = userId;
+    map['group'] = group;
+    map['unit'] = unit;
+    map['name'] = name;
+    map['value'] = value;
+    map['fund'] = fund;
+    map['buy'] = buy;
+    map['sell'] = sell;
+    map['picture'] = picture;
+    map['status'] = status;
+    map['created_at'] = createdAt;
+    map['sync'] = sync;
+    return map;
+  }
+}
+
 class DataProduk {
   DataProduk(
       {this.id,

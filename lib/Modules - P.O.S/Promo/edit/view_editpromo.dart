@@ -1,6 +1,7 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pattern_formatter/numeric_formatter.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Promo/edit/controller_editpromo.dart';
 
 import '../../../Config/config.dart';
@@ -26,134 +27,116 @@ class EditPromo extends GetView<EditPromoController> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.nama.value,
-                        decoration: InputDecoration(
-                          labelText: 'Kode Promo',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nama promo harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.nama.value,
+                      keyboardType: TextInputType.text,
+                      labelText: 'Nama promo'),
+                  Padding(
+                    padding: AppPading.customBottomPadding(),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Obx(() {
+                            return TextFormField(
+                              style: AppFont.regular(),
+                              inputFormatters: [ThousandsFormatter()],
+                              controller: controller.promovalue.value,
+                              decoration: InputDecoration(
+                                prefixIcon: controller.selecteddiskon.value ==
+                                        controller.opsidiskon[0]
+                                    ? const Icon(Icons.attach_money)
+                                    : const Icon(Icons.percent),
+                                labelText: 'Nilai Promo',
+                                labelStyle: AppFont.regular(),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                              keyboardType: TextInputType.number,
+                              validator: (value) {
+                                if (value == null || value.isEmpty)
+                                  return 'Diskon harus diisi';
+                                final parsed = double.tryParse(
+                                    value.replaceAll(RegExp(r'[^0-9.]'), ''));
+                                if (parsed == null)
+                                  return 'Masukkan angka valid';
+                                if (controller.selecteddiskon.value ==
+                                        controller.opsidiskon[0] &&
+                                    parsed <= 0) {
+                                  return 'Nominal harus > 0';
+                                }
+                                if (controller.selecteddiskon.value !=
+                                        controller.opsidiskon[0] &&
+                                    (parsed <= 0 || parsed > 100)) {
+                                  return 'Persen harus 1-100';
+                                }
+                                return null;
+                              },
+                              onChanged: (value) {
+                                final cleanValue =
+                                    value.replaceAll(RegExp(r'[^0-9.]'), '');
+                                final parsed = double.tryParse(cleanValue);
+                                if (parsed == null) return;
+
+                                if (controller.selecteddiskon.value ==
+                                    controller.opsidiskon[0]) {
+                                  controller.diskonpersen.value = 0.0;
+                                  controller.diskonnominal.value = parsed;
+                                  print('nominal');
+                                  print('nominal --> ' +
+                                      controller.diskonnominal.value
+                                          .toString() +
+                                      'persen --> ' +
+                                      controller.diskonpersen.value.toString());
+                                } else {
+                                  controller.diskonnominal.value = 0.0;
+                                  controller.diskonpersen.value = parsed;
+                                  print('persen');
+                                  print('nominal --> ' +
+                                      controller.diskonnominal.value
+                                          .toString() +
+                                      'persen --> ' +
+                                      controller.diskonpersen.value.toString());
+                                }
+                              },
+                            );
+                          }),
                         ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'kode promo harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
-                  Obx(
-                    () {
-                      // Update text field when radio changes
-                      final isNominal = controller.selecteddiskon.value ==
-                          controller.opsidiskon[0];
-                      final currentValue = isNominal
-                          ? controller.diskonnominal.value.toStringAsFixed(0)
-                          : controller.diskonpersen.value.toStringAsFixed(0);
-
-                      // Update controller text when value changes
-                      if (controller.promovalue.value.text != currentValue) {
-                        controller.promovalue.value.text = currentValue;
-                      }
-
-                      return Padding(
-                        padding: AppPading.customBottomPadding(),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: controller.promovalue.value,
-                                decoration: InputDecoration(
-                                  prefixIcon: isNominal
-                                      ? const Icon(Icons.money)
-                                      : const Icon(Icons.percent),
-                                  labelText: 'Nilai Promo',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
+                        Expanded(
+                          child: Obx(() {
+                            return Row(
+                              children: [
+                                Expanded(
+                                  child: RadioMenuButton(
+                                    value: controller.opsidiskon[0],
+                                    groupValue: controller.selecteddiskon.value,
+                                    onChanged: (x) =>
+                                        controller.selecteddiskon.value = x!,
+                                    child: const Text('Rp.'),
                                   ),
                                 ),
-                                keyboardType: TextInputType.number,
-                                validator: (value) {
-                                  if (value == null || value.isEmpty)
-                                    return 'Diskon harus diisi';
-                                  final parsed = double.tryParse(value);
-                                  if (parsed == null)
-                                    return 'Masukkan angka valid';
-                                  if (isNominal && parsed <= 0)
-                                    return 'Nominal harus > 0';
-                                  if (!isNominal &&
-                                      (parsed <= 0 || parsed > 100)) {
-                                    return 'Persen harus 1-100';
-                                  }
-                                  return null;
-                                },
-                                onChanged: (value) {
-                                  final parsed = double.tryParse(value);
-                                  if (parsed == null) return;
-
-                                  if (isNominal) {
-                                    controller.diskonpersen.value = 0.0;
-                                    controller.diskonnominal.value = parsed;
-                                    print('nominal');
-                                    print('nominal --> ' +
-                                        controller.diskonnominal.value
-                                            .toString() +
-                                        'persen --> ' +
-                                        controller.diskonpersen.value
-                                            .toString());
-                                  } else {
-                                    controller.diskonnominal.value = 0.0;
-                                    controller.diskonpersen.value = parsed;
-                                    print('persen');
-                                    print('nominal --> ' +
-                                        controller.diskonnominal.value
-                                            .toString() +
-                                        'persen --> ' +
-                                        controller.diskonpersen.value
-                                            .toString());
-                                  }
-                                },
-                              ),
-                            ),
-                            Expanded(
-                              child: Obx(
-                                () => Row(
-                                  children: [
-                                    Expanded(
-                                      child: RadioMenuButton(
-                                        value: controller.opsidiskon[0],
-                                        groupValue:
-                                            controller.selecteddiskon.value,
-                                        onChanged: (x) {
-                                          controller.selecteddiskon.value = x!;
-                                        },
-                                        child: const Text('Rp.'),
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: RadioMenuButton(
-                                        value: controller.opsidiskon[1],
-                                        groupValue:
-                                            controller.selecteddiskon.value,
-                                        onChanged: (x) {
-                                          controller.selecteddiskon.value = x!;
-                                        },
-                                        child: const Text('%'),
-                                      ),
-                                    ),
-                                  ],
+                                Expanded(
+                                  child: RadioMenuButton(
+                                    value: controller.opsidiskon[1],
+                                    groupValue: controller.selecteddiskon.value,
+                                    onChanged: (x) =>
+                                        controller.selecteddiskon.value = x!,
+                                    child: const Text('%'),
+                                  ),
                                 ),
-                              ),
-                            ),
-                          ],
+                              ],
+                            );
+                          }),
                         ),
-                      );
-                    },
+                      ],
+                    ),
                   ),
                   Obx(() {
                     return Container(
@@ -161,6 +144,7 @@ class EditPromo extends GetView<EditPromoController> {
                       margin: AppPading.customBottomPadding(),
                       //width: 200,
                       child: TextFormField(
+                        style: AppFont.regular(),
                         onTap: () {
                           FocusScope.of(context).requestFocus(new FocusNode());
                           Get.dialog(AlertDialog(
@@ -189,6 +173,9 @@ class EditPromo extends GetView<EditPromoController> {
                                     centerAlignModePicker: true,
                                   ),
                                   value: controller.dates,
+                                  onCancelTapped: () {
+                                    Get.back();
+                                  },
                                   onOkTapped: () {
                                     Get.back();
                                     print('tgl-----------------------------');
@@ -234,26 +221,15 @@ class EditPromo extends GetView<EditPromoController> {
                       ),
                     );
                   }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.keterangan.value,
-                        decoration: InputDecoration(
-                          labelText: 'Keterangan',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        // validator: (value) {
-                        //   if (value!.isEmpty) {
-                        //     return 'Alamat harus diisi';
-                        //   }
-                        //   return null;
-                        // },
-                      ),
-                    );
-                  }),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'keterangan harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.keterangan.value,
+                      labelText: 'Keterangan'),
                   Obx(() {
                     return Padding(
                       padding: AppPading.customBottomPadding(),

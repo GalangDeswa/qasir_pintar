@@ -40,7 +40,7 @@ class MetodeTunai extends GetView<KasirController> {
                       // controller.addbayar(controller.total.value);
                       controller.bayarvalue.value = controller.total.value;
                       controller.bayar.value.text =
-                          controller.total.value.toString();
+                          AppFormat().numFormat(controller.total.value);
                     },
                     child: Padding(
                       padding: const EdgeInsets.symmetric(

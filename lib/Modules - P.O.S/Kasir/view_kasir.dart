@@ -142,7 +142,7 @@ class CartSheet extends GetView<KasirController> {
                                 },
                                 icon: Icon(
                                   FontAwesomeIcons.tag,
-                                  color: controller.namaPromo != ''
+                                  color: controller.namaPromo.value != ''
                                       ? AppColor.primary
                                       : Colors.grey,
                                   size: 15,
@@ -154,7 +154,7 @@ class CartSheet extends GetView<KasirController> {
                                   // Get.toNamed('/basemenupelanggan');
                                   controller.popListPelanggan();
                                 },
-                                icon: controller.pelangganvalue == ''
+                                icon: controller.pelangganvalue.value == ''
                                     ? Icon(
                                         FontAwesomeIcons.userLarge,
                                         color: Colors.grey,

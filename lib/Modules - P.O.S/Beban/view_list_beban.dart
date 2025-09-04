@@ -82,16 +82,21 @@ class ListBeban extends GetView<BasemenuBebanController> {
                         subtitle: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text(beban[index].kategoriBeban!),
                             Text(
                               AppFormat().formatRupiah(
                                 beban[index].jumlahBeban!,
                               ),
-                              style: AppFont.small(),
+                              style: AppFont.regular_bold(),
                             ),
                             Text(
-                              AppFormat()
-                                  .dateFormat(beban[index].tanggalBeban!),
+                              beban[index].kategoriBeban!,
+                              style: AppFont.regular(),
+                            ),
+                            Text(
+                              style: AppFont.regular(),
+                              AppFormat().dateFormat(
+                                beban[index].tanggalBeban!,
+                              ),
                             )
                           ],
                         ),

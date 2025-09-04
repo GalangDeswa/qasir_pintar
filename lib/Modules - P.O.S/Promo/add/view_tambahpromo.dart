@@ -28,26 +28,16 @@ class TambahPromo extends GetView<TambahPromoController> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.nama.value,
-                        decoration: InputDecoration(
-                          labelText: 'kode Promo',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'kode promo harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nama promo harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.nama.value,
+                      keyboardType: TextInputType.text,
+                      labelText: 'Nama promo'),
                   Padding(
                     padding: AppPading.customBottomPadding(),
                     child: Row(
@@ -56,14 +46,16 @@ class TambahPromo extends GetView<TambahPromoController> {
                         Expanded(
                           child: Obx(() {
                             return TextFormField(
+                              style: AppFont.regular(),
                               inputFormatters: [ThousandsFormatter()],
                               controller: controller.promovalue.value,
                               decoration: InputDecoration(
                                 prefixIcon: controller.selecteddiskon.value ==
                                         controller.opsidiskon[0]
-                                    ? const Icon(Icons.money)
+                                    ? const Icon(Icons.attach_money)
                                     : const Icon(Icons.percent),
                                 labelText: 'Nilai Promo',
+                                labelStyle: AppFont.regular(),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
                                 ),
@@ -153,6 +145,7 @@ class TambahPromo extends GetView<TambahPromoController> {
                       margin: AppPading.customBottomPadding(),
                       //width: 200,
                       child: TextFormField(
+                        style: AppFont.regular(),
                         onTap: () {
                           FocusScope.of(context).requestFocus(new FocusNode());
                           Get.dialog(AlertDialog(
@@ -181,6 +174,9 @@ class TambahPromo extends GetView<TambahPromoController> {
                                     centerAlignModePicker: true,
                                   ),
                                   value: controller.dates,
+                                  onCancelTapped: () {
+                                    Get.back();
+                                  },
                                   onOkTapped: () {
                                     Get.back();
                                     print('tgl-----------------------------');
@@ -225,34 +221,21 @@ class TambahPromo extends GetView<TambahPromoController> {
                       ),
                     );
                   }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.keterangan.value,
-                        decoration: InputDecoration(
-                          labelText: 'Keterangan',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        // validator: (value) {
-                        //   if (value!.isEmpty) {
-                        //     return 'Alamat harus diisi';
-                        //   }
-                        //   return null;
-                        // },
-                      ),
-                    );
-                  }),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'keterangan harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.keterangan.value,
+                      labelText: 'Keterangan'),
                   button_solid_custom(
                       onPressed: () {
                         if (controller.registerKey.value.currentState!
                             .validate()) {
                           controller.tambahPromo();
                         }
-                        //Get.toNamed('/setuptoko');
-                        // Get.toNamed('/loginform');
                       },
                       child: Text(
                         'Tambah',

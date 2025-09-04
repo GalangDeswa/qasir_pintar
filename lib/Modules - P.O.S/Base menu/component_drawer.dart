@@ -23,6 +23,7 @@ class DrawerBase extends GetView<BasemenuController> {
       child: Column(
         children: [
           DrawerHeader(
+            curve: Curves.bounceIn,
             padding: AppPading.defaultBodyPadding(),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.only(
@@ -31,11 +32,12 @@ class DrawerBase extends GetView<BasemenuController> {
               ),
               color: AppColor.primary,
               image: DecorationImage(
-                image: AssetImage('assets/images/bg.png'),
+                image: AssetImage('assets/images/bg_login.png'),
                 fit: BoxFit.cover,
                 // alignment: Alignment(1.0, -0.5),
                 colorFilter: ColorFilter.mode(
-                    AppColor.primary.withOpacity(1), BlendMode.dstATop),
+                    AppColor.primary.withValues(alpha: 0.15),
+                    BlendMode.dstATop),
               ),
             ),
             child: Row(
@@ -43,13 +45,18 @@ class DrawerBase extends GetView<BasemenuController> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Obx(() {
-                  return CircleAvatar(
-                    backgroundImage: controller.datauser.first.logo != '-'
-                        ? MemoryImage(
-                            base64Decode(controller.datauser.first.logo!))
-                        : AssetImage(AppString.defaultImgStore),
-                    backgroundColor: Colors.white,
-                    radius: 40,
+                  return GestureDetector(
+                    onTap: () {
+                      Get.toNamed('/user');
+                    },
+                    child: CircleAvatar(
+                      backgroundImage: controller.datauser.first.logo != '-'
+                          ? MemoryImage(
+                              base64Decode(controller.datauser.first.logo!))
+                          : AssetImage(AppString.defaultImgStore),
+                      backgroundColor: Colors.white,
+                      radius: 40,
+                    ),
                   );
                 }),
                 SizedBox(width: 16),
@@ -118,46 +125,56 @@ class DrawerBase extends GetView<BasemenuController> {
                 //   indent: 16,
                 //   endIndent: 16,
                 // ),
-                ExpansionTile(
-                  title: ListTile(
-                    leading: Icon(
-                      FontAwesomeIcons.book,
-                      color: AppColor.primary,
-                    ),
-                    title: Text(
-                      'Penjualan',
-                      style: AppFont.regular(),
-                    ),
-                  ),
-                  children: [
-                    _buildDrawerItem(
-                      icon: FontAwesomeIcons.receipt,
-                      title: 'Riwayat Penjualan',
-                      onTap: () {
-                        Get.toNamed('/history');
-                      },
-                    ),
-                    // _buildDrawerItem(
-                    //   icon: FontAwesomeIcons.chartSimple,
-                    //   title: 'Laporan',
-                    //   onTap: () {
-                    //     Get.toNamed('/laporanmenu');
-                    //   },
-                    // ),
-                    // _buildDrawerItem(
-                    //   icon: FontAwesomeIcons.book,
-                    //   title: 'Laporan',
-                    //   onTap: () {
-                    //     Get.toNamed('/laporanmenu');
-                    //   },
-                    // ),
-                  ],
+                // ExpansionTile(
+                //   title: ListTile(
+                //     leading: Icon(
+                //       FontAwesomeIcons.book,
+                //       color: AppColor.primary,
+                //     ),
+                //     title: Text(
+                //       'Penjualan',
+                //       style: AppFont.regular(),
+                //     ),
+                //   ),
+                //   children: [
+                //     _buildDrawerItem(
+                //       icon: FontAwesomeIcons.receipt,
+                //       title: 'Riwayat Penjualan',
+                //       onTap: () {
+                //         Get.toNamed('/history');
+                //       },
+                //     ),
+                //     // _buildDrawerItem(
+                //     //   icon: FontAwesomeIcons.chartSimple,
+                //     //   title: 'Laporan',
+                //     //   onTap: () {
+                //     //     Get.toNamed('/laporanmenu');
+                //     //   },
+                //     // ),
+                //     // _buildDrawerItem(
+                //     //   icon: FontAwesomeIcons.book,
+                //     //   title: 'Laporan',
+                //     //   onTap: () {
+                //     //     Get.toNamed('/laporanmenu');
+                //     //   },
+                //     // ),
+                //   ],
+                // ),
+
+                _buildDrawerItem(
+                  icon: FontAwesomeIcons.receipt,
+                  title: 'Riwayat Penjualan',
+                  onTap: () {
+                    Get.toNamed('/history');
+                  },
                 ),
+
                 ExpansionTile(
                   title: ListTile(
                     leading: Icon(
                       FontAwesomeIcons.chartSimple,
                       color: AppColor.primary,
+                      size: 20,
                     ),
                     title: Text(
                       'Laporan',
@@ -201,6 +218,7 @@ class DrawerBase extends GetView<BasemenuController> {
                     leading: Icon(
                       FontAwesomeIcons.moneyBillWave,
                       color: AppColor.primary,
+                      size: 20,
                     ),
                     title: Text(
                       'Beban',
@@ -211,46 +229,50 @@ class DrawerBase extends GetView<BasemenuController> {
                     },
                   ),
                 ),
-                ExpansionTile(
-                  title: ListTile(
-                    leading: Icon(
-                      FontAwesomeIcons.box,
-                      color: AppColor.primary,
-                    ),
-                    title: Text(
-                      'Produk',
-                      style: AppFont.regular(),
-                    ),
-                  ),
-                  children: [
-                    _buildDrawerItem(
-                      icon: FontAwesomeIcons.boxOpen,
-                      title: 'Produk / kategori',
-                      onTap: () {
-                        Get.toNamed('/basemenuproduk');
-                      },
-                    ),
-                    _buildDrawerItem(
-                      icon: FontAwesomeIcons.tags,
-                      title: 'Promo / Kupon',
-                      onTap: () {
-                        Get.toNamed('/promo');
-                      },
-                    ),
-                    _buildDrawerItem(
-                      icon: FontAwesomeIcons.boxesStacked,
-                      title: 'Inventori',
-                      onTap: () {
-                        Get.toNamed('/basemenu_stock');
-                      },
-                    ),
-                  ],
+
+                _buildDrawerItem(
+                  icon: FontAwesomeIcons.boxesStacked,
+                  title: 'Inventori',
+                  onTap: () {
+                    Get.toNamed('/basemenu_stock');
+                  },
                 ),
+                // ExpansionTile(
+                //   title: ListTile(
+                //     leading: Icon(
+                //       FontAwesomeIcons.box,
+                //       color: AppColor.primary,
+                //       size: 20,
+                //     ),
+                //     title: Text(
+                //       'Produk',
+                //       style: AppFont.regular(),
+                //     ),
+                //   ),
+                //   children: [
+                //     _buildDrawerItem(
+                //       icon: FontAwesomeIcons.boxOpen,
+                //       title: 'Produk / kategori',
+                //       onTap: () {
+                //         Get.toNamed('/basemenuproduk');
+                //       },
+                //     ),
+                //     _buildDrawerItem(
+                //       icon: FontAwesomeIcons.tags,
+                //       title: 'Promo / Kupon',
+                //       onTap: () {
+                //         Get.toNamed('/promo');
+                //       },
+                //     ),
+                //
+                //   ],
+                // ),
                 ExpansionTile(
                   title: ListTile(
                     leading: Icon(
                       FontAwesomeIcons.phone,
                       color: AppColor.primary,
+                      size: 20,
                     ),
                     title: Text(
                       'Data Kontak',
@@ -273,7 +295,7 @@ class DrawerBase extends GetView<BasemenuController> {
                       },
                     ),
 
-                    //TODO: check sistem pos
+                    //TODO: regis/edit user custom form / check dashboard report
                     _buildDrawerItem(
                       icon: FontAwesomeIcons.boxesPacking,
                       title: 'Supplier',
@@ -451,35 +473,35 @@ class DrawerBase extends GetView<BasemenuController> {
                     }),
                   ],
                 ),
-                ExpansionTile(
-                  title: ListTile(
-                    leading: Icon(
-                      FontAwesomeIcons.gears,
-                      color: AppColor.primary,
-                    ),
-                    title: Text(
-                      'Pengaturan',
-                      style: AppFont.regular(),
-                    ),
-                  ),
-                  children: [
-                    _buildDrawerItem(
-                      icon: FontAwesomeIcons.gear,
-                      title: 'Pengaturan',
-                      onTap: () {
-                        Get.toNamed('/pengaturan');
-                      },
-                    ),
-                    _buildDrawerItem(
-                      icon: FontAwesomeIcons.sync,
-                      title: 'Sync',
-                      onTap: () {
-                        // Get.toNamed('/edit_tokov2');
-                        //controller.stringGenerator(10);
-                      },
-                    ),
-                  ],
-                ),
+                // ExpansionTile(
+                //   title: ListTile(
+                //     leading: Icon(
+                //       FontAwesomeIcons.gears,
+                //       color: AppColor.primary,
+                //     ),
+                //     title: Text(
+                //       'Pengaturan',
+                //       style: AppFont.regular(),
+                //     ),
+                //   ),
+                //   children: [
+                //     _buildDrawerItem(
+                //       icon: FontAwesomeIcons.gear,
+                //       title: 'Pengaturan',
+                //       onTap: () {
+                //         Get.toNamed('/pengaturan');
+                //       },
+                //     ),
+                //     _buildDrawerItem(
+                //       icon: FontAwesomeIcons.sync,
+                //       title: 'Sync',
+                //       onTap: () {
+                //         // Get.toNamed('/edit_tokov2');
+                //         //controller.stringGenerator(10);
+                //       },
+                //     ),
+                //   ],
+                // ),
                 Divider(
                   color: Colors.black.withOpacity(0.1),
                   thickness: 1,
@@ -487,13 +509,21 @@ class DrawerBase extends GetView<BasemenuController> {
                   indent: 16,
                   endIndent: 16,
                 ),
-                _buildDrawerItem(
-                  icon: FontAwesomeIcons.signOut,
-                  title: 'Keluar',
-                  onTap: () {
-                    // Get.toNamed('/edit_tokov2');
-                    //controller.stringGenerator(10);
-                  },
+                Padding(
+                  padding: const EdgeInsets.only(left: 15),
+                  child: ListTile(
+                    leading: Icon(
+                      FontAwesomeIcons.arrowRightFromBracket,
+                      color: AppColor.primary,
+                    ),
+                    title: Text(
+                      'Log out',
+                      style: AppFont.regular(),
+                    ),
+                    onTap: () {
+                      controller.logout();
+                    },
+                  ),
                 ),
               ],
             ),
@@ -509,7 +539,7 @@ class DrawerBase extends GetView<BasemenuController> {
     required VoidCallback onTap,
   }) {
     return Padding(
-      padding: EdgeInsets.only(left: 35),
+      padding: EdgeInsets.only(left: 15),
       child: ListTile(
         leading: Icon(
           icon,

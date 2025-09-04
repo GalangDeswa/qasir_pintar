@@ -25,66 +25,34 @@ class EditSupplier extends GetView<EditSupplierController> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.nama.value,
-                        decoration: InputDecoration(
-                          labelText: 'Nama Supllier',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Nama harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.telepon.value,
-                        decoration: InputDecoration(
-                          labelText: 'Nomor telepon',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.phone,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Nomor telepon harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.alamat.value,
-                        decoration: InputDecoration(
-                          labelText: 'Alamat',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Alamat harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nama supplier harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.nama.value,
+                      labelText: 'Nama supplier'),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nomor hp harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.telepon.value,
+                      keyboardType: TextInputType.phone,
+                      labelText: 'Nomor hp'),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Alamat harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.alamat.value,
+                      labelText: 'Alamat'),
                   Obx(() {
                     return Padding(
                       padding: AppPading.customBottomPadding(),

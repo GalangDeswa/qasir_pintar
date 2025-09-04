@@ -178,26 +178,15 @@ class TambahKategoriPelanggan
                       ),
                     );
                   }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.nama.value,
-                        decoration: InputDecoration(
-                          labelText: 'Kategori',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Kategori harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Kategori harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.nama.value,
+                      labelText: 'Kategori pelanggan'),
                   button_solid_custom(
                       onPressed: () {
                         if (controller.registerKey.value.currentState!

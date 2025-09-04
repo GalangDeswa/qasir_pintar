@@ -21,7 +21,7 @@ class TambahProdukv3 extends GetView<TambahProdukController> {
     return Scaffold(
       appBar: AppbarCustom(title: 'Tambah produk', NeedBottom: false),
       body: Padding(
-        padding: EdgeInsets.all(16.0),
+        padding: AppPading.defaultBodyPadding(),
         child: SingleChildScrollView(
           child: Form(
             key: controller.registerKey.value,
@@ -285,201 +285,130 @@ class TambahProdukv3 extends GetView<TambahProdukController> {
                   );
                 }),
 
-                Padding(
-                  padding: AppPading.customBottomPadding(),
-                  child: TextFormField(
-                    controller: controller.namaProduk,
-                    decoration: InputDecoration(
-                      labelText: 'Nama Produk',
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
+                customTextField(
+                  controller: controller.namaProduk,
+                  labelText: 'Nama produk',
+                  validator: (value) {
+                    print('print value validator');
+                    print(value);
+                    if (value == null || value.isEmpty) {
+                      return 'keterangan harus dipilih';
+                    }
+                    return null;
+                  },
+                ),
+
+                customTextField(
+                  controller: controller.kodeProduk.value,
+                  labelText: 'Kode produk (opsional)',
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Obx(() {
+                        return customDropdownField(
+                          hintText: 'Kategori produk',
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Kategori harus dipilih';
+                            }
+                            return null;
+                          },
+                          items: controller.kategorilist.map((x) {
+                            return DropdownMenuItem(
+                              child: Text(x.namakelompok!),
+                              value: x.uuid,
+                            );
+                          }).toList(),
+                          value: controller.kategorivalue,
+                          onChanged: (val) async {
+                            controller.kategorivalue = val;
+                            controller.subKategorivalue = null;
+                            await controller.fetchSubKategoriProdukLocal(
+                                id_toko: controller.id_toko, kategori: val);
+                          },
+                        );
+                      }),
                     ),
-                    validator: (value) {
-                      if (value!.isEmpty) {
-                        return 'Nama Produk harus diisi';
-                      }
-                      return null;
-                    },
-                  ),
+                    Container(
+                        margin: EdgeInsets.only(left: 15),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle, color: AppColor.primary),
+                        child: IconButton(
+                            onPressed: () {
+                              Get.toNamed('/tambahkategoriproduk');
+                            },
+                            icon: Icon(
+                              Icons.add,
+                              color: Colors.white,
+                            ))),
+                  ],
+                ),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Obx(() {
+                        return customDropdownField(
+                          hintText: 'Sub Kategori produk',
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Sub Kategori harus dipilih';
+                            }
+                            return null;
+                          },
+                          items: controller.subKategorilist.map((x) {
+                            return DropdownMenuItem(
+                              child: Text(x.namaSubkelompok!),
+                              value: x.uuid,
+                            );
+                          }).toList(),
+                          value: controller.subKategorivalue,
+                          onChanged: (val) {
+                            controller.subKategorivalue = val;
+                            print(controller.subKategorivalue);
+                          },
+                        );
+                      }),
+                    ),
+                    Container(
+                        margin: EdgeInsets.only(left: 15),
+                        decoration: BoxDecoration(
+                            shape: BoxShape.circle, color: AppColor.primary),
+                        child: IconButton(
+                            onPressed: () {
+                              print('ke sub kat');
+                              Get.toNamed('/tambahsubkategori',
+                                  arguments: controller.kategorivalue);
+                            },
+                            icon: Icon(
+                              Icons.add,
+                              color: Colors.white,
+                            ))),
+                  ],
                 ),
 
                 Obx(() {
-                  return Padding(
-                    padding: AppPading.customBottomPadding(),
-                    child: TextFormField(
-                      controller: controller.kodeProduk.value,
-                      decoration: InputDecoration(
-                        labelText: 'Kode Produk (Opsional)',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      // validator: (value) {
-                      //   if (value!.isEmpty) {
-                      //     return 'Kode Produk harus diisi';
-                      //   }
-                      //   return null;
-                      // },
-                    ),
-                  );
-                }),
-                Obx(() {
-                  return Padding(
-                    padding: AppPading.customBottomPadding(),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButtonFormField2(
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Kategori harus dipilih';
-                              }
-                              return null;
-                            },
-                            isExpanded: true,
-                            dropdownStyleData: DropdownStyleData(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.white)),
-                            hint: Text('kategori', style: AppFont.regular()),
-                            value: controller.kategorivalue,
-                            items: controller.kategorilist.map((x) {
-                              return DropdownMenuItem(
-                                child: Text(x.namakelompok!),
-                                value: x.uuid,
-                              );
-                            }).toList(),
-                            onChanged: (val) async {
-                              controller.kategorivalue = val;
-                              controller.subKategorivalue = null;
-                              await controller.fetchSubKategoriProdukLocal(
-                                  id_toko: controller.id_toko, kategori: val);
-                            },
-                          ),
-                        ),
-                        Container(
-                            margin: EdgeInsets.only(left: 15),
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColor.primary),
-                            child: IconButton(
-                                onPressed: () {
-                                  Get.toNamed('/tambahkategoriproduk');
-                                },
-                                icon: Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                ))),
-                      ],
-                    ),
-                  );
-                }),
-                Obx(() {
-                  return Padding(
-                    padding: AppPading.customBottomPadding(),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButtonFormField2(
-                            // key: UniqueKey(),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null) {
-                                return 'Sub Kategori dipilih';
-                              }
-                              return null;
-                            },
-                            isExpanded: true,
-                            dropdownStyleData: DropdownStyleData(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.white)),
-                            hint:
-                                Text('Sub kategori', style: AppFont.regular()),
-                            value: controller.subKategorivalue,
-                            items: controller.subKategorilist.map((x) {
-                              return DropdownMenuItem(
-                                child: Text(x.namaSubkelompok!),
-                                value: x.uuid,
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              controller.subKategorivalue = val;
-                              print(controller.subKategorivalue);
-                            },
-                          ),
-                        ),
-                        Container(
-                            margin: EdgeInsets.only(left: 15),
-                            decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: AppColor.primary),
-                            child: IconButton(
-                                onPressed: () {
-                                  print('ke sub kat');
-                                  Get.toNamed('/tambahsubkategori',
-                                      arguments: controller.kategorivalue);
-                                },
-                                icon: Icon(
-                                  Icons.add,
-                                  color: Colors.white,
-                                ))),
-                      ],
-                    ),
-                  );
-                }),
-
-                Obx(() {
-                  return Padding(
-                    padding: AppPading.customBottomPadding(),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          child: DropdownButtonFormField2(
-                            //key: UniqueKey(),
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            validator: (value) {
-                              if (value == null) {
-                                return 'jenis produk dipilih';
-                              }
-                              return null;
-                            },
-                            isExpanded: true,
-                            dropdownStyleData: DropdownStyleData(
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.white)),
-                            hint:
-                                Text('Jenis produk', style: AppFont.regular()),
-                            value: controller.jenisvalue,
-                            items: controller.jenisproduklist.map((x) {
-                              return DropdownMenuItem(
-                                child: Text(x),
-                                value: x,
-                              );
-                            }).toList(),
-                            onChanged: (val) {
-                              controller.jenisvalue = val;
-                              print(controller.jenisvalue);
-                            },
-                          ),
-                        ),
-                      ],
-                    ),
+                  return customDropdownField(
+                    hintText: 'Jenis produk',
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Jenis produk harus dipilih';
+                      }
+                      return null;
+                    },
+                    items: controller.jenisproduklist.map((x) {
+                      return DropdownMenuItem(
+                        child: Text(x),
+                        value: x,
+                      );
+                    }).toList(),
+                    value: controller.jenisvalue,
+                    onChanged: (val) {
+                      controller.jenisvalue = val;
+                      print(controller.jenisvalue);
+                    },
                   );
                 }),
 
@@ -568,187 +497,71 @@ class TambahProdukv3next extends GetView<TambahProdukController> {
                   ),
                 ),
 
-                Obx(() {
-                  return Padding(
-                    padding: AppPading.customBottomPadding(),
-                    child: TextFormField(
-                      controller: controller.hargaBeli.value,
-                      onChanged: (val) {
-                        print(controller.hargaBeli.value.text);
-                      },
-                      inputFormatters: [ThousandsFormatter()],
-                      decoration: InputDecoration(
-                        labelText: 'Harga Beli',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value!.isEmpty) {
-                          return 'Harga Beli harus diisi';
-                        }
-                        return null;
-                      },
-                    ),
-                  );
-                }),
-                Obx(() {
-                  return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.hpp.value,
-                        inputFormatters: [ThousandsFormatter()],
-                        decoration: InputDecoration(
-                          labelText: 'Harga Minimal Jual',
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'HPP harus diisi';
-                          }
-                          if (double.parse(controller.hpp.value.text
-                                  .replaceAll(',', '')) <
-                              double.parse(controller.hargaBeli.value.text
-                                  .replaceAll(',', ''))) {
-                            return 'HPP harus >= dari Harga Beli';
-                          }
-                          return null;
-                        },
-                      ));
-                }),
+                customTextField(
+                  controller: controller.hargaBeli.value,
+                  labelText: 'Harga beli',
+                  validator: (value) {
+                    print('print value validator');
+                    print(value);
+                    if (value == null || value.isEmpty) {
+                      return 'harga beli harus dipilih';
+                    }
+                    return null;
+                  },
+                  inputFormatters: [ThousandsFormatter()],
+                  keyboardType: TextInputType.number,
+                ),
+                customTextField(
+                  controller: controller.hpp.value,
+                  labelText: 'HPP',
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'HPP harus diisi';
+                    }
+                    if (double.parse(
+                            controller.hpp.value.text.replaceAll(',', '')) <
+                        double.parse(controller.hargaBeli.value.text
+                            .replaceAll(',', ''))) {
+                      return 'HPP harus >= dari Harga Beli';
+                    }
+                    return null;
+                  },
+                  inputFormatters: [ThousandsFormatter()],
+                  keyboardType: TextInputType.number,
+                ),
 
-                Obx(() {
-                  return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: controller.hargaJualEceran.value,
-                              inputFormatters: [ThousandsFormatter()],
-                              decoration: InputDecoration(
-                                labelText: 'Harga Jual Eceran',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                if (value!.isEmpty) {
-                                  return 'Harga Jual eceran harus diisi';
-                                }
-                                if (double.parse(controller
-                                        .hargaJualEceran.value.text
-                                        .replaceAll(',', '')) <
-                                    double.parse(controller.hpp.value.text
-                                        .replaceAll(',', ''))) {
-                                  return 'harga eceran harus >= HPP';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                          // Container(
-                          //     margin: EdgeInsets.only(left: 15),
-                          //     decoration: BoxDecoration(
-                          //         shape: BoxShape.circle,
-                          //         color: AppColor.primary),
-                          //     child: IconButton(
-                          //         onPressed: () {},
-                          //         icon: Icon(
-                          //           Icons.add,
-                          //           color: Colors.white,
-                          //         )))
-                        ],
-                      ));
-                }),
+                customTextField(
+                  controller: controller.hargaJualEceran.value,
+                  labelText: 'Harga jual eceran',
+                  validator: (value) {
+                    if (value!.isEmpty) {
+                      return 'Harga Jual eceran harus diisi';
+                    }
+                    if (double.parse(controller.hargaJualEceran.value.text
+                            .replaceAll(',', '')) <
+                        double.parse(
+                            controller.hpp.value.text.replaceAll(',', ''))) {
+                      return 'harga eceran harus >= HPP';
+                    }
+                    return null;
+                  },
+                  inputFormatters: [ThousandsFormatter()],
+                  keyboardType: TextInputType.number,
+                ),
 
-                Obx(() {
-                  return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: controller.hargaJualGrosir.value,
-                              inputFormatters: [ThousandsFormatter()],
-                              decoration: InputDecoration(
-                                labelText: 'Harga Jual grosir (optional)',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                // if (value!.isEmpty) {
-                                //   return 'Harga Jual grosir harus diisi';
-                                // }
-                                if (value!.isNotEmpty &&
-                                    double.parse(controller
-                                            .hargaJualGrosir.value.text
-                                            .replaceAll(',', '')) <
-                                        double.parse(controller.hpp.value.text
-                                            .replaceAll(',', ''))) {
-                                  return 'harga grosir harus >= dengan HPP';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                        ],
-                      ));
-                }),
+                customTextField(
+                  controller: controller.hargaJualGrosir.value,
+                  labelText: 'Harga jual grosir (opsional)',
+                  inputFormatters: [ThousandsFormatter()],
+                  keyboardType: TextInputType.number,
+                ),
 
-                Obx(() {
-                  return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextFormField(
-                              controller: controller.hargaJualPelanggan.value,
-                              inputFormatters: [ThousandsFormatter()],
-                              decoration: InputDecoration(
-                                labelText: 'Harga Jual pelanggan (optional)',
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              keyboardType: TextInputType.number,
-                              validator: (value) {
-                                // if (value!.isEmpty) {
-                                //   return 'Harga Jual eceran harus diisi';
-                                // }
-                                if (value!.isNotEmpty &&
-                                    double.parse(controller
-                                            .hargaJualPelanggan.value.text
-                                            .replaceAll(',', '')) <
-                                        double.parse(controller.hpp.value.text
-                                            .replaceAll(',', ''))) {
-                                  return 'harga jual pelanggan harus >= HPP';
-                                }
-                                return null;
-                              },
-                            ),
-                          ),
-                          // Container(
-                          //     margin: EdgeInsets.only(left: 15),
-                          //     decoration: BoxDecoration(
-                          //         shape: BoxShape.circle,
-                          //         color: AppColor.primary),
-                          //     child: IconButton(
-                          //         onPressed: () {},
-                          //         icon: Icon(
-                          //           Icons.add,
-                          //           color: Colors.white,
-                          //         )))
-                        ],
-                      ));
-                }),
+                customTextField(
+                  controller: controller.hargaJualPelanggan.value,
+                  labelText: 'Harga jual pelanggan (opsional)',
+                  inputFormatters: [ThousandsFormatter()],
+                  keyboardType: TextInputType.number,
+                ),
 
                 // switch on off---------------------------------------------
 
@@ -859,53 +672,41 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
                 }),
                 Obx(() {
                   return controller.hitungStok.value == true
-                      ? Padding(
-                          padding: AppPading.customBottomPadding(),
-                          child: TextFormField(
-                            controller: controller.stockawal.value,
-                            decoration: InputDecoration(
-                              labelText: 'Stock awal',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            // validator: (value) {
-                            //            if (value!.isEmpty) {
-                            //              return 'Pajak harus diisi';
-                            //            }
-                            //            return null;
-                            //          },
-                          ))
+                      ? customTextField(
+                          controller: controller.stockawal.value,
+                          labelText: 'Stock awal',
+                          validator: (value) {
+                            if (controller.hitungStok.value == true &&
+                                value!.isEmpty) {
+                              return 'Stock awal harus diisi';
+                            }
+                            return null;
+                          },
+                          inputFormatters: [ThousandsFormatter()],
+                          keyboardType: TextInputType.number,
+                        )
                       : Container();
                 }),
                 Obx(() {
                   return controller.hitungStok.value == true
-                      ? Padding(
-                          padding: AppPading.customBottomPadding(),
-                          child: TextFormField(
-                            controller: controller.infostock.value,
-                            decoration: InputDecoration(
-                              labelText: 'Minimum Stock',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            validator: (value) {
-                              if (controller.hitungStok.value == true &&
-                                  value!.isEmpty) {
-                                return 'Minimum stock harus diisi';
-                              }
-                              if (value!.isNotEmpty && int.parse(value) < 0)
-                                return 'Minimum stock tidak boleh lebih kecil dari 0';
-                              if (value!.isNotEmpty &&
-                                  int.parse(value) >
-                                      int.parse(
-                                          controller.stockawal.value.text))
-                                return 'Minimum stock tidak boleh lebih kecil besar dari stock awal';
-                            },
-                          ))
+                      ? customTextField(
+                          controller: controller.infostock.value,
+                          labelText: 'Minimum stock',
+                          validator: (value) {
+                            if (controller.hitungStok.value == true &&
+                                value!.isEmpty) {
+                              return 'Minimum stock harus diisi';
+                            }
+                            if (value!.isNotEmpty && int.parse(value) < 0)
+                              return 'Minimum stock tidak boleh lebih kecil dari 0';
+                            if (value!.isNotEmpty &&
+                                int.parse(value) >
+                                    int.parse(controller.stockawal.value.text))
+                              return 'Minimum stock tidak boleh lebih kecil besar dari stock awal';
+                          },
+                          inputFormatters: [ThousandsFormatter()],
+                          keyboardType: TextInputType.number,
+                        )
                       : Container();
                 }),
 
@@ -942,9 +743,11 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
                                 Expanded(
                                   child: Obx(() {
                                     return TextFormField(
+                                      style: AppFont.regular(),
                                       inputFormatters: [ThousandsFormatter()],
                                       controller: controller.diskon.value,
                                       decoration: InputDecoration(
+                                        labelStyle: AppFont.regular(),
                                         prefixIcon:
                                             controller.selecteddiskon.value ==
                                                     controller.opsidiskon[0]
@@ -1051,81 +854,58 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
 
                 Obx(() {
                   return controller.pajakdisplay.value == true
-                      ? Padding(
-                          padding: AppPading.customBottomPadding(),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: DropdownButtonFormField2(
-                                  //key: UniqueKey(),
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  // validator: (value) {
-                                  //   if (value == null) {
-                                  //     return 'Sub Kategori dipilih';
-                                  //   }
-                                  //   return null;
-                                  // },
-                                  isExpanded: true,
-                                  dropdownStyleData: DropdownStyleData(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Colors.white)),
-                                  hint: Text('Pajak (opsional)',
-                                      style: AppFont.regular()),
-                                  value: controller.pajakValue,
-                                  items: controller.pajakList.map((x) {
-                                    return DropdownMenuItem(
-                                      child: Text(x.nama_pajak! +
-                                          ' - ' +
-                                          '' +
-                                          x.nominal_pajak!.toString() +
-                                          '%'),
-                                      value: x.uuid,
-                                    );
-                                  }).toList(),
-                                  onChanged: (val) {
-                                    controller.pajakValue = val;
-                                    var matchingPajak =
-                                        controller.pajakList.firstWhere(
-                                      (e) => e.uuid == val,
-                                    );
+                      ? Row(
+                          children: [
+                            Expanded(
+                              child: customDropdownField(
+                                hintText: 'Pajak',
+                                items: controller.pajakList.map((x) {
+                                  return DropdownMenuItem(
+                                    child: Text(x.nama_pajak! +
+                                        ' - ' +
+                                        '' +
+                                        x.nominal_pajak!.toString() +
+                                        '%'),
+                                    value: x.uuid,
+                                  );
+                                }).toList(),
+                                value: controller.pajakValue,
+                                onChanged: (val) {
+                                  controller.pajakValue = val;
+                                  var matchingPajak =
+                                      controller.pajakList.firstWhere(
+                                    (e) => e.uuid == val,
+                                  );
 
-                                    // If a matching pajak is found, update nominalPajak
-                                    if (matchingPajak != null) {
-                                      controller.nominalPajak.value.text =
-                                          matchingPajak.nominal_pajak
-                                              .toString();
-                                    } else {
-                                      // Handle the case where no matching pajak is found
-                                      controller.nominalPajak.value.text =
-                                          '0'; // or any default value
-                                    }
-                                    print(controller.pajakValue);
-                                  },
-                                ),
+                                  // If a matching pajak is found, update nominalPajak
+                                  if (matchingPajak != null) {
+                                    controller.nominalPajak.value.text =
+                                        matchingPajak.nominal_pajak.toString();
+                                  } else {
+                                    // Handle the case where no matching pajak is found
+                                    controller.nominalPajak.value.text =
+                                        '0'; // or any default value
+                                  }
+                                  print(controller.pajakValue);
+                                },
                               ),
-                              Container(
-                                  margin: EdgeInsets.only(left: 15),
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColor.primary),
-                                  child: IconButton(
-                                      onPressed: () {
-                                        Get.toNamed(
-                                          '/tambahpajak',
-                                        );
-                                      },
-                                      icon: Icon(
-                                        Icons.add,
-                                        color: Colors.white,
-                                      ))),
-                            ],
-                          ),
+                            ),
+                            Container(
+                                margin: EdgeInsets.only(left: 15),
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColor.primary),
+                                child: IconButton(
+                                    onPressed: () {
+                                      Get.toNamed(
+                                        '/tambahpajak',
+                                      );
+                                    },
+                                    icon: Icon(
+                                      Icons.add,
+                                      color: Colors.white,
+                                    ))),
+                          ],
                         )
                       : Container();
                 }),
@@ -1152,61 +932,39 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
                 }),
                 Obx(() {
                   return controller.ukurandisplay.value == true
-                      ? Padding(
-                          padding: AppPading.customBottomPadding(),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: DropdownButtonFormField2(
-                                  //key: UniqueKey(),
-                                  decoration: InputDecoration(
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  // validator: (value) {
-                                  //   if (value == null) {
-                                  //     return 'Sub Kategori dipilih';
-                                  //   }
-                                  //   return null;
-                                  // },
-                                  isExpanded: true,
-                                  dropdownStyleData: DropdownStyleData(
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10),
-                                          color: Colors.white)),
-                                  hint: Text('Ukuran (opsional)',
-                                      style: AppFont.regular()),
-                                  value: controller.ukuranValue,
-                                  items: controller.ukuranList.map((x) {
-                                    return DropdownMenuItem(
-                                      child: Text(x.ukuran!),
-                                      value: x.uuid,
-                                    );
-                                  }).toList(),
-                                  onChanged: (val) {
-                                    controller.ukuranValue = val;
-                                  },
-                                ),
+                      ? Row(
+                          children: [
+                            Expanded(
+                              child: customDropdownField(
+                                hintText: 'Ukuran',
+                                items: controller.ukuranList.map((x) {
+                                  return DropdownMenuItem(
+                                    child: Text(x.ukuran!),
+                                    value: x.uuid,
+                                  );
+                                }).toList(),
+                                value: controller.ukuranValue,
+                                onChanged: (val) {
+                                  controller.ukuranValue = val;
+                                },
                               ),
-                              Container(
-                                  margin: EdgeInsets.only(left: 15),
-                                  decoration: BoxDecoration(
-                                      shape: BoxShape.circle,
-                                      color: AppColor.primary),
-                                  child: IconButton(
-                                      onPressed: () {
-                                        Get.toNamed(
-                                          '/tambahukuran',
-                                        );
-                                      },
-                                      icon: Icon(
-                                        Icons.add,
-                                        color: Colors.white,
-                                      ))),
-                            ],
-                          ),
+                            ),
+                            Container(
+                                margin: EdgeInsets.only(left: 15),
+                                decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: AppColor.primary),
+                                child: IconButton(
+                                    onPressed: () {
+                                      Get.toNamed(
+                                        '/tambahukuran',
+                                      );
+                                    },
+                                    icon: Icon(
+                                      Icons.add,
+                                      color: Colors.white,
+                                    ))),
+                          ],
                         )
                       : Container();
                 }),
@@ -1233,94 +991,38 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
                 }),
                 Obx(() {
                   return controller.dimensi == true
-                      ? Padding(
-                          padding: AppPading.customBottomPadding(),
-                          child: TextFormField(
-                            controller: controller.berat.value,
-                            inputFormatters: [ThousandsFormatter()],
-                            decoration: InputDecoration(
-                              labelText: 'Berat (Kg) (opsional)',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            // validator: (value) {
-                            //   if (value!.isEmpty) {
-                            //     return 'Berat harus diisi';
-                            //   }
-                            //   return null;
-                            // },
-                          ))
+                      ? customTextField(
+                          controller: controller.berat.value,
+                          labelText: 'Berat (KG) (opsional)',
+                          inputFormatters: [ThousandsFormatter()],
+                          keyboardType: TextInputType.number)
                       : Container();
                 }),
                 Obx(() {
                   return controller.dimensi == true
-                      ? Padding(
-                          padding: AppPading.customBottomPadding(),
-                          child: TextFormField(
-                            controller: controller.volumePanjang.value,
-                            inputFormatters: [ThousandsFormatter()],
-                            decoration: InputDecoration(
-                              labelText: 'Volume Panjang (opsional)',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            validator: (value) {
-                              //   if (value!.isEmpty) {
-                              //     return 'Volume Panjang harus diisi';
-                              //   }
-                              //   return null;
-                            },
-                          ))
+                      ? customTextField(
+                          controller: controller.volumePanjang.value,
+                          labelText: 'Pajang (M) (opsional)',
+                          inputFormatters: [ThousandsFormatter()],
+                          keyboardType: TextInputType.number)
                       : Container();
                 }),
                 Obx(() {
                   return controller.dimensi == true
-                      ? Padding(
-                          padding: AppPading.customBottomPadding(),
-                          child: TextFormField(
-                            controller: controller.volumeLebar.value,
-                            inputFormatters: [ThousandsFormatter()],
-                            decoration: InputDecoration(
-                              labelText: 'Volume Lebar (opsional)',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            validator: (value) {
-                              //   if (value!.isEmpty) {
-                              //     return 'Volume Lebar harus diisi';
-                              //   }
-                              //   return null;
-                            },
-                          ))
+                      ? customTextField(
+                          controller: controller.volumeLebar.value,
+                          labelText: 'lebar (M) (opsional)',
+                          inputFormatters: [ThousandsFormatter()],
+                          keyboardType: TextInputType.number)
                       : Container();
                 }),
                 Obx(() {
                   return controller.dimensi == true
-                      ? Padding(
-                          padding: AppPading.customBottomPadding(),
-                          child: TextFormField(
-                            controller: controller.volumeTinggi.value,
-                            inputFormatters: [ThousandsFormatter()],
-                            decoration: InputDecoration(
-                              labelText: 'Volume Tinggi (opsional)',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            keyboardType: TextInputType.number,
-                            validator: (value) {
-                              //   if (value!.isEmpty) {
-                              //     return 'Volume Tinggi harus diisi';
-                              //   }
-                              //   return null;
-                            },
-                          ))
+                      ? customTextField(
+                          controller: controller.volumeTinggi.value,
+                          labelText: 'Tinggi (M) (opsional)',
+                          inputFormatters: [ThousandsFormatter()],
+                          keyboardType: TextInputType.number)
                       : Container();
                 }),
                 // Switch for hitung_stok
@@ -1332,7 +1034,10 @@ class TambahProdukv3Final extends GetView<TambahProdukController> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text('Tampilkan di Produk'),
+                        Text(
+                          'Tampilkan di Produk',
+                          style: AppFont.regular(),
+                        ),
                         Switch(
                           value: controller.tampilkanDiProduk.value,
                           onChanged: (value) {

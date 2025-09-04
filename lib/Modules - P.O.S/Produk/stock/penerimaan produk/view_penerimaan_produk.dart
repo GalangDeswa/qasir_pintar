@@ -286,7 +286,12 @@ class PenerimaanProduk extends GetView<PenerimaanProdukController> {
                                     return null;
                                   },
                                   hintText: 'Jenis penerimaan',
-                                  items: controller.jenispenerimaan,
+                                  items: controller.jenispenerimaan.map((x) {
+                                    return DropdownMenuItem(
+                                      child: Text(x),
+                                      value: x,
+                                    );
+                                  }).toList(),
                                   value: controller.jenispenerimaanvalue.value,
                                   onChanged: (val) {
                                     controller.jenispenerimaanvalue.value =
@@ -307,7 +312,7 @@ class PenerimaanProduk extends GetView<PenerimaanProdukController> {
                               Obx(() {
                                 return customTextField(
                                     validator: (value) {
-                                      if (value == null) {
+                                      if (value == null || value.isEmpty) {
                                         return 'Nomor faktur harus diisi';
                                       }
                                       return null;
@@ -319,7 +324,7 @@ class PenerimaanProduk extends GetView<PenerimaanProdukController> {
                                 return customTextField(
                                     readOnly: true,
                                     validator: (value) {
-                                      if (value == null) {
+                                      if (value == null || value.isEmpty) {
                                         return 'jumlah harus diisi';
                                       }
                                       return null;
@@ -331,7 +336,7 @@ class PenerimaanProduk extends GetView<PenerimaanProdukController> {
                                 return customTextField(
                                     readOnly: true,
                                     validator: (value) {
-                                      if (value == null) {
+                                      if (value == null || value.isEmpty) {
                                         return 'total harga harus diisi';
                                       }
                                       return null;
@@ -359,6 +364,12 @@ class PenerimaanProduk extends GetView<PenerimaanProdukController> {
                                 return customTextField(
                                     onChanged: (x) {
                                       controller.cariSisaBayar();
+                                    },
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'jumlah harus diisi';
+                                      }
+                                      return null;
                                     },
                                     inputFormatters: [ThousandsFormatter()],
                                     controller: controller.jumlahbayar.value,

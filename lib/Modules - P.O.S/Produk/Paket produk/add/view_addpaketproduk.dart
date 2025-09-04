@@ -423,149 +423,61 @@ class TambahPaketProduk extends GetView<TambahPaketProdukController> {
                                     )
                                   : Center(child: Text('Paket kosong')),
                             ),
-                            Padding(
-                                padding: AppPading.customBottomPadding(),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller: controller.namaPaket.value,
-                                        decoration: InputDecoration(
-                                          labelText: 'Nama Paket',
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        keyboardType: TextInputType.text,
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return 'nama paket harus diisi';
-                                          }
+                            customTextField(
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Nama paket harus diisi';
+                                }
+                                return null;
+                              },
+                              controller: controller.namaPaket.value,
+                              labelText: 'Nama paket',
+                            ),
 
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                )),
+                            customTextField(
+                                readOnly: true,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'harga modal harus diisi';
+                                  }
+                                  return null;
+                                },
+                                controller: controller.hargaModal.value,
+                                labelText: 'Harga modal',
+                                inputFormatters: [ThousandsFormatter()],
+                                keyboardType: TextInputType.number),
 
-                            Padding(
-                                padding: AppPading.customBottomPadding(),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextFormField(
-                                        readOnly: true,
-                                        controller: controller.hargaModal.value,
-                                        inputFormatters: [ThousandsFormatter()],
-                                        decoration: InputDecoration(
-                                          labelText: 'Harga modal',
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        keyboardType: TextInputType.number,
-                                        // validator: (value) {
-                                        //   if (value!.isEmpty) {
-                                        //     return 'Harga modal harus diisi';
-                                        //   }
-                                        //   if (double.parse(controller
-                                        //           .hargaModal.value.text
-                                        //           .replaceAll(',', '')) <
-                                        //       double.parse(controller.hpp.value.text
-                                        //           .replaceAll(',', ''))) {
-                                        //     return 'harga modal harus >= dengan HPP';
-                                        //   }
-                                        //   return null;
-                                        // },
-                                      ),
-                                    ),
-                                  ],
-                                )),
+                            customTextField(
+                                readOnly: true,
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'HPP harus diisi';
+                                  }
+                                  return null;
+                                },
+                                controller: controller.hpp.value,
+                                labelText: 'HPP',
+                                inputFormatters: [ThousandsFormatter()],
+                                keyboardType: TextInputType.number),
 
-                            Padding(
-                                padding: AppPading.customBottomPadding(),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextFormField(
-                                        readOnly: true,
-                                        controller: controller.hpp.value,
-                                        inputFormatters: [ThousandsFormatter()],
-                                        decoration: InputDecoration(
-                                          labelText: 'HPP',
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        keyboardType: TextInputType.number,
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return 'HPP harus diisi';
-                                          }
-                                          // if (double.parse(controller
-                                          //         .hargaJualEceran.value.text
-                                          //         .replaceAll(',', '')) <
-                                          //     double.parse(controller.hpp.value.text
-                                          //         .replaceAll(',', ''))) {
-                                          //   return 'harga eceran harus >= HPP';
-                                          // }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                    // Container(
-                                    //     margin: EdgeInsets.only(left: 15),
-                                    //     decoration: BoxDecoration(
-                                    //         shape: BoxShape.circle,
-                                    //         color: AppColor.primary),
-                                    //     child: IconButton(
-                                    //         onPressed: () {},
-                                    //         icon: Icon(
-                                    //           Icons.add,
-                                    //           color: Colors.white,
-                                    //         )))
-                                  ],
-                                )),
-
-                            Padding(
-                                padding: AppPading.customBottomPadding(),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextFormField(
-                                        controller:
-                                            controller.hargaJualPaket.value,
-                                        inputFormatters: [ThousandsFormatter()],
-                                        decoration: InputDecoration(
-                                          labelText: 'Harga Jual Paket',
-                                          border: OutlineInputBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(10),
-                                          ),
-                                        ),
-                                        keyboardType: TextInputType.number,
-                                        validator: (value) {
-                                          if (value!.isEmpty) {
-                                            return 'Harga Jual paket harus diisi';
-                                          }
-                                          if (double.parse(controller
-                                                  .hargaJualPaket.value.text
-                                                  .replaceAll(',', '')) <
-                                              double.parse(controller
-                                                  .hpp.value.text
-                                                  .replaceAll(',', ''))) {
-                                            return 'harga jual paket harus >= HPP';
-                                          }
-                                          return null;
-                                        },
-                                      ),
-                                    ),
-                                  ],
-                                )),
+                            customTextField(
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Harga Jual paket harus diisi';
+                                  }
+                                  if (double.parse(controller
+                                          .hargaJualPaket.value.text
+                                          .replaceAll(',', '')) <
+                                      double.parse(controller.hpp.value.text
+                                          .replaceAll(',', ''))) {
+                                    return 'harga jual paket harus >= HPP';
+                                  }
+                                  return null;
+                                },
+                                controller: controller.hargaJualPaket.value,
+                                labelText: 'Harga jual paket',
+                                inputFormatters: [ThousandsFormatter()],
+                                keyboardType: TextInputType.number),
 
                             Padding(
                               padding: AppPading.customBottomPadding(),
@@ -601,12 +513,15 @@ class TambahPaketProduk extends GetView<TambahPaketProdukController> {
                                             Expanded(
                                               child: Obx(() {
                                                 return TextFormField(
+                                                  style: AppFont.regular(),
                                                   inputFormatters: [
                                                     ThousandsFormatter()
                                                   ],
                                                   controller:
                                                       controller.diskon.value,
                                                   decoration: InputDecoration(
+                                                    labelStyle:
+                                                        AppFont.regular(),
                                                     prefixIcon: controller
                                                                 .selecteddiskon
                                                                 .value ==
@@ -749,86 +664,38 @@ class TambahPaketProduk extends GetView<TambahPaketProdukController> {
                             }),
 
                             controller.pajakdisplay.value == true
-                                ? Padding(
-                                    padding: AppPading.customBottomPadding(),
-                                    child: Row(
-                                      children: [
-                                        Expanded(
-                                          child: DropdownButtonFormField2(
-                                            // key: UniqueKey(),
-                                            decoration: InputDecoration(
-                                              border: OutlineInputBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(10),
-                                              ),
-                                            ),
-                                            // validator: (value) {
-                                            //   if (value == null) {
-                                            //     return 'Sub Kategori dipilih';
-                                            //   }
-                                            //   return null;
-                                            // },
-                                            isExpanded: true,
-                                            dropdownStyleData:
-                                                DropdownStyleData(
-                                                    decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        color: Colors.white)),
-                                            hint: Text('Pajak (opsional)',
-                                                style: AppFont.regular()),
-                                            value: controller.pajakValue,
-                                            items:
-                                                controller.pajakList.map((x) {
-                                              return DropdownMenuItem(
-                                                child: Text(x.nama_pajak! +
-                                                    ' - ' +
-                                                    ' ${NumberFormat('#,###').format(x.nominal_pajak)} %'),
-                                                value: x.uuid,
-                                              );
-                                            }).toList(),
-                                            onChanged: (val) {
-                                              controller.pajakValue = val;
-                                              var matchingPajak = controller
-                                                  .pajakList
-                                                  .firstWhere(
-                                                (e) => e.uuid == val,
-                                              );
+                                ? customDropdownField(
+                                    hintText: 'Pajak',
+                                    items: controller.pajakList.map((x) {
+                                      return DropdownMenuItem(
+                                        child: Text(x.nama_pajak! +
+                                            ' - ' +
+                                            '' +
+                                            x.nominal_pajak!.toString() +
+                                            '%'),
+                                        value: x.uuid,
+                                      );
+                                    }).toList(),
+                                    value: controller.pajakValue,
+                                    onChanged: (val) {
+                                      controller.pajakValue = val;
+                                      var matchingPajak =
+                                          controller.pajakList.firstWhere(
+                                        (e) => e.uuid == val,
+                                      );
 
-                                              // If a matching pajak is found, update nominalPajak
-                                              if (matchingPajak != null) {
-                                                controller.nominalPajak.value
-                                                        .text =
-                                                    matchingPajak.nominal_pajak
-                                                        .toString();
-                                              } else {
-                                                // Handle the case where no matching pajak is found
-                                                controller.nominalPajak.value
-                                                        .text =
-                                                    '0'; // or any default value
-                                              }
-                                              print(controller.pajakValue);
-                                            },
-                                          ),
-                                        ),
-                                        Container(
-                                            margin: EdgeInsets.only(left: 15),
-                                            decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: AppColor.primary),
-                                            child: IconButton(
-                                                onPressed: () {
-                                                  Get.toNamed(
-                                                    '/tambahpajak',
-                                                  );
-                                                },
-                                                icon: Icon(
-                                                  Icons.add,
-                                                  color: Colors.white,
-                                                ))),
-                                      ],
-                                    ),
+                                      // If a matching pajak is found, update nominalPajak
+                                      if (matchingPajak != null) {
+                                        controller.nominalPajak.value.text =
+                                            matchingPajak.nominal_pajak
+                                                .toString();
+                                      } else {
+                                        // Handle the case where no matching pajak is found
+                                        controller.nominalPajak.value.text =
+                                            '0'; // or any default value
+                                      }
+                                      print(controller.pajakValue);
+                                    },
                                   )
                                 : Container(),
 

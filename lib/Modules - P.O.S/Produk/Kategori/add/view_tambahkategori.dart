@@ -33,66 +33,37 @@ class TambahSubKategori extends GetView<TambahSubKategoriController> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField2(
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'kategori harus dipilih';
-                                }
-                                return null;
-                              },
-                              isExpanded: true,
-                              dropdownStyleData: DropdownStyleData(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white)),
-                              hint: Text('Kategori', style: AppFont.regular()),
-                              value: controller.kategorivalue,
-                              items: controller.kategoriprodukList.map((x) {
-                                return DropdownMenuItem(
-                                  child: Text(x.namakelompok!),
-                                  value: x.uuid,
-                                );
-                              }).toList(),
-                              onChanged: (val) {
-                                controller.kategorivalue = val;
-                                print(controller.kategorivalue);
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
+                    return customDropdownField(
+                      validator: (value) {
+                        if (value == null) {
+                          return 'kategori harus dipilih';
+                        }
+                        return null;
+                      },
+                      hintText: 'Kategori produk',
+                      items: controller.kategoriprodukList.map((x) {
+                        return DropdownMenuItem(
+                          child: Text(x.namakelompok!),
+                          value: x.uuid,
+                        );
+                      }).toList(),
+                      value: controller.kategorivalue,
+                      onChanged: (val) {
+                        controller.kategorivalue = val;
+                        print(controller.kategorivalue);
+                      },
                     );
                   }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.nama.value,
-                        decoration: InputDecoration(
-                          labelText: 'Sub Kategori Produk',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Kategori harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Sub kategori harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.nama.value,
+                      keyboardType: TextInputType.text,
+                      labelText: 'Sub kategori produk'),
                   button_solid_custom(
                       onPressed: () {
                         if (controller.registerKey.value.currentState!

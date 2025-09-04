@@ -39,7 +39,9 @@ class DetailPromo extends GetView<DetailPromoController> {
                   Divider(height: 0, thickness: 0.5),
                   _buildDetailTile(
                       title: 'Masa promo',
-                      value: controller.date1 + ' - ' + controller.date2),
+                      value: AppFormat().dateFormat(controller.date1) +
+                          ' - ' +
+                          AppFormat().dateFormat(controller.date2)),
                   Divider(height: 0, thickness: 0.5),
                   _buildDetailTile(
                       title: 'Keterangan', value: controller.data.keterangan!),

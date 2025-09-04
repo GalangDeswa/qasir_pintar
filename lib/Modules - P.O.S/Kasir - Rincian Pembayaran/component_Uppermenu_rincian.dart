@@ -18,11 +18,14 @@ class UppermenuRincian extends GetView<KasirController> {
           children: [
             Expanded(
               child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    'Total tagihan',
-                    style: AppFont.regular_white(),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: 5),
+                    child: Text(
+                      'Total tagihan',
+                      style: AppFont.regular_white_bold(fontSize: 15),
+                    ),
                   ),
                   Text(
                     'Rp. ' + AppFormat().numFormat(controller.total.value),

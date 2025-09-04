@@ -9,8 +9,10 @@ import 'package:meta/meta.dart';
 
 import 'package:qasir_pintar/Widget/popscreen.dart';
 
+import '../../Config/config.dart';
 import '../../Database/DB_helper.dart';
 import '../../Services/BoxStorage.dart';
+import '../../Widget/widget.dart';
 import '../Auth/login karyawan pin/view_loginpin.dart';
 import '../Home/view_home.dart';
 import '../Kasir/model_penjualan.dart';
@@ -58,6 +60,87 @@ class BasemenuController extends GetxController {
   var totalpenjualan = 0.obs;
   var totaluang = 0.0.obs;
   var groupedPenjualan = <DataPenjualanByDate>[].obs;
+
+  void logout() {
+    Get.dialog(AlertDialog(
+      backgroundColor: Colors.white,
+      surfaceTintColor: Colors.white,
+      title: header(
+        title: 'Log out',
+        icon: Icons.warning,
+        icon_color: AppColor.warning,
+      ),
+      contentPadding: EdgeInsets.all(10),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(
+          Radius.circular(12.0),
+        ),
+      ),
+      content: Builder(
+        builder: (context) {
+          return Container(
+              margin: EdgeInsets.all(10),
+              width: context.res_width / 2.6,
+              height: context.res_height / 4.5,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  Text(
+                    "Yakin ingin logout?",
+                    style: AppFont.regular_bold(),
+                  ),
+                  SizedBox(
+                    height: 10,
+                  ),
+                  button_solid_custom(
+                    onPressed: () {
+                      box.remove('user_id');
+                      box.remove('uuid');
+                      box.remove('user_name');
+                      box.remove('user_email');
+                      box.remove('user_phone');
+                      box.remove('user_ref_code');
+                      box.remove('user_business_name');
+                      box.remove('user_pin');
+                      box.remove('user_logo');
+                      box.remove('user_business_type_id');
+                      box.remove('user_province_id');
+                      box.remove('user_district_id');
+                      box.remove('user_regency_id');
+                      box.remove('user_address');
+                      box.remove('user_package_id');
+                      box.remove('user_start_date');
+                      box.remove('user_end_date');
+                      box.remove('status');
+                      box.remove('user_logo_url');
+                      box.remove('user_register_date');
+                      box.remove('user_status');
+
+                      Get.offAllNamed('/login');
+                    },
+                    child: Text(
+                      'Log out',
+                      style: AppFont.regular_white_bold(),
+                    ),
+                    width: context.res_width,
+                  ),
+                  button_border_custom(
+                    onPressed: () {
+                      Get.back();
+                    },
+                    child: Text(
+                      'Batal',
+                      style: AppFont.regular(),
+                    ),
+                    width: context.res_width,
+                  )
+                ],
+              ));
+        },
+      ),
+    ));
+  }
+
   fetchRiwayatPenjualan({id_toko}) async {
     print('-------------------fetch produk local---------------------');
 

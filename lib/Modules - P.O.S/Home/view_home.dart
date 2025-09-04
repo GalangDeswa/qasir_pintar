@@ -1,4 +1,3 @@
-import 'package:bluetooth_print_plus/bluetooth_print_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -6,10 +5,13 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:intl/intl.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:qasir_pintar/Config/config.dart';
 import 'package:qasir_pintar/Modules - P.O.S/Base%20menu/controller_basemenu.dart';
 import 'package:qasir_pintar/Services/BoxStorage.dart';
+import 'package:qasir_pintar/Services/Handler.dart';
+import 'package:qasir_pintar/Widget/widget.dart';
 
 import '../../Controllers/CentralController.dart';
 import '../../Controllers/printerController.dart';
@@ -34,11 +36,19 @@ class HomeScreen extends GetView<BasemenuController> {
               Container(
                 height: context.res_height * 0.14,
                 decoration: BoxDecoration(
-                    gradient: AppGradient.customGradientv2(),
-                    color: AppColor.primary,
-                    borderRadius: BorderRadius.only(
-                        bottomLeft: Radius.circular(15),
-                        bottomRight: Radius.circular(15))),
+                  // image: DecorationImage(
+                  //     colorFilter: ColorFilter.mode(
+                  //         AppColor.primary.withValues(alpha: 0.15),
+                  //         BlendMode.dstATop),
+                  //     fit: BoxFit.cover,
+                  //     image: AssetImage('assets/images/bg.png')),
+                  gradient: AppGradient.customGradientv2(),
+                  color: AppColor.primary,
+                  borderRadius: BorderRadius.only(
+                    bottomLeft: Radius.circular(15),
+                    bottomRight: Radius.circular(15),
+                  ),
+                ),
               ),
               Positioned(
                 top: 20, // Background height + margin
@@ -49,12 +59,14 @@ class HomeScreen extends GetView<BasemenuController> {
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage('assets/images/bgcard.png'),
-                        fit: BoxFit.cover,
-                        opacity: 0.35,
-                        colorFilter: ColorFilter.mode(
-                            Colors.greenAccent.withOpacity(0.2),
-                            BlendMode.multiply)),
+                      image: AssetImage('assets/images/bgcard.png'),
+                      fit: BoxFit.cover,
+                      opacity: 0.35,
+                      colorFilter: ColorFilter.mode(
+                        Colors.greenAccent.withOpacity(0.2),
+                        BlendMode.multiply,
+                      ),
+                    ),
                     gradient: AppGradient.customGradient(),
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
@@ -73,9 +85,11 @@ class HomeScreen extends GetView<BasemenuController> {
                       Padding(
                         padding: AppPading.customBottomPadding(),
                         child: Text(
-                            DateFormat('EEEE, dd MMMM yyyy')
-                                .format(DateTime.now()),
-                            style: AppFont.regular_white_bold()),
+                          DateFormat(
+                            'EEEE, dd MMMM yyyy',
+                          ).format(DateTime.now()),
+                          style: AppFont.regular_white_bold(),
+                        ),
                       ),
                       Expanded(
                         child: Row(
@@ -93,7 +107,8 @@ class HomeScreen extends GetView<BasemenuController> {
                                     return Text(
                                       'Rp. ' +
                                           AppFormat().numFormat(
-                                              controller.netProfit.value),
+                                            controller.netProfit.value,
+                                          ),
                                       style: TextStyle(
                                         fontSize: 20,
                                         color: Colors.white,
@@ -122,8 +137,10 @@ class HomeScreen extends GetView<BasemenuController> {
                                   SizedBox(height: 1),
                                   Obx(() {
                                     return Text(
-                                      AppFormat().moneyFormat(controller
-                                          .summary.first.totalKeuntungan),
+                                      AppFormat().moneyFormat(
+                                        controller
+                                            .summary.first.totalKeuntungan,
+                                      ),
                                       style: AppFont.regular_white_bold(),
                                     );
                                   }),
@@ -135,8 +152,10 @@ class HomeScreen extends GetView<BasemenuController> {
                                   SizedBox(height: 1),
                                   Obx(() {
                                     return Text(
-                                      AppFormat().moneyFormat(controller
-                                          .summary.first.totalJumlahBeban),
+                                      AppFormat().moneyFormat(
+                                        controller
+                                            .summary.first.totalJumlahBeban,
+                                      ),
                                       style: AppFont.regular_white_bold(),
                                     );
                                   }),
@@ -181,11 +200,9 @@ class HomeScreen extends GetView<BasemenuController> {
           ),
 
           //summary
+          SizedBox(height: context.res_height * 0.10),
 
-          SizedBox(height: context.res_height * 0.13),
           // Shortcut Icons
-
-          //TODO : validasi role
 
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 20),
@@ -193,80 +210,94 @@ class HomeScreen extends GetView<BasemenuController> {
               crossAxisAlignment: CrossAxisAlignment.center,
               //mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Container(
-                  padding: EdgeInsets.all(5),
-                  decoration: BoxDecoration(
-                      color: AppColor.primary,
-                      borderRadius: BorderRadius.circular(10)),
-                  child: Text(
-                    'Welcome',
-                    style: AppFont.regular_white_bold(fontSize: 20),
-                  ),
-                ),
-                Expanded(
-                  child: Container(
-                      margin: EdgeInsets.only(left: 10),
-                      width: Get.width,
-                      height: 3,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: AppColor.primary)),
-                )
+                // Container(
+                //   padding: EdgeInsets.all(5),
+                //   decoration: BoxDecoration(
+                //     color: AppColor.primary,
+                //     borderRadius: BorderRadius.circular(10),
+                //   ),
+                //   child: Text(
+                //     'Welcome',
+                //     style: AppFont.regular_white_bold(fontSize: 20),
+                //   ),
+                // ),
+                // Expanded(
+                //   child: Container(
+                //     margin: EdgeInsets.only(left: 10),
+                //     width: Get.width,
+                //     height: 3,
+                //     decoration: BoxDecoration(
+                //       borderRadius: BorderRadius.circular(12),
+                //       color: AppColor.primary,
+                //     ),
+                //   ),
+                // ),
               ],
             ),
           ),
           Padding(
             padding: AppPading.defaultBodyPadding(),
-            child: Container(
-              decoration: BoxDecoration(
+            child: Card(
+              color: Colors.white,
+              elevation: 2,
+              child: Container(
+                decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(12),
-                  color: Colors.cyan.withValues(alpha: 0.1)),
-              padding: EdgeInsets.all(25),
-              width: Get.width,
-              //height: Get.height * 0.15,
-              //TODO : kasir sistem buka tutup / db proper constraint
-              child: Wrap(
-                crossAxisAlignment: WrapCrossAlignment.center,
-                alignment: WrapAlignment.spaceBetween,
-                spacing: 30, // Horizontal space between icons
-                runSpacing: 20, // Vertical space between icons
-                children: [
-                  _buildShortcutIcon(
-                    'assets/icons/inventory.svg',
-                    'Inventori',
-                    () {
-                      Get.toNamed('/basemenu_stock');
-                    },
-                  ),
-                  _buildShortcutIcon(
-                    'assets/icons/employe.svg',
-                    'Karyawan',
-                    () {
-                      Get.toNamed('/karyawan');
-                    },
-                  ),
-                  _buildShortcutIcon(
-                    'assets/icons/box.svg',
-                    'Produk',
-                    () {
-                      //nav.toProduk();
-                      Get.toNamed('/basemenuproduk');
-                      // Navigator.of(context).push(MaterialPageRoute(
-                      //     builder: (context) => PhysicsAndSnapGridExample()));
-                    },
-                  ),
-                  _buildShortcutIcon(
-                    'assets/icons/receipt.svg',
-                    'Riwayat',
-                    () {
+                  //color: Colors.cyan.withValues(alpha: 0.1),
+                ),
+                padding: EdgeInsets.all(25),
+                width: Get.width,
+                //height: Get.height * 0.15,
+                child: Wrap(
+                  crossAxisAlignment: WrapCrossAlignment.center,
+                  alignment: WrapAlignment.spaceBetween,
+                  spacing: 30, // Horizontal space between icons
+                  runSpacing: 20, // Vertical space between icons
+                  children: [
+                    _buildShortcutIcon(
+                      'assets/icons/inventory.svg',
+                      'Inventori',
+                      () {
+                        Get.toNamed('/basemenu_stock');
+                      },
+                    ),
+                    _buildShortcutIcon(
+                      'assets/icons/customer.svg',
+                      'Pelanggan',
+                      () {
+                        Get.toNamed('/basemenupelanggan');
+                      },
+                    ),
+                    // _buildShortcutIcon(
+                    //   'assets/icons/box.svg',
+                    //   'Produk',
+                    //   () {
+                    //     //nav.toProduk();
+                    //     Get.toNamed('/basemenuproduk');
+                    //     // Navigator.of(context).push(MaterialPageRoute(
+                    //     //     builder: (context) => PhysicsAndSnapGridExample()));
+                    //   },
+                    // ),
+                    _buildShortcutIcon('assets/icons/receipt.svg', 'Riwayat',
+                        () {
                       Get.toNamed('/history');
-                    },
-                  ),
-                  // Add more icons as needed
-                ],
+                    }),
+                    // Add more icons as needed
+                  ],
+                ),
               ),
             ),
           ),
+
+          button_solid_custom(
+            onPressed: () async {
+              final api = Get.find<API>();
+              api.fetchProduk();
+            },
+            child: Text('api prduk'),
+            width: Get.width,
+          ),
+
           SizedBox(height: 25),
           // Recent Transactions
           // Padding(
@@ -433,18 +464,11 @@ class HomeScreen extends GetView<BasemenuController> {
               color: Colors.blue.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: SvgPicture.asset(
-              iconPath,
-              width: 35,
-              height: 35,
-            ),
+            child: SvgPicture.asset(iconPath, width: 35, height: 35),
           ),
         ),
         SizedBox(height: 15),
-        Text(
-          label,
-          style: AppFont.regular_bold(),
-        ),
+        Text(label, style: AppFont.regular_bold()),
       ],
     );
   }

@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:http/http.dart' as http;
 
+import '../Modules - P.O.S/Produk/Data produk/model_produk.dart';
 import '../Widget/widget.dart';
 import 'API.dart';
 
@@ -94,9 +95,9 @@ class check_conn {
     } on SocketException catch (e) {
       print('Not connected to the Internet: $e');
       Get.showSnackbar(
-        toast().bottom_snackbar_error(
+        toast().bottom_snackbar_connection_error(
           'Error',
-          'Check your internet connection: $e',
+          'PERIKSA KONEKSI INTERNET --> : $e',
         ),
       );
     }
@@ -105,6 +106,14 @@ class check_conn {
 }
 
 class API extends GetConnect {
+  @override
+  void onInit() {
+    print('GetConnect on init -->');
+    httpClient.baseUrl =
+        'https://adminmarket.tubinnews.com/api/'; // change to your real base URL
+    super.onInit();
+  }
+
   static Future<dynamic> login(
       {required String email, required String password}) async {
     try {
@@ -295,6 +304,31 @@ class API extends GetConnect {
     } catch (e) {
       print('Error: $e');
       return null;
+    }
+  }
+
+  // Fetch all produk
+  Future<List<DataProdukApi>> fetchProduk() async {
+    final bool check = await check_conn.checkInternetConnection();
+    if (!check) {
+      print(' tidak ada koenksi');
+      return Future.error("No internet connection");
+    }
+
+    final response =
+        await post("employee/products", {}); // adjust endpoint if needed
+
+    if (response.status.hasError) {
+      // Get.showSnackbar(toast().bottom_snackbar_connection_error(
+      //     response.statusCode.toString(), response.statusText));
+      return Future.error(response.statusText ?? "Unknown Error");
+    } else {
+      // response.body is already decoded JSON
+      final data = response.body['product'] as List<dynamic>;
+      final meta = response.body['meta'];
+      print(data);
+      print(meta);
+      return data.map((e) => DataProdukApi.fromJsondb(e)).toList();
     }
   }
 }

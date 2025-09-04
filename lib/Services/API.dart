@@ -1,5 +1,5 @@
 class server {
-  final String host = 'https://pos.bangkareem.com/api/';
+  final String host = 'https://adminmarket.tubinnews.com/api/';
 }
 
 class Link {
@@ -20,4 +20,6 @@ class Link {
   Uri GET_district(int province, int regency) {
     return Uri.parse(server().host + 'region/district/$province/$regency');
   }
+
+  final Uri GET_productsAPI = Uri.parse(server().host + 'employee/products');
 }

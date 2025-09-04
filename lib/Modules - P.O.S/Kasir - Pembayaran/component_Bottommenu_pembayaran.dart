@@ -16,6 +16,7 @@ class BottomMenuPembayaran extends GetView<KasirController> {
   @override
   Widget build(BuildContext context) {
     var con = Get.find<CentralPelangganController>();
+    var conpromo = Get.find<CentralPromoController>();
     return Column(
       children: [
         Obx(() {
@@ -113,7 +114,7 @@ class BottomMenuPembayaran extends GetView<KasirController> {
                                 children: [
                                   Text('Promo', style: AppFont.regular()),
                                   Text(
-                                      controller.promolist
+                                      conpromo.promo
                                                   .where((nilai) =>
                                                       nilai.uuid ==
                                                       controller.promolistvalue)
@@ -121,8 +122,8 @@ class BottomMenuPembayaran extends GetView<KasirController> {
                                                   .promoNominal !=
                                               0.0
                                           ? 'Rp. ' +
-                                              AppFormat().numFormat(controller
-                                                  .promolist
+                                              AppFormat().numFormat(conpromo
+                                                  .promo
                                                   .where((promo) =>
                                                       promo.uuid ==
                                                       controller.promolistvalue
@@ -131,7 +132,7 @@ class BottomMenuPembayaran extends GetView<KasirController> {
                                                   .promoNominal) +
                                               '  ' +
                                               '(' +
-                                              controller.promolist
+                                              conpromo.promo
                                                   .where((promo) =>
                                                       promo.uuid ==
                                                       controller.promolistvalue
@@ -140,7 +141,7 @@ class BottomMenuPembayaran extends GetView<KasirController> {
                                                   .namaPromo! +
                                               ')'
                                           : '% ' +
-                                              controller.promolist
+                                              conpromo.promo
                                                   .where((promo) =>
                                                       promo.uuid ==
                                                       controller.promolistvalue
@@ -150,7 +151,7 @@ class BottomMenuPembayaran extends GetView<KasirController> {
                                                   .toString()! +
                                               '  '
                                                   '(' +
-                                              controller.promolist
+                                              conpromo.promo
                                                   .where((promo) =>
                                                       promo.uuid ==
                                                       controller.promolistvalue

@@ -208,10 +208,10 @@ class UpperMenuKasir extends GetView<KasirController> {
         Container(
           margin: EdgeInsets.only(top: 10),
           width: Get.width,
-          padding: EdgeInsets.all(10),
-          //TODO : UI IMPROVEMENT
-          color: Colors.cyan.withValues(alpha: 0.25),
-          height: Get.height / 14,
+          padding: EdgeInsets.all(5),
+
+          // color: Colors.grey.withValues(alpha: 0.1),
+
           child: Obx(() {
             return GroupButton(
               isRadio: true,

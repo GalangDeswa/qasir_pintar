@@ -121,7 +121,8 @@ class TambahKategoriBebanController extends GetxController {
   }
 
   tambahKategoriBeban() async {
-    print('-------------------tambah beban local---------------------');
+    print(
+        '-------------------tambah kategori beban local---------------------');
 
     Get.dialog(showloading(), barrierDismissible: false);
     var uuid = Uuid().v4();

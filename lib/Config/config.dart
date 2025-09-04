@@ -45,11 +45,29 @@ class AppFont {
     );
   }
 
+  static TextStyle small_bold(
+      {double fontSize = 10, Color color = Colors.black}) {
+    return TextStyle(
+      fontSize: fontSize,
+      color: color,
+      fontWeight: FontWeight.w900,
+    );
+  }
+
   static TextStyle small_white(
       {double fontSize = 10, Color color = Colors.white}) {
     return TextStyle(
       fontSize: fontSize,
       color: color,
+    );
+  }
+
+  static TextStyle small_white_bold(
+      {double fontSize = 10, Color color = Colors.white}) {
+    return TextStyle(
+      fontSize: fontSize,
+      color: color,
+      fontWeight: FontWeight.w900,
     );
   }
 

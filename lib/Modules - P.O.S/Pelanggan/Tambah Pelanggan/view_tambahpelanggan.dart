@@ -198,131 +198,78 @@ class TambahPelanggan extends GetView<TambahPelangganController> {
                         child: Text('Tambah dari kontak'),
                         width: context.res_width),
                   ),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nama pelanggan harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.nama.value,
+                      keyboardType: TextInputType.text,
+                      labelText: 'Nama pelanggan'),
+                  customTextField(
+                      controller: controller.email.value,
+                      keyboardType: TextInputType.emailAddress,
+                      labelText: 'Email (opsional)'),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'nomor hp harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.telepon.value,
+                      keyboardType: TextInputType.phone,
+                      labelText: 'Nomor hp'),
                   Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.nama.value,
-                        decoration: InputDecoration(
-                          labelText: 'Nama',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Nama harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.email.value,
-                        decoration: InputDecoration(
-                          labelText: 'Email (Optional)',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        // validator: (value) {
-                        //   if (value!.isEmpty) {
-                        //     return 'Email harus diisi';
-                        //   } else if (value.isEmail == false) {
-                        //     return 'Periksa format email';
-                        //   }
-                        //   return null;
-                        // },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.telepon.value,
-                        decoration: InputDecoration(
-                          labelText: 'Nomor telepon',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.phone,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Nomor telepon harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField2(
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Kategori pelanggan harus dipilih';
-                                }
-                                return null;
-                              },
-                              isExpanded: true,
-                              dropdownStyleData: DropdownStyleData(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white)),
-                              hint: Text('Kategori Pelanggan',
-                                  style: AppFont.regular()),
-                              value: controller.kategorivalue,
-                              items: controller.kategoripelangganList.map((x) {
-                                return DropdownMenuItem(
-                                  child: Text(x.kategori!),
-                                  value: x.uuid,
-                                );
-                              }).toList(),
-                              onChanged: (val) {
-                                controller.kategorivalue = val;
-                                print(controller.kategorivalue);
-                              },
-                            ),
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: customDropdownField(
+                            validator: (value) {
+                              if (value == null) {
+                                return 'kategori harus dipilih';
+                              }
+                              return null;
+                            },
+                            hintText: 'Kategori pelanggan',
+                            items: controller.kategoripelangganList.map((x) {
+                              return DropdownMenuItem(
+                                child: Text(x.kategori!),
+                                value: x.uuid,
+                              );
+                            }).toList(),
+                            value: controller.kategorivalue,
+                            onChanged: (val) {
+                              controller.kategorivalue = val;
+                              print(controller.kategorivalue);
+                            },
                           ),
-                          Container(
-                              margin: EdgeInsets.only(left: 15),
-                              decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: AppColor.primary),
-                              child: IconButton(
-                                  onPressed: () {
-                                    Get.toNamed('/tambahkategoripelanggan',
-                                        arguments: Get.put(
-                                            KategoriPelangganController()));
-                                  },
-                                  icon: Icon(
-                                    Icons.add,
-                                    color: Colors.white,
-                                  ))),
-                        ],
-                      ),
+                        ),
+                        Container(
+                            margin: EdgeInsets.only(left: 15),
+                            decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: AppColor.primary),
+                            child: IconButton(
+                                onPressed: () {
+                                  Get.toNamed('/tambahkategoripelanggan',
+                                      arguments: Get.put(
+                                          KategoriPelangganController()));
+                                },
+                                icon: Icon(
+                                  Icons.add,
+                                  color: Colors.white,
+                                ))),
+                      ],
                     );
                   }),
                   Padding(
                     padding: AppPading.customBottomPadding(),
                     child: Container(
                       child: TextFormField(
+                        style: AppFont.regular(),
                         onTap: () {
                           FocusScope.of(context).requestFocus(new FocusNode());
                           showDialog(
@@ -342,7 +289,7 @@ class TambahPelanggan extends GetView<TambahPelangganController> {
                                                     7 -
                                                 10,
                                             controlsTextStyle: TextStyle(
-                                              fontSize: 12, // Adjust font size
+                                              fontSize: 10, // Adjust font size
                                               fontWeight: FontWeight
                                                   .bold, // Make it bold
                                               color: Colors
@@ -351,7 +298,7 @@ class TambahPelanggan extends GetView<TambahPelangganController> {
 
                                             // Adjust day width based on screen width
                                             weekdayLabelTextStyle:
-                                                TextStyle(fontSize: 12),
+                                                TextStyle(fontSize: 10),
                                             weekdayLabels: [
                                               'Ming',
                                               'Sen',
@@ -388,35 +335,12 @@ class TambahPelanggan extends GetView<TambahPelangganController> {
                           focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10)),
                         ),
-                        // validator: (value) {
-                        //   if (value!.isEmpty) {
-                        //     return 'Pilih tanggal lahir';
-                        //   }
-                        //   return null;
-                        // },
                       ),
                     ),
                   ),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.alamat.value,
-                        decoration: InputDecoration(
-                          labelText: 'Alamat (Opsional)',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        // validator: (value) {
-                        //   if (value!.isEmpty) {
-                        //     return 'Alamat harus diisi';
-                        //   }
-                        //   return null;
-                        // },
-                      ),
-                    );
-                  }),
+                  customTextField(
+                      controller: controller.alamat.value,
+                      labelText: 'Alamat (opsional)'),
                   button_solid_custom(
                       onPressed: () {
                         if (controller.registerKey.value.currentState!

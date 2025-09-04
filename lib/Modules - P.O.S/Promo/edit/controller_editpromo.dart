@@ -43,6 +43,9 @@ class EditPromoController extends GetxController {
       selecteddiskon.value = 'Rp.';
     }
     isAktif.value = data.aktif == 1 ? true : false;
+    promovalue.value.text = data.promoNominal.toString() != '0.0'
+        ? AppFormat().numFormat(data.promoNominal)
+        : AppFormat().numFormat(data.promoPersen);
   }
 
   DataPromo data = Get.arguments;

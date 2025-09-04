@@ -26,104 +26,48 @@ class EditKaryawan extends GetView<EditKaryawanController> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nama karyawan harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.nama.value,
+                      labelText: 'Nama karyawan'),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Nomor hp harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.telepon.value,
+                      keyboardType: TextInputType.phone,
+                      labelText: 'Nomor Hp'),
+                  customTextField(
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Email harus disini';
+                        }
+                        return null;
+                      },
+                      controller: controller.email.value,
+                      keyboardType: TextInputType.emailAddress,
+                      labelText: 'Email'),
                   Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.nama.value,
-                        decoration: InputDecoration(
-                          labelText: 'Nama Karyawan',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.name,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Nama harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.telepon.value,
-                        decoration: InputDecoration(
-                          labelText: 'Nomor telepon',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.phone,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Nomor telepon harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: TextFormField(
-                        controller: controller.email.value,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10)),
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return 'Email harus diisi';
-                          }
-                          return null;
-                        },
-                      ),
-                    );
-                  }),
-                  Obx(() {
-                    return Padding(
-                      padding: AppPading.customBottomPadding(),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField2(
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                              ),
-                              validator: (value) {
-                                if (value == null) {
-                                  return 'Jabatan harus dipilih';
-                                }
-                                return null;
-                              },
-                              isExpanded: true,
-                              dropdownStyleData: DropdownStyleData(
-                                  decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white)),
-                              hint: Text('Jabatan', style: AppFont.regular()),
-                              value: controller.rolevalue,
-                              items: controller.rolelist.map((x) {
-                                return DropdownMenuItem(
-                                  child: Text(x),
-                                  value: x,
-                                );
-                              }).toList(),
-                              onChanged: (val) async {
-                                controller.rolevalue = val;
-                              },
-                            ),
-                          ),
-                        ],
-                      ),
+                    return customDropdownField(
+                      hintText: 'Pilih jabatan',
+                      items: controller.rolelist.map((x) {
+                        return DropdownMenuItem(
+                          child: Text(x),
+                          value: x,
+                        );
+                      }).toList(),
+                      value: controller.rolevalue,
+                      onChanged: (val) async {
+                        controller.rolevalue = val;
+                      },
                     );
                   }),
                   Obx(() {
@@ -152,11 +96,13 @@ class EditKaryawan extends GetView<EditKaryawanController> {
                         : Padding(
                             padding: AppPading.customBottomPadding(),
                             child: TextFormField(
+                              style: AppFont.regular(),
                               obscureText: controller.showpin.value,
                               controller: controller.pinlama.value,
                               keyboardType: TextInputType.number,
                               decoration: InputDecoration(
                                 labelText: 'PIN lama',
+                                labelStyle: AppFont.regular(),
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10)),
                                 suffixIcon: IconButton(
@@ -192,11 +138,13 @@ class EditKaryawan extends GetView<EditKaryawanController> {
                         : Padding(
                             padding: AppPading.customBottomPadding(),
                             child: TextFormField(
+                              style: AppFont.regular(),
                               obscureText: controller.showpin.value,
                               controller: controller.pin.value,
                               keyboardType: TextInputType.number,
                               decoration: InputDecoration(
                                 labelText: 'PIN baru',
+                                labelStyle: AppFont.regular(),
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10)),
                                 suffixIcon: IconButton(
@@ -229,6 +177,7 @@ class EditKaryawan extends GetView<EditKaryawanController> {
                         : Padding(
                             padding: AppPading.customBottomPadding(),
                             child: TextFormField(
+                              style: AppFont.regular(),
                               obscureText: controller.showkonpin.value,
                               controller: controller.konpin.value,
                               keyboardType: TextInputType.number,
@@ -244,6 +193,7 @@ class EditKaryawan extends GetView<EditKaryawanController> {
                                   },
                                 ),
                                 labelText: 'Konfirmasi PIN',
+                                labelStyle: AppFont.regular(),
                                 border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(10)),
                               ),
